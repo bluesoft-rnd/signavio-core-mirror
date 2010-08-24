@@ -103,43 +103,21 @@
 					"type":"Boolean",
 					"title":"CancelActivity",
 					"title_de":"Aktivität abbrechen",
-					"value":"",
+					"value":true,
 					"description":"Denotes whether the activity should be cancelled or not, i.e., whether the boundary catch event acts as an error or an escalation. If the activity is not cancelled, multiple instances of that handler can run concurrently.",
 					"description_de":"Kennzeichnet ob eine Aktivität abgebrochen werden soll.",
 					"readonly":false,
-					"optional":true
+					"optional":true,
+					"refToView": [
+						"frame",
+						"frame2"
+					]
 				}
 			]
 		},
  		{
  			"name":"catchEventAttributes",
  			"properties":[
- 				{
-					"id":"eventdefinitionref",
-					"type":"String",
-					"title":"EventDefinitionRef",
-					"title_de":"Ereignis-Definitions Referenz",
-					"value":"",
-					"description":"EventDefinitionRefs (EventDefinition) is an attribute that defines the type of reusable triggers expected for a catch Event.",
-					"description_de":"Das Attribut EreignisDefinitionsRef (EreignisDefinition) definiert einen wiederverwendbaren Auslösertyp für ein eintretendes Ereignis.",
-					"readonly":false,
-					"optional":true,
-					"length":"",
-					"wrapLines":true
-				},
-				{
-					"id":"eventdefinitions",
-					"type":"String",
-					"title":"EventDefinitions",
-					"title_de":"EreignisDefinitionen",
-					"value":"",
-					"description":"EventDefinitions (EventDefinition) is an attribute that defines the type of contained triggers expected for a catch Event.",
-					"description_de":"Das Attribut EreignisDefinitions (EreignisDefinition) definiert die beinhaltenten Auslöser für ein eintretendes Ereignis.",
-					"readonly":false,
-					"optional":true,
-					"length":"",
-					"wrapLines":true
-				},
 				{
 					"id":"dataoutputassociations",
 					"type":"String",
@@ -184,32 +162,6 @@
  		{
  			"name":"throwEventAttributes",
  			"properties":[
- 				{
-					"id":"eventdefinitionref",
-					"type":"String",
-					"title":"EventDefinitionRef",
-					"title_de":"Ereignis Definitions-Referenz",
-					"value":"",
-					"description":"EventDefinitionRefs (EventDefinition) is an attribute that defines the type of reusable triggers expected for a catch Event.",
-					"description_de":"Das Attribut EreignisDefinitionsRef (EreignisDefinition) definiert einen wiederverwendbaren Auslösertyp für ein eintretendes Ereignis.",
-					"readonly":false,
-					"optional":true,
-					"length":"",
-					"wrapLines":true
-				},
-				{
-					"id":"eventdefinitions",
-					"type":"String",
-					"title":"EventDefinitions",
-					"title_de":"EreignisDefinitionen",
-					"value":"",
-					"description":"EventDefinitions (EventDefinition) is an attribute that defines the type of contained triggers expected for a catch Event.",
-					"description_de":"Das Attribut EreignisDefinitions (EreignisDefinition) definiert die beinhaltenten Auslöser für ein eintretendes Ereignis.",
-					"readonly":false,
-					"optional":true,
-					"length":"",
-					"wrapLines":true
-				},
 				{
 					"id":"datainputassociations",
 					"type":"String",
@@ -252,40 +204,6 @@
  			]
  		},
  		{
- 			"name" : "compensationThrowing",
- 			"properties" : [
- 				{
- 					"id":"waitforcompletion",
-					"type":"Boolean",
-					"title":"Wait for completion",
-					"title_de":"Auf Fertigstellung warten",
-					"value":true,
-					"popular":true,
-					"description":"Determine whether a throw compensation is performed synchronously or asynchronously.",
-					"description_de":"Gibt an, ob die erzeugt Kompensierung synchron oder asynchron aufgerufen wird.",
-					"readonly":false,
-					"optional":true
- 				}
- 			]
- 		},
- 		{
- 			"name" : "compensation",
- 			"properties" : [
- 				{
- 					"id":"activityref",
-					"type":"String",
-					"title":"Activity reference",
-					"title_de":"Aktivitätsreferenz",
-					"value":"",
-					"popular":true,
-					"description":"The activity related to the compensation event",
-					"description_de":"Die Kompensierung betreffende Aktivität",
-					"readonly":false,
-					"optional":true
- 				}
- 			]
- 		},
- 		{
  			"name":"interrupting",
  			"properties":[
  				{
@@ -306,6 +224,186 @@
 				}
  			]
  		},
+		
+		// Event Definitions Attributes
+		
+		{
+ 			"name":"error",
+ 			"properties":[
+ 				{
+					"id":"errorname",
+					"type":"String",
+					"title":"Error Name",
+					"title_de":"Fehlername",
+					"value":"",
+					"description":"The name of an error definition.",
+					"description_de":"Name des definierten Fehlers",
+					"readonly":false,
+					"optional":true,
+					"popular": true
+				},
+				{
+					"id":"errorcode",
+					"type":"String",
+					"title":"Error Code",
+					"title_de":"Fehlercode",
+					"value":"",
+					"description":"The code of an error definition.",
+					"description_de":"Code des definierten Fehlers",
+					"readonly":false,
+					"optional":true,
+					"popular": true
+				}
+ 			]
+ 		},
+		{
+ 			"name":"escalation",
+ 			"properties":[
+ 				{
+					"id":"escalationname",
+					"type":"String",
+					"title":"Escalation Name",
+					"title_de":"Eskalationsname",
+					"value":"",
+					"description":"",
+					"description_de":"",
+					"readonly":false,
+					"optional":true,
+					"popular": true
+				},
+				{
+					"id":"escalationcode",
+					"type":"String",
+					"title":"Escalation Code",
+					"title_de":"Eskalationscode",
+					"value":"",
+					"description":"",
+					"description_de":"",
+					"readonly":false,
+					"optional":true,
+					"popular": true
+				}
+ 			]
+ 		},
+		{
+ 			"name":"message",
+ 			"properties":[
+ 				{
+					"id":"messagename",
+					"type":"String",
+					"title":"Message Name",
+					"title_de":"Nachrichtenname",
+					"value":"",
+					"description":"",
+					"description_de":"",
+					"readonly":false,
+					"optional":true,
+					"popular": true
+				},
+				{
+					"id":"operationname",
+					"type":"String",
+					"title":"Operation Name",
+					"title_de":"Anweisungsname",
+					"value":"",
+					"description":"",
+					"description_de":"",
+					"readonly":false,
+					"optional":true,
+					"popular": true
+				}
+ 			]
+ 		},
+		{
+ 			"name":"signal",
+ 			"properties":[
+ 				{
+					"id":"signalname",
+					"type":"String",
+					"title":"Signal Name",
+					"title_de":"Signalname",
+					"value":"",
+					"description":"",
+					"description_de":"",
+					"readonly":false,
+					"optional":true,
+					"popular": true
+				}
+ 			]
+ 		},
+		{
+ 			"name":"timer",
+ 			"properties":[
+ 				{
+					"id":"timedate",
+					"type":"String",
+					"title":"Time Date",
+					"title_de":"Datum",
+					"value":"",
+					"description":"",
+					"description_de":"",
+					"readonly":false,
+					"optional":true,
+					"popular": true
+				},
+				{
+					"id":"timecycle",
+					"type":"String",
+					"title":"Time Cycle",
+					"title_de":"Zeit-Zyklus",
+					"value":"",
+					"description":"",
+					"description_de":"",
+					"readonly":false,
+					"optional":true,
+					"popular": true
+				},
+				{
+					"id":"timeduration",
+					"type":"String",
+					"title":"Time Duration",
+					"title_de":"Dauer",
+					"value":"",
+					"description":"",
+					"description_de":"",
+					"readonly":false,
+					"optional":true,
+					"popular": true
+				}
+ 			]
+ 		},
+		{
+ 			"name":"compensation",
+ 			"properties":[
+ 				{
+ 					"id":"waitforcompletion",
+					"type":"Boolean",
+					"title":"Wait for completion",
+					"title_de":"Auf Fertigstellung warten",
+					"value":true,
+					"popular":true,
+					"description":"Determine whether a throw compensation is performed synchronously or asynchronously.",
+					"description_de":"Gibt an, ob die erzeugt Kompensierung synchron oder asynchron aufgerufen wird.",
+					"readonly":false,
+					"optional":true
+ 				},
+				{
+ 					"id":"activityref",
+					"type":"String",
+					"title":"Activity reference",
+					"title_de":"Aktivitätsreferenz",
+					"value":"",
+					"popular":true,
+					"description":"The activity related to the compensation event",
+					"description_de":"Die Kompensierung betreffende Aktivität",
+					"readonly":false,
+					"optional":true
+ 				}
+ 			]
+ 		},
+		
+		// End Event Definitions
+		
 		{
 			"name" : "diagram",
 			"properties" : [
@@ -1528,12 +1626,12 @@
 					"optional":true
 				},
 				{
-					"id":"script_language",
+					"id":"scriptformat",
 					"type":"String",
-					"title":"ScriptLanguage",
-					"title_de":"Skript Sprache",
+					"title":"ScriptFormat",
+					"title_de":"Skript Format",
 					"value":"",
-					"description":"Defines the script language. The script language MUST be provided if a script is provided.",
+					"description":"Defines the script format. The script format MUST be provided if a script is provided.",
 					"readonly":false,
 					"optional":true
 				},
@@ -3186,12 +3284,14 @@
 					"wrapLines":true
 				},
 				{
-					"id":"artifacttype",
+					"id":"textformat",
 					"type":"String",
-					"title":"ArtifactType",
-					"title_de":"Artefakttyp",
-					"value":"Annotation",
-					"description":"",
+					"title":"Text Format",
+					"title_de":"Textformat",
+					"popular":true,
+					"value":"text/plain",
+					"description":"This attribute identifies the format of the text. It MUST follow the mimetype format.",
+					"description_de":"Dieses Attribut definiert das Format des Textes.",
 					"readonly":true,
 					"optional":false,
 					"length":""
@@ -3519,6 +3619,7 @@
 				"baseAttributes",
 				"catchEventAttributes",
 				"interrupting",
+				"message",
 				"bgColor"
 			],
 			"roles": [
@@ -3559,6 +3660,7 @@
 				"baseAttributes",
 				"catchEventAttributes",
 				"interrupting",
+				"timer",
 				"bgColor"
 			],
 			"roles" : 			[
@@ -3599,6 +3701,7 @@
 				"baseAttributes",
 				"catchEventAttributes",
 				"interrupting",
+				"escalation",
 				"bgColor"
 			],
 			"roles" : [
@@ -3679,6 +3782,7 @@
 			"propertyPackages":[
 				"baseAttributes",
 				"catchEventAttributes",
+				"error",
 				"bgColor"
 			],
 			"roles": [
@@ -3717,8 +3821,8 @@
 			"propertyPackages":[
 				"baseAttributes",
 				"catchEventAttributes",
-				"bgColor",
-				"compensation"
+				"compensation",
+				"bgColor"
 			],
 			"roles": [
 				"all",
@@ -3757,6 +3861,7 @@
 				"baseAttributes",
 				"catchEventAttributes",
 				"interrupting",
+				"signal",
 				"bgColor"
 			],
 			"roles" : 			[
@@ -3880,8 +3985,8 @@
 			"icon":"catching/message.png",
 			"propertyPackages":[
 				"baseAttributes",
-				"interrupting",
 				"boundaryevent",
+				"message",
 				"bgColor"
 			],
 			"roles":[
@@ -3926,8 +4031,8 @@
 			"icon":"catching/timer.png",
 			"propertyPackages":[
 				"baseAttributes",
-				"interrupting",
 				"boundaryevent",
+				"timer",
 				"bgColor"
 			],
 			"roles":[
@@ -3974,8 +4079,8 @@
 			"propertyPackages":[
 				"baseAttributes",
 				"catchEventAttributes",
-				"interrupting",
 				"boundaryevent",
+				"escalation",
 				"bgColor"
 			],
 			"roles":[
@@ -4018,7 +4123,6 @@
 			"propertyPackages":[
 				"baseAttributes",
 				"catchEventAttributes",
-				"interrupting",
 				"boundaryevent",
 				"condition",
 				"bgColor"
@@ -4119,6 +4223,7 @@
 				"baseAttributes",
 				"catchEventAttributes",
 				"boundaryevent",
+				"error",
 				"bgColor"
 			],
 			"roles":[
@@ -4246,6 +4351,7 @@
 				"catchEventAttributes",
 				"interrupting",
 				"boundaryevent",
+				"signal",
 				"bgColor"
 			],
 			"roles":[
@@ -4431,6 +4537,7 @@
 			"propertyPackages":[
 				"baseAttributes",
 				"throwEventAttributes",
+				"message",
 				"bgColor"
 			],
 			"roles":[
@@ -4470,6 +4577,7 @@
 			"propertyPackages":[
 				"baseAttributes",
 				"throwEventAttributes",
+				"escalation",
 				"bgColor"
 			],
 			"roles":[
@@ -4598,6 +4706,7 @@
 			"propertyPackages":[
 				"baseAttributes",
 				"throwEventAttributes",
+				"signal",
 				"bgColor"
 			],
 			"roles":[
@@ -4717,6 +4826,7 @@
 			"propertyPackages":[
 				"baseAttributes",
 				"throwingEventAttributes",
+				"message",
 				"bgColor"
 			],
 			"roles": [
@@ -4756,6 +4866,7 @@
 			"propertyPackages":[
 				"baseAttributes",
 				"throwingEventAttributes",
+				"escalation",
 				"bgColor"
 			],
 			"roles": [
@@ -4792,6 +4903,7 @@
 			"propertyPackages":[
 				"baseAttributes",
 				"catchEventAttributes",
+				"error",
 				"bgColor"
 			],
 			"roles": [
@@ -4908,6 +5020,7 @@
 			"propertyPackages":[
 				"baseAttributes",
 				"catchEventAttributes",
+				"signal",
 				"bgColor"
 			],
 			"roles": [
@@ -5028,7 +5141,8 @@
 			],
 			"roles": [
 				"all",
-				"ConnectingObjectsMorph"
+				"ConnectingObjectsMorph",
+				"fromtoall"
 			],
 			"properties":[
 				{
@@ -5116,7 +5230,8 @@
 			"icon":"connector/association.undirected.png",
 			"roles": [
 				"all",
-				"ConnectingObjectsMorph"
+				"ConnectingObjectsMorph",
+				"fromtoall"
 			],			
 			"propertyPackages" : [
 			    "dataAssociation"
@@ -5182,7 +5297,8 @@
 			"roles": [
 				"all",
 				"ConnectingObjectsMorph",
-				"Directed_Association"
+				"Directed_Association",
+				"fromtoall"
 			],
 			"propertyPackages" : [
 			    "dataAssociation"
@@ -5218,7 +5334,8 @@
 			"roles": [
 				"all",
 				"ConnectingObjectsMorph",
-				"Directed_Association"
+				"Directed_Association",
+				"fromtoall"
 			],			
 			"propertyPackages" : [
 			    "dataAssociation"
@@ -5256,7 +5373,8 @@
 			],
 			"roles": [
 				"ConnectingObjectsMorph",
-				"MessageContainer"
+				"MessageContainer",
+				"fromtoall"
 			]
 		}
 	],
