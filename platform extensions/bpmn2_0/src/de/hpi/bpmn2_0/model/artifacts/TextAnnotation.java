@@ -51,14 +51,18 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tTextAnnotation", propOrder = {
-    "text"
+    "text",
+    "textFormat"
 })
 public class TextAnnotation
     extends Artifact
 {
 
     protected String text;
+    protected String textFormat;
 
+    /* Getter & Setter */
+    
     /**
      * Gets the value of the text property.
      * 
@@ -71,7 +75,15 @@ public class TextAnnotation
         return text;
     }
 
-    /**
+    public String getTextFormat() {
+		return textFormat;
+	}
+
+	public void setTextFormat(String textFormat) {
+		this.textFormat = textFormat;
+	}
+
+	/**
      * Sets the value of the text property.
      * 
      * @param value

@@ -27,13 +27,19 @@ import org.oryxeditor.server.diagram.Shape;
 
 import de.hpi.bpmn2_0.annotations.StencilId;
 import de.hpi.bpmn2_0.exceptions.BpmnConverterException;
+import de.hpi.bpmn2_0.model.activity.Task;
+import de.hpi.bpmn2_0.model.activity.misc.Operation;
+import de.hpi.bpmn2_0.model.data_object.Message;
 import de.hpi.bpmn2_0.model.diagram.EventShape;
 import de.hpi.bpmn2_0.model.event.CompensateEventDefinition;
+import de.hpi.bpmn2_0.model.event.Escalation;
 import de.hpi.bpmn2_0.model.event.EscalationEventDefinition;
 import de.hpi.bpmn2_0.model.event.IntermediateThrowEvent;
 import de.hpi.bpmn2_0.model.event.LinkEventDefinition;
 import de.hpi.bpmn2_0.model.event.MessageEventDefinition;
 import de.hpi.bpmn2_0.model.event.SignalEventDefinition;
+import de.hpi.bpmn2_0.model.misc.Signal;
+import de.hpi.diagram.SignavioUUID;
 
 /**
  * Factory to create intermediate throwing events
@@ -109,6 +115,24 @@ public class IntermediateThrowEventFactory extends AbstractBpmnFactory {
 		IntermediateThrowEvent itEvent = new IntermediateThrowEvent();
 
 		MessageEventDefinition msgDef = new MessageEventDefinition();
+		
+		Message message = new Message();
+		Operation operation = new Operation();
+		
+		/* Message name */
+		String messageName = shape.getProperty("messagename");
+		if(messageName != null && !messageName.isEmpty()) {
+			message.setName(messageName);
+		}
+		
+		/* Operation name */
+		String operationName = shape.getProperty("operationname");
+		if(operationName != null && !operationName.isEmpty()) {
+			operation.setName(operationName);
+		}
+		
+		msgDef.setMessageRef(message);
+		msgDef.setOperationRef(operation);
 		itEvent.getEventDefinition().add(msgDef);
 		
 		return itEvent;
@@ -119,6 +143,22 @@ public class IntermediateThrowEventFactory extends AbstractBpmnFactory {
 		IntermediateThrowEvent itEvent = new IntermediateThrowEvent();
 
 		EscalationEventDefinition escalDef = new EscalationEventDefinition();
+		
+		Escalation escalation = new Escalation();
+		
+		/* Escalation name */
+		String escalationName = shape.getProperty("escalationname");
+		if(escalationName != null && !escalationName.isEmpty()) {
+			escalation.setName(escalationName);
+		}
+		
+		/* Escalation code */
+		String escalationCode = shape.getProperty("escalationcode");
+		if(escalationCode != null && !escalationCode.isEmpty()) {
+			escalation.setEscalationCode(escalationCode);
+		}
+		
+		escalDef.setEscalationRef(escalation);
 		itEvent.getEventDefinition().add(escalDef);
 		
 		return itEvent;
@@ -145,6 +185,23 @@ public class IntermediateThrowEventFactory extends AbstractBpmnFactory {
 		IntermediateThrowEvent itEvent = new IntermediateThrowEvent();
 
 		CompensateEventDefinition compDef = new CompensateEventDefinition();
+		
+		/* Activity Reference */
+		String activityRef = shape.getProperty("activityref");
+		if(activityRef != null && !activityRef.isEmpty()) {
+			Task taskRef = new Task();
+			taskRef.setId(activityRef);
+			compDef.setActivityRef(taskRef);
+		}
+		
+		/* Wait for Completion */
+		String waitForCompletion = shape.getProperty("waitforcompletion");
+		if(waitForCompletion != null && waitForCompletion.equals("false")) {
+			compDef.setWaitForCompletion(false);
+		} else {
+			compDef.setWaitForCompletion(true);
+		}
+		
 		itEvent.getEventDefinition().add(compDef);
 		
 		return itEvent;
@@ -156,6 +213,19 @@ public class IntermediateThrowEventFactory extends AbstractBpmnFactory {
 		IntermediateThrowEvent itEvent = new IntermediateThrowEvent();
 
 		SignalEventDefinition sigDef = new SignalEventDefinition();
+		
+		Signal signal = new Signal();
+		
+		/* Signal ID */
+		signal.setId(SignavioUUID.generate());
+		
+		/* Signal name */
+		String signalName = shape.getProperty("signalname");
+		if(signalName != null && !signalName.isEmpty()) {
+			signal.setName(signalName);
+		}
+		
+		sigDef.setSignalRef(signal);
 		itEvent.getEventDefinition().add(sigDef);
 		
 		return itEvent;

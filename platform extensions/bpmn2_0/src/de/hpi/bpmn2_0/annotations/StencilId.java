@@ -33,7 +33,6 @@ import java.lang.annotation.Target;
  * 
  * @author Sven Wagner-Boysen
  */
-
 @Target({
 	ElementType.TYPE,
 	ElementType.METHOD

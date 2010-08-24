@@ -23,12 +23,12 @@
 
 package de.hpi.bpmn2_0.model.connector;
 
-import java.util.UUID;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+
+import de.hpi.diagram.SignavioUUID;
 
 
 /**
@@ -69,7 +69,7 @@ public class DataOutputAssociation
 	 * @param dataAssociation
 	 */
 	public DataOutputAssociation(DataAssociation dataAssociation) {
-		this.id = UUID.randomUUID().toString();
+		this.id = SignavioUUID.generate();
 		this.assignment = dataAssociation.getAssignment();
 		this.documentation = dataAssociation.getDocumentation();
 		this.transformation = dataAssociation.getTransformation();

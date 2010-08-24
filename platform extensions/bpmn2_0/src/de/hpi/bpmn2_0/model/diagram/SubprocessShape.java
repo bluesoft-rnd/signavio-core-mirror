@@ -43,7 +43,7 @@ import de.hpi.bpmn2_0.model.diagram.activity.ActivityShape;
  * <pre>
  * &lt;complexType name="subprocessShapeType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://bpmndi.org}activityShapeType_1">
+ *     &lt;extension base="{http://www.omg.org/spec/BPMN/20100524/DI}activityShapeType_1">
  *       &lt;sequence>
  *         &lt;element name="laneCompRef" type="{http://www.w3.org/2001/XMLSchema}IDREF" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
@@ -56,14 +56,14 @@ import de.hpi.bpmn2_0.model.diagram.activity.ActivityShape;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "subprocessShapeType", namespace = "http://bpmndi.org", propOrder = {
+@XmlType(name = "subprocessShapeType", namespace = "http://www.omg.org/spec/BPMN/20100524/DI", propOrder = {
     "laneCompRef"
 })
 public class SubprocessShape
     extends ActivityShape
 {
 
-    @XmlElementRef(name = "laneCompRef", namespace = "http://bpmndi.org", type = JAXBElement.class)
+    @XmlElementRef(name = "laneCompRef", namespace = "http://www.omg.org/spec/BPMN/20100524/DI", type = JAXBElement.class)
     protected List<JAXBElement<Object>> laneCompRef;
     @XmlAttribute
     protected Boolean isExpanded;

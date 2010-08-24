@@ -55,10 +55,10 @@ import de.hpi.bpmn2_0.model.participant.Lane;
  * <pre>
  * &lt;complexType name="laneCompartmentType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://bpmndi.org}bpmnCompartmentType">
+ *     &lt;extension base="{http://www.omg.org/spec/BPMN/20100524/DI}bpmnCompartmentType">
  *       &lt;sequence>
- *         &lt;element ref="{http://bpmndi.org}bpmnShape" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="subLane" type="{http://bpmndi.org}laneCompartmentType_1" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element ref="{http://www.omg.org/spec/BPMN/20100524/DI}bpmnShape" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="subLane" type="{http://www.omg.org/spec/BPMN/20100524/DI}laneCompartmentType_1" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="laneRef" type="{http://www.w3.org/2001/XMLSchema}IDREF" />
  *     &lt;/extension>
@@ -69,7 +69,7 @@ import de.hpi.bpmn2_0.model.participant.Lane;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "laneCompartmentType", namespace = "http://bpmndi.org", propOrder = {
+@XmlType(name = "laneCompartmentType", namespace = "http://www.omg.org/spec/BPMN/20100524/DI", propOrder = {
     "bpmnShape",
     "subLane"
 })

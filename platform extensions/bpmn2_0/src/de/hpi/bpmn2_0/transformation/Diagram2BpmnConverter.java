@@ -52,6 +52,7 @@ import de.hpi.bpmn2_0.model.Process;
 import de.hpi.bpmn2_0.model.activity.Activity;
 import de.hpi.bpmn2_0.model.activity.SubProcess;
 import de.hpi.bpmn2_0.model.activity.Task;
+import de.hpi.bpmn2_0.model.artifacts.Artifact;
 import de.hpi.bpmn2_0.model.choreography.Choreography;
 import de.hpi.bpmn2_0.model.choreography.ChoreographyActivity;
 import de.hpi.bpmn2_0.model.connector.Association;
@@ -84,12 +85,14 @@ import de.hpi.bpmn2_0.model.diagram.SequenceFlowConnector;
 import de.hpi.bpmn2_0.model.event.BoundaryEvent;
 import de.hpi.bpmn2_0.model.event.CompensateEventDefinition;
 import de.hpi.bpmn2_0.model.event.Event;
+import de.hpi.bpmn2_0.model.event.SignalEventDefinition;
 import de.hpi.bpmn2_0.model.gateway.Gateway;
 import de.hpi.bpmn2_0.model.gateway.GatewayWithDefaultFlow;
 import de.hpi.bpmn2_0.model.misc.ProcessType;
 import de.hpi.bpmn2_0.model.participant.Lane;
 import de.hpi.bpmn2_0.model.participant.LaneSet;
 import de.hpi.bpmn2_0.model.participant.Participant;
+import de.hpi.diagram.SignavioUUID;
 
 /**
  * Converter class for Diagram to BPMN 2.0 transformation.
@@ -139,7 +142,7 @@ public class Diagram2BpmnConverter {
 		this.factories = new HashMap<String, AbstractBpmnFactory>();
 		this.bpmnElements = new HashMap<String, BPMNElement>();
 		this.definitions = new Definitions();
-		this.definitions.setId(UUID.randomUUID().toString());
+		this.definitions.setId(SignavioUUID.generate());
 		this.diagram = diagram;
 		this.factoryClasses = factoryClasses;
 	}
@@ -566,6 +569,46 @@ public class Diagram2BpmnConverter {
 
 		this.processes.add(process);
 	}
+	
+	/** 
+	 * Identifies {@link Artifact} elements and puts them into the appropriate
+	 * {@link Process} element.
+	 */
+	private void handleArtifacts() {
+		for(Artifact artifact : this.getAllArtifacts()) {
+			
+			/* Prefer the process by connecting object over process by pool 
+			 * containment. Use case: task in Pool1 text annotation in Pool2 */
+			Process containmentProcess = artifact.getProcess();
+			
+			artifact.findRelatedProcess();
+			
+			/* If a new process was assigned, delete the artifact as a child 
+			 * element from the old process */
+			if(containmentProcess != null && artifact.getProcess() != null && !containmentProcess.getId().equals(artifact.getProcess().getId())) {
+				containmentProcess.removeChild(artifact);
+			}
+			
+			/*
+			 * If no related process was found, add assign to the default
+			 * process.
+			 */
+			if (artifact.getProcess() == null && this.processes.size() > 0) {
+				artifact.setProcess(this.processes
+						.get(this.processes.size() - 1));
+				this.processes.get(this.processes.size() - 1).addChild(
+						artifact);
+			} else if (artifact.getProcess() == null) {
+				Process process = new Process();
+				this.processes.add(process);
+				process.setId(SignavioUUID.generate());
+				process.addChild(artifact);
+				
+				
+				artifact.setProcess(process);
+			}
+		}
+	}
 
 	/**
 	 * Assigns the DataObjectes to the appropriate {@link Process}.
@@ -598,7 +641,7 @@ public class Diagram2BpmnConverter {
 			} else if (dataObject.getProcess() == null) {
 				Process process = new Process();
 				this.processes.add(process);
-				process.setId(UUID.randomUUID().toString());
+				process.setId(SignavioUUID.generate());
 				process.addChild(dataObject);
 				dataObject.setProcess(process);
 			}
@@ -641,6 +684,22 @@ public class Diagram2BpmnConverter {
 		}
 
 		return activities;
+	}
+	
+	/**
+	 * 
+	 * @return All {@link Artifact} contained in the diagram.
+	 */
+	private List<Artifact> getAllArtifacts() {
+		List<Artifact> artifacts = new ArrayList<Artifact>();
+		
+		for(BPMNElement element : this.bpmnElements.values()) {
+			if(element.getNode() instanceof Artifact) {
+				artifacts.add((Artifact) element.getNode());
+			}
+		}
+		
+		return artifacts;
 	}
 
 	/**
@@ -731,19 +790,48 @@ public class Diagram2BpmnConverter {
 				continue;
 
 			Edge edge = (Edge) element.getNode();
-			/* Find process for edge */
-			for (Process process : this.processes) {
-				List<FlowElement> flowElements;
-				if (process.isSubprocess())
-					flowElements = process.getSubprocessRef().getFlowElement();
-				else
-					flowElements = process.getFlowElement();
+			List<FlowElement> flowElements = findProcessFlowElementListForEdge(edge);
+			if(flowElements != null) {
+				flowElements.add(edge);
+			}
+		}
+	}
 
-				if (flowElements.contains(edge.getSourceRef())
-						|| flowElements.contains(edge.getTargetRef())) {
-					flowElements.add(edge);
-					break;
-				}
+	/**
+	 * Finds the process for an {@link Edge}
+	 * 
+	 * @param edge
+	 */
+	private List<FlowElement> findProcessFlowElementListForEdge(Edge edge) {
+		/* Find process for edge */
+		for (Process process : this.processes) {
+			List<FlowElement> flowElements;
+			if (process.isSubprocess())
+				flowElements = process.getSubprocessRef().getFlowElement();
+			else
+				flowElements = process.getFlowElement();
+
+			if (flowElements.contains(edge.getSourceRef())
+					|| flowElements.contains(edge.getTargetRef())) {
+				return flowElements;
+			}
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Assigns {@link Association} to the appropriate process element.
+	 */
+	private void addAssociationsToProcess() {
+		for(BPMNElement element : this.diagramChilds) {
+			if(!(element.getNode() instanceof Association))
+				continue;
+			
+			Edge edge = (Edge) element.getNode();
+			List<FlowElement> flowElements = findProcessFlowElementListForEdge(edge);
+			if(flowElements != null) {
+				flowElements.add(edge);
 			}
 		}
 	}
@@ -955,7 +1043,7 @@ public class Diagram2BpmnConverter {
 
 				for (FlowElement node : process.getFlowElement()) {
 					if (node instanceof FlowNode) {
-						defaultLane.getFlowElementRef().add(node);
+						defaultLane.getFlowNodeRef().add((FlowNode) node);
 						defaultLaneComp.getBpmnShape().add(
 								(BpmnNode) this.bpmnElements.get(node.getId())
 										.getShape());
@@ -1209,6 +1297,19 @@ public class Diagram2BpmnConverter {
 		for (Task t : this.getAllTasks())
 			t.determineIoSpecification();
 	}
+	
+	/**
+	 * Retrieves all elements like Signals and puts them in the appropriate 
+	 * field of the {@link Definitions} element.
+	 */
+	private void putGlobalElementsIntoDefinitions() {
+		for(BPMNElement element : this.bpmnElements.values()) {
+			if(element.getNode() instanceof Event && ((Event) element.getNode()).isSignalEvent()) {
+				SignalEventDefinition sigEvDev = (SignalEventDefinition) ((Event) element.getNode()).getEventDefinitionOfType(SignalEventDefinition.class);
+				sigEvDev.insertSignalIntoDefinitions(definitions);
+			}
+		}
+	}
 
 	/**
 	 * Retrieves a BPMN 2.0 diagram and transforms it into the BPMN 2.0 model.
@@ -1244,6 +1345,7 @@ public class Diagram2BpmnConverter {
 
 		this.setDefaultSequenceFlowOfExclusiveGateway();
 		this.setCompensationEventActivityRef();
+		this.putGlobalElementsIntoDefinitions();
 		this.setConversationParticipants();
 
 		this.identifyProcesses();
@@ -1252,6 +1354,8 @@ public class Diagram2BpmnConverter {
 		this.insertConversationIntoDefinitions();
 
 		this.handleDataObjects();
+		this.handleArtifacts();
+		this.addAssociationsToProcess();
 
 		this.insertProcessesIntoDefinitions();
 		this.insertCollaborationElements();

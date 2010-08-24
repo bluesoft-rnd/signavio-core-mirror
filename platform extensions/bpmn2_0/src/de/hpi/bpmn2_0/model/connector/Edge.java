@@ -51,6 +51,16 @@ public abstract class Edge extends FlowElement {
 	@XmlSchemaType(name = "IDREF")
 	protected FlowElement targetRef;
 	
+	public Edge() {}
+	
+	public Edge(Edge edge) {
+		super(edge);
+		
+		this.setSourceRef(edge.getSourceRef());
+		this.setTargetRef(edge.getTargetRef());
+	}
+
+
 	/**
 	 * Returns true if source and target node are of same pool
 	 */

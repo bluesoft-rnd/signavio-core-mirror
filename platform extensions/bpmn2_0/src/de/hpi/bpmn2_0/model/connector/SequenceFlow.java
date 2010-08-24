@@ -93,7 +93,9 @@ import de.hpi.bpmn2_0.model.data_object.AbstractDataObject;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tSequenceFlow", propOrder = { "conditionExpression" })
 public class SequenceFlow extends Edge {
-
+	
+	/* Attributes */
+	
 	@XmlElement(name = "conditionExpression")
 	protected Expression conditionExpression;
 	@XmlAttribute
@@ -101,6 +103,26 @@ public class SequenceFlow extends Edge {
 
 	@XmlTransient
 	private boolean isDefaultSequenceFlow;
+
+	/* Constructors */
+	
+	/**
+	 * Default constructor
+	 */
+	public SequenceFlow() {}
+	
+	/**
+	 * Copy constructor
+	 * 
+	 * @param seqFlow
+	 */
+	public SequenceFlow(SequenceFlow seqFlow) {
+		super(seqFlow);
+		
+		this.setConditionExpression(seqFlow.getConditionExpression());
+		this.setIsImmediate(seqFlow.isIsImmediate());
+		this.setDefaultSequenceFlow(seqFlow.isDefaultSequenceFlow());
+	}
 
 	/**
 	 * Transform undirected data associations into input and output

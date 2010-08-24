@@ -26,9 +26,13 @@ package de.hpi.bpmn2_0.model.event;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.namespace.QName;
+
+import de.hpi.bpmn2_0.model.Definitions;
+import de.hpi.bpmn2_0.model.RootElement;
+import de.hpi.bpmn2_0.model.misc.Signal;
 
 
 /**
@@ -56,17 +60,28 @@ public class SignalEventDefinition
 {
 
     @XmlAttribute
-    protected QName signalRef;
+    @XmlIDREF
+    protected Signal signalRef;
+    
+    /**
+     * Put Signal into the {@link RootElement} list.
+     * @param definitions
+     */
+    public void insertSignalIntoDefinitions(Definitions definitions) {
+    	definitions.getRootElement().add(signalRef);
+    }
+    
+    /* Getter & Setter */
 
     /**
      * Gets the value of the signalRef property.
      * 
      * @return
      *     possible object is
-     *     {@link QName }
+     *     {@link Signal }
      *     
      */
-    public QName getSignalRef() {
+    public Signal getSignalRef() {
         return signalRef;
     }
 
@@ -75,10 +90,10 @@ public class SignalEventDefinition
      * 
      * @param value
      *     allowed object is
-     *     {@link QName }
+     *     {@link Signal }
      *     
      */
-    public void setSignalRef(QName value) {
+    public void setSignalRef(Signal value) {
         this.signalRef = value;
     }
 

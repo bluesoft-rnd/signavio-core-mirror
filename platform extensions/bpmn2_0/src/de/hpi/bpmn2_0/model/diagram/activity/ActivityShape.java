@@ -44,7 +44,7 @@ import de.hpi.bpmn2_0.model.diagram.BpmnNode;
  * <pre>
  * &lt;complexType name="activityShapeType_1">
  *   &lt;complexContent>
- *     &lt;extension base="{http://bpmndi.org}bpmnNodeType">
+ *     &lt;extension base="{http://www.omg.org/spec/BPMN/20100524/DI}bpmnNodeType">
  *       &lt;attribute name="activityRef" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
  *     &lt;/extension>
  *   &lt;/complexContent>

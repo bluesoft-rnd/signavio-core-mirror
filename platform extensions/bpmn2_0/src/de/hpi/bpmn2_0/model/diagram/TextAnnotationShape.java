@@ -43,7 +43,7 @@ import de.hpi.bpmn2_0.model.artifacts.TextAnnotation;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://bpmndi.org}bpmnNodeType">
+ *     &lt;extension base="{http://www.omg.org/spec/BPMN/20100524/DI}bpmnNodeType">
  *       &lt;attribute name="annotationRef" type="{http://www.w3.org/2001/XMLSchema}IDREF" />
  *     &lt;/extension>
  *   &lt;/complexContent>

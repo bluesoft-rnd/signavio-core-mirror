@@ -23,8 +23,6 @@
 
 package de.hpi.bpmn2_0.factory;
 
-import java.util.UUID;
-
 import org.oryxeditor.server.diagram.Shape;
 
 import de.hpi.bpmn2_0.annotations.StencilId;
@@ -36,6 +34,7 @@ import de.hpi.bpmn2_0.model.diagram.PoolCompartment;
 import de.hpi.bpmn2_0.model.participant.Lane;
 import de.hpi.bpmn2_0.model.participant.LaneSet;
 import de.hpi.bpmn2_0.model.participant.Participant;
+import de.hpi.diagram.SignavioUUID;
 
 /**
  * Factory to create lanes and pools
@@ -68,7 +67,7 @@ public class LaneFactory extends AbstractBpmnFactory {
 						.setParticipantRef((Participant) poolElement);
 			else {
 				Participant participant = new Participant();
-				participant.setId(UUID.randomUUID().toString());
+				participant.setId(SignavioUUID.generate());
 				participant.setName(poolLaneShape.getName());
 				((PoolCompartment) poolLaneShape).setParticipantRef(participant);
 			}
@@ -173,7 +172,7 @@ public class LaneFactory extends AbstractBpmnFactory {
 		if (this.hasChildLanes(shape)) {
 			LaneSet laneSet = new LaneSet();
 			laneSet.setParentLane(lane);
-			laneSet.setId(UUID.randomUUID().toString());
+			laneSet.setId(SignavioUUID.generate());
 			lane.setChildLaneSet(laneSet);
 		}
 

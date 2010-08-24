@@ -97,6 +97,10 @@ public abstract class Event
 		return null;
 	}
 	
+	public boolean isSignalEvent() {
+		return getEventDefinitionOfType(SignalEventDefinition.class) != null;
+	}
+	
 	/* Getter & Setter */
 	
 	/**

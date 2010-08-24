@@ -25,7 +25,6 @@ package de.hpi.bpmn2_0.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -33,6 +32,8 @@ import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+
+import de.hpi.diagram.SignavioUUID;
 
 
 /**
@@ -75,7 +76,7 @@ public class Documentation extends BaseElement {
 	 */
 	public Documentation(String text) {
 		this.setText(text);
-		this.setId(UUID.randomUUID().toString());
+		this.setId(SignavioUUID.generate());
 	}
 	
 	@XmlAnyElement

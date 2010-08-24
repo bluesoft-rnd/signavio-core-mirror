@@ -27,15 +27,22 @@ import org.oryxeditor.server.diagram.Shape;
 
 import de.hpi.bpmn2_0.annotations.StencilId;
 import de.hpi.bpmn2_0.exceptions.BpmnConverterException;
+import de.hpi.bpmn2_0.model.activity.Task;
+import de.hpi.bpmn2_0.model.activity.misc.Operation;
+import de.hpi.bpmn2_0.model.data_object.Message;
 import de.hpi.bpmn2_0.model.diagram.EventShape;
 import de.hpi.bpmn2_0.model.event.CancelEventDefinition;
 import de.hpi.bpmn2_0.model.event.CompensateEventDefinition;
 import de.hpi.bpmn2_0.model.event.EndEvent;
 import de.hpi.bpmn2_0.model.event.ErrorEventDefinition;
+import de.hpi.bpmn2_0.model.event.Escalation;
 import de.hpi.bpmn2_0.model.event.EscalationEventDefinition;
 import de.hpi.bpmn2_0.model.event.MessageEventDefinition;
 import de.hpi.bpmn2_0.model.event.SignalEventDefinition;
 import de.hpi.bpmn2_0.model.event.TerminateEventDefinition;
+import de.hpi.bpmn2_0.model.misc.Error;
+import de.hpi.bpmn2_0.model.misc.Signal;
+import de.hpi.diagram.SignavioUUID;
 
 /**
  * Factory to create end events
@@ -114,6 +121,24 @@ public class EndEventFactory extends AbstractBpmnFactory {
 		EndEvent endEvent = new EndEvent();
 		
 		MessageEventDefinition msgEventDef = new MessageEventDefinition();
+		
+		Message message = new Message();
+		Operation operation = new Operation();
+		
+		/* Message name */
+		String messageName = shape.getProperty("messagename");
+		if(messageName != null && !messageName.isEmpty()) {
+			message.setName(messageName);
+		}
+		
+		/* Operation name */
+		String operationName = shape.getProperty("operationname");
+		if(operationName != null && !operationName.isEmpty()) {
+			operation.setName(operationName);
+		}
+		
+		msgEventDef.setMessageRef(message);
+		msgEventDef.setOperationRef(operation);
 		endEvent.getEventDefinition().add(msgEventDef);
 		
 		return endEvent;
@@ -124,6 +149,22 @@ public class EndEventFactory extends AbstractBpmnFactory {
 		EndEvent endEvent = new EndEvent();
 		
 		EscalationEventDefinition escalEventDef = new EscalationEventDefinition();
+		
+		Escalation escalation = new Escalation();
+		
+		/* Escalation name */
+		String escalationName = shape.getProperty("escalationname");
+		if(escalationName != null && !escalationName.isEmpty()) {
+			escalation.setName(escalationName);
+		}
+		
+		/* Escalation code */
+		String escalationCode = shape.getProperty("escalationcode");
+		if(escalationCode != null && !escalationCode.isEmpty()) {
+			escalation.setEscalationCode(escalationCode);
+		}
+		
+		escalEventDef.setEscalationRef(escalation);
 		endEvent.getEventDefinition().add(escalEventDef);
 		
 		return endEvent;
@@ -134,6 +175,23 @@ public class EndEventFactory extends AbstractBpmnFactory {
 		EndEvent endEvent = new EndEvent();
 		
 		ErrorEventDefinition errorEventDef = new ErrorEventDefinition();
+		
+		Error error = new Error();
+		
+		/* Error name */
+		String errorName = shape.getProperty("errorname");
+		if(errorName != null && !errorName.isEmpty()) {
+			error.setName(errorName);
+		}
+		
+		/* Error code */
+		String errorCode = shape.getProperty("errorcode");
+		if(errorCode != null && !errorCode.isEmpty()) {
+			error.setErrorCode(errorCode);
+		}
+		
+		errorEventDef.setError(error);
+		
 		endEvent.getEventDefinition().add(errorEventDef);
 		
 		return endEvent;
@@ -154,6 +212,23 @@ public class EndEventFactory extends AbstractBpmnFactory {
 		EndEvent endEvent = new EndEvent();
 		
 		CompensateEventDefinition compEventDef = new CompensateEventDefinition();
+		
+		/* Activity Reference */
+		String activityRef = shape.getProperty("activityref");
+		if(activityRef != null && !activityRef.isEmpty()) {
+			Task taskRef = new Task();
+			taskRef.setId(activityRef);
+			compEventDef.setActivityRef(taskRef);
+		}
+		
+		/* Wait for Completion */
+		String waitForCompletion = shape.getProperty("waitforcompletion");
+		if(waitForCompletion != null && waitForCompletion.equals("false")) {
+			compEventDef.setWaitForCompletion(false);
+		} else {
+			compEventDef.setWaitForCompletion(true);
+		}
+		
 		endEvent.getEventDefinition().add(compEventDef);
 		
 		return endEvent;
@@ -164,6 +239,19 @@ public class EndEventFactory extends AbstractBpmnFactory {
 		EndEvent endEvent = new EndEvent();
 		
 		SignalEventDefinition signalEventDef = new SignalEventDefinition();
+		
+		Signal signal = new Signal();
+		
+		/* Signal ID */
+		signal.setId(SignavioUUID.generate());
+		
+		/* Signal name */
+		String signalName = shape.getProperty("signalname");
+		if(signalName != null && !signalName.isEmpty()) {
+			signal.setName(signalName);
+		}
+		
+		signalEventDef.setSignalRef(signal);
 		endEvent.getEventDefinition().add(signalEventDef);
 		
 		return endEvent;

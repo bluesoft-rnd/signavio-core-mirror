@@ -25,7 +25,6 @@ package de.hpi.bpmn2_0.model.event;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
@@ -56,35 +55,29 @@ public class EscalationEventDefinition
     extends EventDefinition
 {
 
-    @XmlAttribute
-    protected String escalationCode;
+	/* Attributes */
     
     @XmlElementRef(type = Escalation.class)
     protected Escalation escalationRef;
-
+    
+    /* Constructors */
+    
     /**
-     * Gets the value of the escalationCode property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     * Default constructor
      */
-    public String getEscalationCode() {
-        return escalationCode;
-    }
-
+    public EscalationEventDefinition() {}
+    
     /**
-     * Sets the value of the escalationCode property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     * Copy constructor
+     * @param escEventDefinition
      */
-    public void setEscalationCode(String value) {
-        this.escalationCode = value;
+    public EscalationEventDefinition(EscalationEventDefinition escEventDefinition) {
+    	super(escEventDefinition);
+    	
+    	this.setEscalationRef(escEventDefinition.getEscalationRef());
     }
+    
+    /* Getter & Setter */
 
     /**
      * Gets the value of the escalationRef property.

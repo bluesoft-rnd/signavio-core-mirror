@@ -37,6 +37,8 @@ import javax.xml.namespace.QName;
 import org.oryxeditor.server.diagram.Shape;
 
 import de.hpi.bpmn2_0.model.connector.Edge;
+import de.hpi.bpmn2_0.model.misc.Auditing;
+import de.hpi.bpmn2_0.model.misc.Monitoring;
 import de.hpi.bpmn2_0.model.participant.Lane;
 
 
@@ -64,8 +66,8 @@ import de.hpi.bpmn2_0.model.participant.Lane;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tFlowElement", propOrder = {
-//    "auditing",
-//    "monitoring",
+    "auditing",
+    "monitoring",
 	"categoryValue"
 //	"incoming",
 //	"outgoing",
@@ -82,8 +84,8 @@ public abstract class FlowElement
     extends BaseElement
 {
 
-//    protected TAuditing auditing;
-//    protected TMonitoring monitoring;
+    protected Auditing auditing;
+    protected Monitoring monitoring;
     protected List<QName> categoryValue;
     
     @XmlAttribute
@@ -129,6 +131,9 @@ public abstract class FlowElement
     	
     	if(flowEl.getOutgoing().size() > 0)
     		this.getOutgoing().addAll(flowEl.getOutgoing());
+    	
+    	this.setAuditing(flowEl.getAuditing());
+    	this.setMonitoring(flowEl.getMonitoring());
     	
     	this.setProcess(flowEl.getProcess());
     	this.setName(flowEl.getName());
@@ -216,48 +221,48 @@ public abstract class FlowElement
      * 
      * @return
      *     possible object is
-     *     {@link TAuditing }
+     *     {@link Auditing }
      *     
      */
-//    public TAuditing getAuditing() {
-//        return auditing;
-//    }
+    public Auditing getAuditing() {
+        return auditing;
+    }
 
     /**
      * Sets the value of the auditing property.
      * 
      * @param value
      *     allowed object is
-     *     {@link TAuditing }
+     *     {@link Auditing }
      *     
      */
-//    public void setAuditing(TAuditing value) {
-//        this.auditing = value;
-//    }
+    public void setAuditing(Auditing value) {
+        this.auditing = value;
+    }
 
     /**
      * Gets the value of the monitoring property.
      * 
      * @return
      *     possible object is
-     *     {@link TMonitoring }
+     *     {@link Monitoring }
      *     
      */
-//    public TMonitoring getMonitoring() {
-//        return monitoring;
-//    }
-//
-//    /**
-//     * Sets the value of the monitoring property.
-//     * 
-//     * @param value
-//     *     allowed object is
-//     *     {@link TMonitoring }
-//     *     
-//     */
-//    public void setMonitoring(TMonitoring value) {
-//        this.monitoring = value;
-//    }
+    public Monitoring getMonitoring() {
+        return monitoring;
+    }
+
+    /**
+     * Sets the value of the monitoring property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Monitoring }
+     *     
+     */
+    public void setMonitoring(Monitoring value) {
+        this.monitoring = value;
+    }
 
     /**
      * Gets the value of the categoryValue property.

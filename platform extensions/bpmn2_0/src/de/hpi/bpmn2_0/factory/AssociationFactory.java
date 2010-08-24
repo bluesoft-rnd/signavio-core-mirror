@@ -24,7 +24,6 @@
 package de.hpi.bpmn2_0.factory;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -42,6 +41,7 @@ import de.hpi.bpmn2_0.model.connector.Edge;
 import de.hpi.bpmn2_0.model.diagram.AssociationConnector;
 import de.hpi.bpmn2_0.model.diagram.DataAssociationConnector;
 import de.hpi.bpmn2_0.model.misc.Assignment;
+import de.hpi.diagram.SignavioUUID;
 
 /**
  * Factory that creates association elements
@@ -239,7 +239,7 @@ public class AssociationFactory extends AbstractBpmnFactory {
 					JSONObject assignmentObject = items.getJSONObject(i);
 
 					Assignment dataAssignment = new Assignment();
-					dataAssignment.setId(UUID.randomUUID().toString());
+					dataAssignment.setId(SignavioUUID.generate());
 					dataAssignment.setTo(assignmentObject.getString("to"));
 					dataAssignment.setFrom(assignmentObject.getString("from"));
 					dataAssignment.setLanguage(assignmentObject

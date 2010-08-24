@@ -216,9 +216,9 @@ public class TaskFactory extends AbstractActivityFactory {
 		task.setId(shape.getResourceId());
 		task.setName(shape.getProperty("name"));
 
-		String scriptLanguage = shape.getProperty("script_language");
-		if (scriptLanguage != null) {
-			task.setScriptLanguage(scriptLanguage);
+		String scriptFormat = shape.getProperty("scriptformat");
+		if (scriptFormat != null) {
+			task.setScriptFormat(scriptFormat);
 		}
 
 		String script = shape.getProperty("script");

@@ -59,7 +59,13 @@ public class Escalation
 
     @XmlAttribute
     protected QName structureRef;
+    @XmlAttribute
+    protected String name;
+    @XmlAttribute
+    protected String escalationCode;
 
+    /* Getter & Setter */
+    
     /**
      * Gets the value of the structureRef property.
      * 
@@ -83,5 +89,21 @@ public class Escalation
     public void setStructureRef(QName value) {
         this.structureRef = value;
     }
+
+	public String getName() {
+		return name;
+	}
+
+	public String getEscalationCode() {
+		return escalationCode;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setEscalationCode(String escalationCode) {
+		this.escalationCode = escalationCode;
+	}
 
 }

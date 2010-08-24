@@ -28,4 +28,12 @@ public class Json2XmlConverter {
 		
 		return converter.getXml();
 	}
+	
+	public StringBuilder getValidationResults() throws JSONException, JAXBException, SAXException, BpmnConverterException {
+		Diagram diagram = DiagramBuilder.parseJson(json);
+		
+		Diagram2XmlConverter converter = new Diagram2XmlConverter(diagram, bpmn20XsdPath);
+		
+		return converter.getValidationResults();
+	}
 }

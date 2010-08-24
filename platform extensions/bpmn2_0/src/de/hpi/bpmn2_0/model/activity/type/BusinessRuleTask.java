@@ -57,6 +57,24 @@ public class BusinessRuleTask
 {
 	@XmlAttribute
 	BusinessRuleTaskImplementation implementation;
+	
+	/* Constructors */
+	
+	/**
+	 * Default constructor
+	 */
+	public BusinessRuleTask() {	}
+	
+	/**
+	 * Copy constructor
+	 * 
+	 * @param brTask
+	 * 		Template {@link BusinessRuleTask}
+	 */
+	public BusinessRuleTask(BusinessRuleTask brTask) {
+		super(brTask);
+		this.setImplementation(brTask.getImplementation());
+	}
 
 	/* Getter & Setter */
 	

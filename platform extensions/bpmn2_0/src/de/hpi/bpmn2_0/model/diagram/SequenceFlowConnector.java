@@ -28,7 +28,7 @@ import de.hpi.bpmn2_0.model.connector.SequenceFlow;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://bpmndi.org}bpmnConnectorType">
+ *     &lt;extension base="{http://www.omg.org/spec/BPMN/20100524/DI}bpmnConnectorType">
  *       &lt;attribute name="sequenceFlowRef" type="{http://www.w3.org/2001/XMLSchema}IDREF" />
  *     &lt;/extension>
  *   &lt;/complexContent>

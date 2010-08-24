@@ -48,7 +48,7 @@ public class ChoreographyDiagram extends BpmnDiagram {
 	@XmlElement(type = ChoreographyCompartment.class)
 	private List<ChoreographyCompartment> choreographyCompartment;
 	
-	@XmlElement(namespace = "http://bpmndi.org")
+	@XmlElement(namespace = "http://www.omg.org/spec/BPMN/20100524/DI")
     protected List<SequenceFlowConnector> sequenceFlowConnector;
 	
 	@XmlElement

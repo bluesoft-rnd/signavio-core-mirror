@@ -25,7 +25,6 @@ package de.hpi.bpmn2_0.model.participant;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -46,6 +45,7 @@ import de.hpi.bpmn2_0.model.BaseElement;
 import de.hpi.bpmn2_0.model.FlowElement;
 import de.hpi.bpmn2_0.model.FlowNode;
 import de.hpi.bpmn2_0.model.connector.Edge;
+import de.hpi.diagram.SignavioUUID;
 
 
 /**
@@ -75,7 +75,7 @@ import de.hpi.bpmn2_0.model.connector.Edge;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tLane", propOrder = {
     "partitionElement",
-    "flowElementRef",
+    "flowNodeRef",
 //    "laneSet",
     "childLaneSet"
 })
@@ -109,7 +109,7 @@ public class Lane
 //		@XmlElement(type = Participant.class)
 //	})
 	@XmlElement(type = FlowNode.class)
-    protected List<FlowElement> flowElementRef;
+    protected List<FlowNode> flowNodeRef;
     
 	@XmlElement(type = LaneSet.class)
 	protected LaneSet childLaneSet;
@@ -135,7 +135,7 @@ public class Lane
     		this.getChildLaneSet().getLanes().add((Lane) child);
     		((Lane) child).setLaneSet(this.getChildLaneSet());
     	} else if (!(child instanceof Edge)) {
-    		this.getFlowElementRef().add((FlowElement) child);
+    		this.getFlowNodeRef().add((FlowNode) child);
     	}
     }
     
@@ -212,11 +212,11 @@ public class Lane
      * 
      */
     @ChildElements
-    public List<FlowElement> getFlowElementRef() {
-        if (flowElementRef == null) {
-            flowElementRef = new ArrayList<FlowElement>();
+    public List<FlowNode> getFlowNodeRef() {
+        if (flowNodeRef == null) {
+            flowNodeRef = new ArrayList<FlowNode>();
         }
-        return this.flowElementRef;
+        return this.flowNodeRef;
     }
 
     /**
@@ -231,7 +231,7 @@ public class Lane
     public LaneSet getChildLaneSet() {
     	if(childLaneSet == null) {
     		childLaneSet = new LaneSet();
-    		childLaneSet.setId(UUID.randomUUID().toString());
+    		childLaneSet.setId(SignavioUUID.generate());
     		childLaneSet.setParentLane(this);
     	}
         return childLaneSet;

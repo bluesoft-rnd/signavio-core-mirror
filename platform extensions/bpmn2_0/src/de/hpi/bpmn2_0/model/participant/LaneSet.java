@@ -62,8 +62,8 @@ import de.hpi.bpmn2_0.model.Process;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tLaneSet", propOrder = {
-	"name",
-    "lanes"//,
+    "name",
+	"lanes"//,
     //"parentLane"
 })
 public class LaneSet
@@ -117,7 +117,7 @@ public class LaneSet
 		List<Lane> lanes = this.getDeepestLanes(this.getLanes()); 
 		
 		for(Lane lane : lanes) {
-			deepestFlowElements.addAll(lane.getFlowElementRef());
+			deepestFlowElements.addAll(lane.getFlowNodeRef());
 		}
 		
 		return deepestFlowElements;

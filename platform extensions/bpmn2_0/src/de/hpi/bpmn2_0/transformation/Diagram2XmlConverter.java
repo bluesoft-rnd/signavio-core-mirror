@@ -31,4 +31,14 @@ public class Diagram2XmlConverter {
 		Bpmn2XmlConverter xmlConverter = new Bpmn2XmlConverter(bpmnDefinitions, bpmn20XsdPath);
 		return xmlConverter.getXml();
 	}
+	
+	public StringBuilder getValidationResults() throws JAXBException, SAXException, BpmnConverterException {
+		/* Build up BPMN 2.0 model */
+		Diagram2BpmnConverter converter = new Diagram2BpmnConverter(diagram, AbstractBpmnFactory.getFactoryClasses());
+		Definitions bpmnDefinitions = converter.getDefinitionsFromDiagram();
+		
+		/* Get BPMN 2.0 XML */
+		Bpmn2XmlConverter xmlConverter = new Bpmn2XmlConverter(bpmnDefinitions, bpmn20XsdPath);
+		return xmlConverter.getValidationResults();
+	}
 }

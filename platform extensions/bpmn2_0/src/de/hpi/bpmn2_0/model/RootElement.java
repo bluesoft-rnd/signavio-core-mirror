@@ -50,6 +50,12 @@ import javax.xml.bind.annotation.XmlType;
 public abstract class RootElement
     extends BaseElement
 {
+	
+	public RootElement() {}
+	
+	public RootElement(RootElement rootElement) {
+		super(rootElement);
+	}
 
 
 }

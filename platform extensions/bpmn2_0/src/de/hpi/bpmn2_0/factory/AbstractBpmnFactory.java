@@ -36,7 +36,10 @@ import de.hpi.bpmn2_0.annotations.StencilId;
 import de.hpi.bpmn2_0.exceptions.BpmnConverterException;
 import de.hpi.bpmn2_0.model.BaseElement;
 import de.hpi.bpmn2_0.model.Documentation;
+import de.hpi.bpmn2_0.model.FlowElement;
 import de.hpi.bpmn2_0.model.diagram.BpmnNode;
+import de.hpi.bpmn2_0.model.misc.Auditing;
+import de.hpi.bpmn2_0.model.misc.Monitoring;
 
 /**
  * This is the abstract factory that offers methods to create a process element
@@ -51,6 +54,9 @@ public abstract class AbstractBpmnFactory {
 	 * except reading the jar file?
 	 */
 	static {
+		
+		/* Standard BPMN 2.0 */
+		
 		factoryClasses.add(AbstractActivityFactory.class);
 		factoryClasses.add(SubprocessFactory.class);
 		factoryClasses.add(TaskFactory.class);
@@ -123,9 +129,25 @@ public abstract class AbstractBpmnFactory {
 	 *            The resource shape
 	 */
 	protected void setCommonAttributes(BaseElement element, Shape shape) {
+		
+		/* Documentation */
 		String documentation = shape.getProperty("documentation");
 		if (documentation != null && !documentation.isEmpty())
 			element.getDocumentation().add(new Documentation(documentation));
+		
+		/* Common FlowElement attributes */
+		if(element instanceof FlowElement) {
+			
+			/* Auditing */
+			String auditing = shape.getProperty("auditing");
+			if (auditing != null && !auditing.isEmpty())
+				((FlowElement) element).setAuditing(new Auditing(auditing));
+			
+			/* Monitoring */
+			String monitoring = shape.getProperty("monitoring");
+			if (monitoring != null && !monitoring.isEmpty())
+				((FlowElement) element).setMonitoring(new Monitoring(monitoring));
+		}
 	}
 
 	/**

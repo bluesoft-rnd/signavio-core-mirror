@@ -50,6 +50,7 @@ import de.hpi.bpmn2_0.model.activity.type.ScriptTask;
 import de.hpi.bpmn2_0.model.activity.type.SendTask;
 import de.hpi.bpmn2_0.model.activity.type.ServiceTask;
 import de.hpi.bpmn2_0.model.activity.type.UserTask;
+import de.hpi.bpmn2_0.model.artifacts.Artifact;
 import de.hpi.bpmn2_0.model.choreography.ChoreographyActivity;
 import de.hpi.bpmn2_0.model.choreography.ChoreographySubProcess;
 import de.hpi.bpmn2_0.model.choreography.ChoreographyTask;
@@ -109,7 +110,7 @@ import de.hpi.bpmn2_0.model.participant.LaneSet;
 //    "property",
     "laneSet",
     "flowElement",
-//    "artifact",
+    "artifact",
     "supports"
 })
 public class Process
@@ -157,8 +158,8 @@ public class Process
 //	})
 	@XmlElementRef
     protected List<FlowElement> flowElement;
-//    @XmlElementRef(name = "artifact", namespace = "http://www.omg.org/bpmn20", type = JAXBElement.class)
-//    protected List<JAXBElement<? extends Artifact>> artifact;
+    @XmlElementRef
+    protected List<Artifact> artifact;
     protected List<QName> supports;
     @XmlAttribute
     protected ProcessType processType;
@@ -182,9 +183,25 @@ public class Process
      * Adds the child to the process's flow elements if possible.
      */
     public void addChild(BaseElement child) {
-    	if(child instanceof FlowElement) {
+    	if(child instanceof Artifact) {
+    		this.getArtifact().add((Artifact) child);
+    	}
+    	
+    	else if(child instanceof FlowElement) {
     		this.getFlowElement().add((FlowElement) child);
     	}
+    }
+    
+    /**
+     * Remove the child element from the process.
+     * 
+     * @param child
+     * 		Child element to remove.
+     */
+    public void removeChild(BaseElement child) {
+    	this.getArtifact().remove(child);
+    	
+    	this.getFlowElement().remove(child);
     }
     
     /**
@@ -437,17 +454,17 @@ public class Process
      * Objects of the following type(s) are allowed in the list
      * {@link JAXBElement }{@code <}{@link Artifact }{@code >}
      * {@link JAXBElement }{@code <}{@link Association }{@code >}
-     * {@link JAXBElement }{@code <}{@link TGroup }{@code >}
+     * {@link JAXBElement }{@code <}{@link Group }{@code >}
      * {@link JAXBElement }{@code <}{@link TextAnnotation }{@code >}
      * 
      * 
      */
-//    public List<JAXBElement<? extends Artifact>> getArtifact() {
-//        if (artifact == null) {
-//            artifact = new ArrayList<JAXBElement<? extends Artifact>>();
-//        }
-//        return this.artifact;
-//    }
+    public List<Artifact> getArtifact() {
+        if (artifact == null) {
+            artifact = new ArrayList<Artifact>();
+        }
+        return this.artifact;
+    }
 
     /**
      * Gets the value of the supports property.

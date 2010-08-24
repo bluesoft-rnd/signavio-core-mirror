@@ -25,6 +25,7 @@ package de.hpi.bpmn2_0.model.activity.type;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -61,10 +62,31 @@ import de.hpi.bpmn2_0.model.activity.resource.Rendering;
 @XmlType(name = "tUserTask", propOrder = {
     "rendering"
 })
+
+/* Lists specialized user tasks for serialization */
 public class UserTask
     extends Task
 {
-
+	
+	/* Constructors */
+	
+	/**
+	 * Default constructor
+	 */
+	public UserTask() {	}
+	
+	
+	/**
+	 * Copy constructor based on a {@link UserTask}
+	 * @param task
+	 */
+	public UserTask(UserTask task) {
+		super(task);
+		
+		this.getRendering().addAll(task.getRendering());
+		this.setImplementation(task.getImplementation());
+	}
+	
     protected List<Rendering> rendering;
     @XmlAttribute
     protected UserTaskImplementation implementation;

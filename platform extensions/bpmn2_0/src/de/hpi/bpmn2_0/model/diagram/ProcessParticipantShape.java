@@ -43,7 +43,7 @@ import de.hpi.bpmn2_0.model.artifacts.ProcessParticipant;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://bpmndi.org}bpmnNodeType">
+ *     &lt;extension base="{http://www.omg.org/spec/BPMN/20100524/DI}bpmnNodeType">
  *       &lt;attribute name="dataStoreRef" type="{http://www.w3.org/2001/XMLSchema}IDREF" />
  *     &lt;/extension>
  *   &lt;/complexContent>

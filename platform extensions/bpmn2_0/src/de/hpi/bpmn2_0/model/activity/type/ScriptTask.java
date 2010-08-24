@@ -78,7 +78,7 @@ public class ScriptTask
 	public ScriptTask(ScriptTask scriptTask) {
 		super(scriptTask);
 		this.setScript(scriptTask.getScript());
-		this.setScriptLanguage(scriptTask.getScriptLanguage());
+		this.setScriptFormat(scriptTask.getScriptFormat());
 	}
 	
 	@XmlElement
@@ -86,7 +86,7 @@ public class ScriptTask
     
 	@XmlAttribute
     @XmlSchemaType(name = "anyURI")
-    protected String scriptLanguage;
+    protected String scriptFormat;
 
     /**
      * Gets the value of the script property.
@@ -120,8 +120,8 @@ public class ScriptTask
      *     {@link String }
      *     
      */
-    public String getScriptLanguage() {
-        return scriptLanguage;
+    public String getScriptFormat() {
+        return scriptFormat;
     }
 
     /**
@@ -132,8 +132,8 @@ public class ScriptTask
      *     {@link String }
      *     
      */
-    public void setScriptLanguage(String value) {
-        this.scriptLanguage = value;
+    public void setScriptFormat(String value) {
+        this.scriptFormat = value;
     }
 
 }

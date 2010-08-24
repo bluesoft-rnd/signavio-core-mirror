@@ -27,7 +27,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -57,8 +56,10 @@ import de.hpi.bpmn2_0.model.data_object.InputOutputSpecification;
 import de.hpi.bpmn2_0.model.data_object.InputSet;
 import de.hpi.bpmn2_0.model.data_object.OutputSet;
 import de.hpi.bpmn2_0.model.event.BoundaryEvent;
+import de.hpi.bpmn2_0.model.extension.PropertyListItem;
 import de.hpi.bpmn2_0.model.misc.IoOption;
 import de.hpi.bpmn2_0.model.misc.Property;
+import de.hpi.diagram.SignavioUUID;
 
 
 /**
@@ -97,7 +98,8 @@ import de.hpi.bpmn2_0.model.misc.Property;
     "dataInputAssociation",
     "dataOutputAssociation",
     "activityResource",
-    "loopCharacteristics"
+    "loopCharacteristics",
+    "additionalProperties"
 })
 @XmlSeeAlso({
     SubProcess.class,
@@ -150,6 +152,9 @@ public abstract class Activity
     @XmlSchemaType(name = "IDREF")
     protected Object _default;
 	
+	@XmlElement
+	protected List<PropertyListItem> additionalProperties;
+	
 	@XmlTransient
 	private List<HashMap<String, IoOption>> inputSetInfo;
 	
@@ -193,6 +198,10 @@ public abstract class Activity
 		if(act.getOutputSetInfo().size() > 0)
 			this.getOutputSetInfo().addAll(act.getOutputSetInfo());
 		
+		if(act.getAdditionalProperties().size() > 0) {
+			this.getAdditionalProperties().addAll(act.getAdditionalProperties());
+		}
+		
 		this.setIoSpecification(act.getIoSpecification());
 		this.setLoopCharacteristics(act.getLoopCharacteristics());
 		this.setIsForCompensation(act.isForCompensation);
@@ -215,7 +224,7 @@ public abstract class Activity
 		/* Process data inputs */
 		InputSet inputSet = new InputSet();
 		inputSet.setName("DefaultInputSet");
-		inputSet.setId(UUID.randomUUID().toString());
+		inputSet.setId(SignavioUUID.generate());
 		for(DataInputAssociation dia : this.getDataInputAssociation()) {
 			
 			if(dia.getSourceRef() instanceof DataInput) {
@@ -240,7 +249,7 @@ public abstract class Activity
 		/* Process data outputs */
 		OutputSet outputSet = new OutputSet();
 		outputSet.setName("DefaultOutputSet");
-		outputSet.setId(UUID.randomUUID().toString());
+		outputSet.setId(SignavioUUID.generate());
 		for(DataOutputAssociation dia : this.getDataOutputAssociation()) {
 			
 			if(dia.getTargetRef() instanceof DataOutput) {
@@ -271,7 +280,7 @@ public abstract class Activity
 		/* Add input set to specification */
 		if(inputSet.getDataInputRefs().size() > 0 && outputSet.getDataOutputRefs().size() > 0) {
 			InputOutputSpecification ioSpec = new InputOutputSpecification();
-			ioSpec.setId(UUID.randomUUID().toString());
+			ioSpec.setId(SignavioUUID.generate());
 			ioSpec.getInputSet().add(inputSet);
 			ioSpec.getOutputSet().add(outputSet);
 			ioSpec.getDataInput();
@@ -282,6 +291,13 @@ public abstract class Activity
 	
 	
 	/* Getter & Setter */
+	
+	public List<PropertyListItem> getAdditionalProperties() {
+		if(additionalProperties == null) {
+			additionalProperties = new ArrayList<PropertyListItem>();
+		}
+		return additionalProperties;
+	}
 	
 	/**
 	 * @return The list of boundary event references

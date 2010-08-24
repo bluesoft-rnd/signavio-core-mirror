@@ -50,10 +50,10 @@ import de.hpi.bpmn2_0.model.participant.Participant;
  * <pre>
  * &lt;complexType name="collaborationDiagramType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://bpmndi.org}diagramType">
+ *     &lt;extension base="{http://www.omg.org/spec/BPMN/20100524/DI}diagramType">
  *       &lt;sequence>
- *         &lt;element name="pool" type="{http://bpmndi.org}poolCompartmentType" maxOccurs="unbounded" minOccurs="2"/>
- *         &lt;element ref="{http://bpmndi.org}messageFlowConnector" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="pool" type="{http://www.omg.org/spec/BPMN/20100524/DI}poolCompartmentType" maxOccurs="unbounded" minOccurs="2"/>
+ *         &lt;element ref="{http://www.omg.org/spec/BPMN/20100524/DI}messageFlowConnector" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="collaborationRef" type="{http://www.w3.org/2001/XMLSchema}IDREF" />
  *     &lt;/extension>
@@ -65,7 +65,7 @@ import de.hpi.bpmn2_0.model.participant.Participant;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "collaborationDiagramType", namespace = "http://bpmndi.org", propOrder = {
+@XmlType(name = "collaborationDiagramType", namespace = "http://www.omg.org/spec/BPMN/20100524/DI", propOrder = {
 //    "pool",
 //    "messageFlowConnector"
 })

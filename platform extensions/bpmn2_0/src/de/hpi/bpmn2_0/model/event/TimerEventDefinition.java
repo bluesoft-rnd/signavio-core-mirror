@@ -56,16 +56,41 @@ import de.hpi.bpmn2_0.model.Expression;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tTimerEventDefinition", propOrder = {
     "timeDate",
-    "timeCycle"
+    "timeCycle",
+    "timeDuration"
 })
 public class TimerEventDefinition
     extends EventDefinition
 {
 
+	/* Attributes */
+	
     protected Expression timeDate;
     protected Expression timeCycle;
+    protected Expression timeDuration;
+    
+    /* Constructors */
+    
+    /**
+     * Default constructor
+     */
+    public TimerEventDefinition() {}
 
     /**
+     * Copy constructor based on {@link TimerEventDefinition}
+     * 
+     * @param timerEventDefinition
+     */
+    public TimerEventDefinition(TimerEventDefinition timerEventDefinition) {
+		super(timerEventDefinition);
+		
+		this.setTimeDate(timerEventDefinition.getTimeDate());
+		this.setTimeCycle(timerEventDefinition.getTimeCycle());
+	}
+    
+    /* Getter & Setter */
+
+	/**
      * Gets the value of the timeDate property.
      * 
      * @return
@@ -112,5 +137,13 @@ public class TimerEventDefinition
     public void setTimeCycle(Expression value) {
         this.timeCycle = value;
     }
+
+	public Expression getTimeDuration() {
+		return timeDuration;
+	}
+
+	public void setTimeDuration(Expression timeDuration) {
+		this.timeDuration = timeDuration;
+	}
 
 }

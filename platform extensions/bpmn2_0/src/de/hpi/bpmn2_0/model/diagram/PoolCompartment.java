@@ -50,7 +50,7 @@ import de.hpi.bpmn2_0.model.participant.Participant;
  * <pre>
  * &lt;complexType name="poolCompartmentType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://bpmndi.org}bpmnCompartmentType">
+ *     &lt;extension base="{http://www.omg.org/spec/BPMN/20100524/DI}bpmnCompartmentType">
  *       &lt;sequence>
  *         &lt;element name="lanes" type="{http://www.w3.org/2001/XMLSchema}IDREF" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
@@ -63,7 +63,7 @@ import de.hpi.bpmn2_0.model.participant.Participant;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "poolCompartmentType", namespace = "http://bpmndi.org", propOrder = {
+@XmlType(name = "poolCompartmentType", namespace = "http://www.omg.org/spec/BPMN/20100524/DI", propOrder = {
     "lanes"
 })
 public class PoolCompartment

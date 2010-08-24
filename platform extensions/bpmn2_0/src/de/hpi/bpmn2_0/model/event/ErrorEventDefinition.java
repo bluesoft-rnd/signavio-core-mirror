@@ -25,10 +25,11 @@ package de.hpi.bpmn2_0.model.event;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.namespace.QName;
+
+import de.hpi.bpmn2_0.model.misc.Error;
 
 
 /**
@@ -56,45 +57,22 @@ public class ErrorEventDefinition
     extends EventDefinition
 {
 
-    @XmlAttribute
-    protected String errorCode;
-    @XmlAttribute
-    protected QName errorRef;
+    @XmlElement
+    protected Error error;
 
-    /**
-     * Gets the value of the errorCode property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getErrorCode() {
-        return errorCode;
-    }
 
-    /**
-     * Sets the value of the errorCode property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setErrorCode(String value) {
-        this.errorCode = value;
-    }
-
+    /* Getter & Setter */
+    
     /**
      * Gets the value of the errorRef property.
      * 
      * @return
      *     possible object is
-     *     {@link QName }
+     *     {@link Error }
      *     
      */
-    public QName getErrorRef() {
-        return errorRef;
+    public Error getError() {
+        return error;
     }
 
     /**
@@ -102,11 +80,11 @@ public class ErrorEventDefinition
      * 
      * @param value
      *     allowed object is
-     *     {@link QName }
+     *     {@link Error }
      *     
      */
-    public void setErrorRef(QName value) {
-        this.errorRef = value;
+    public void setError(Error value) {
+        this.error = value;
     }
 
 }

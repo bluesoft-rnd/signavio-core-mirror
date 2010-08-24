@@ -58,7 +58,7 @@ import javax.xml.namespace.QName;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "diagramType", namespace = "http://bpmndi.org")
+@XmlType(name = "diagramType", namespace = "http://www.omg.org/spec/BPMN/20100524/DI")
 @XmlSeeAlso({
     ProcessDiagram.class,
     CollaborationDiagram.class

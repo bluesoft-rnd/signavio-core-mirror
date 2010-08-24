@@ -34,6 +34,7 @@ import org.oryxeditor.server.diagram.JSONBuilder;
 import org.oryxeditor.server.diagram.Shape;
 import org.oryxeditor.server.diagram.StencilSet;
 
+import de.hpi.Configuration;
 import de.hpi.bpmn2_0.exceptions.BpmnMigrationException;
 import de.hpi.bpmn2_0.exceptions.MigrationHelperException;
 
@@ -208,7 +209,7 @@ public class BPMN2Migrator {
 				return JSONBuilder.parseModeltoString(diagram);
 			
 			/* Convert the Namespace and URL */
-			StencilSet ss = new StencilSet("/oryx/stencilsets/bpmn2.0/bpmn2.0.json", "http://b3mn.org/stencilset/bpmn2.0#");
+			StencilSet ss = new StencilSet(Configuration.oryxPath + "/stencilsets/bpmn2.0/bpmn2.0.json", "http://b3mn.org/stencilset/bpmn2.0#");
 			diagram.setStencilset(ss);
 				
 			migrateActivities();

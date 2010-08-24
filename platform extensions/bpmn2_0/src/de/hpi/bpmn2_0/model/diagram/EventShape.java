@@ -43,7 +43,7 @@ import de.hpi.bpmn2_0.model.event.Event;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://bpmndi.org}bpmnNodeType">
+ *     &lt;extension base="{http://www.omg.org/spec/BPMN/20100524/DI}bpmnNodeType">
  *       &lt;attribute name="eventRef" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
  *     &lt;/extension>
  *   &lt;/complexContent>
@@ -54,7 +54,7 @@ import de.hpi.bpmn2_0.model.event.Event;
  */
 @XmlRootElement(name = "eventShape")
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(namespace = "http://bpmndi.org", name = "eventShapeType")
+@XmlType(namespace = "http://www.omg.org/spec/BPMN/20100524/DI", name = "eventShapeType")
 public class EventShape
     extends BpmnNode
 {

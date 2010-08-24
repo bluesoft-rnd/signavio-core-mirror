@@ -58,6 +58,7 @@ import de.hpi.bpmn2_0.model.diagram.ConversationDiagram;
 import de.hpi.bpmn2_0.model.diagram.ProcessDiagram;
 import de.hpi.bpmn2_0.model.event.CompensateEventDefinition;
 import de.hpi.bpmn2_0.model.event.EventDefinition;
+import de.hpi.bpmn2_0.model.misc.Signal;
 import de.hpi.bpmn2_0.validation.BPMN2SyntaxChecker;
 
 /**
@@ -76,7 +77,7 @@ import de.hpi.bpmn2_0.validation.BPMN2SyntaxChecker;
  *         &lt;element ref="{http://www.omg.org/bpmn20}import" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element ref="{http://www.omg.org/bpmn20}extension" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element ref="{http://www.omg.org/bpmn20}rootElement" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element ref="{http://bpmndi.org}diagram" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element ref="{http://www.omg.org/spec/BPMN/20100524/DI}diagram" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element ref="{http://www.omg.org/bpmn20}relationship" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" />
@@ -108,7 +109,8 @@ public class Definitions {
 	@XmlElementRefs( { @XmlElementRef(type = Process.class),
 			@XmlElementRef(type = Choreography.class),
 			@XmlElementRef(type = Collaboration.class),
-			@XmlElementRef(type = Conversation.class) })
+			@XmlElementRef(type = Conversation.class),
+			@XmlElementRef(type = Signal.class)})
 	protected List<RootElement> rootElement;
 	
 	@XmlElementRefs( { @XmlElementRef(type = ProcessDiagram.class),
@@ -123,6 +125,9 @@ public class Definitions {
 	@XmlID
 	@XmlSchemaType(name = "ID")
 	protected String id;
+	
+	@XmlAttribute
+	protected String name;
 
 	@XmlAttribute(required = true)
 	@XmlSchemaType(name = "anyURI")
@@ -463,6 +468,14 @@ public class Definitions {
 	 */
 	public void setId(String value) {
 		this.id = value;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**

@@ -76,7 +76,7 @@ import org.oryxeditor.server.diagram.Shape;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "bpmnConnectorType", namespace = "http://bpmndi.org", propOrder = {
+@XmlType(name = "bpmnConnectorType", namespace = "http://www.omg.org/spec/BPMN/20100524/DI", propOrder = {
     "bendpoint"
 })
 @XmlSeeAlso({
@@ -86,7 +86,7 @@ import org.oryxeditor.server.diagram.Shape;
 })
 public class BpmnConnector implements BpmnShape {
 
-    @XmlElement(namespace = "http://bpmndi.org")
+    @XmlElement(namespace = "http://www.omg.org/spec/BPMN/20100524/DI")
     protected List<BpmnConnector.Bendpoint> bendpoint;
     @XmlAttribute(required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)

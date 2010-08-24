@@ -25,10 +25,12 @@ package de.hpi.bpmn2_0.model.event;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.namespace.QName;
+
+import de.hpi.bpmn2_0.model.activity.misc.Operation;
+import de.hpi.bpmn2_0.model.data_object.Message;
 
 
 /**
@@ -54,25 +56,27 @@ import javax.xml.namespace.QName;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tMessageEventDefinition", propOrder = {
-    "operationRef"
+    "operationRef",
+    "messageRef"
 })
 public class MessageEventDefinition
     extends EventDefinition
 {
-
-    protected QName operationRef;
-    @XmlAttribute
-    protected QName messageRef;
+	
+	@XmlElement
+    protected Operation operationRef;
+    @XmlElement
+    protected Message messageRef;
 
     /**
      * Gets the value of the operationRef property.
      * 
      * @return
      *     possible object is
-     *     {@link QName }
+     *     {@link Operation }
      *     
      */
-    public QName getOperationRef() {
+    public Operation getOperationRef() {
         return operationRef;
     }
 
@@ -81,10 +85,10 @@ public class MessageEventDefinition
      * 
      * @param value
      *     allowed object is
-     *     {@link QName }
+     *     {@link Operation }
      *     
      */
-    public void setOperationRef(QName value) {
+    public void setOperationRef(Operation value) {
         this.operationRef = value;
     }
 
@@ -93,10 +97,10 @@ public class MessageEventDefinition
      * 
      * @return
      *     possible object is
-     *     {@link QName }
+     *     {@link Message }
      *     
      */
-    public QName getMessageRef() {
+    public Message getMessageRef() {
         return messageRef;
     }
 
@@ -105,10 +109,10 @@ public class MessageEventDefinition
      * 
      * @param value
      *     allowed object is
-     *     {@link QName }
+     *     {@link Message }
      *     
      */
-    public void setMessageRef(QName value) {
+    public void setMessageRef(Message value) {
         this.messageRef = value;
     }
 

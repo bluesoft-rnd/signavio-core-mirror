@@ -73,7 +73,18 @@ public class TextannotationFactory extends AbstractBpmnFactory {
 		TextAnnotation text = new TextAnnotation();
 		this.setCommonAttributes(text, shape);
 		text.setId(shape.getResourceId());
-		text.setText(shape.getProperty("text"));
+		
+		/* Text */
+		String textAttr = shape.getProperty("text");
+		if(textAttr != null && !textAttr.isEmpty()) {
+			text.setText(textAttr);
+		}
+		
+		/* Text Format */
+		String textFormat = shape.getProperty("textformat");
+		if(textFormat != null && !textFormat.isEmpty()) {
+			text.setTextFormat(textFormat);
+		}
 		
 		return text;
 	}

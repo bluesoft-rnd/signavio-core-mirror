@@ -37,7 +37,7 @@ import javax.xml.bind.annotation.XmlType;
  * <pre>
  * &lt;complexType name="calledSubprocessShapeType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://bpmndi.org}activityShapeType_1">
+ *     &lt;extension base="{http://www.omg.org/spec/BPMN/20100524/DI}activityShapeType_1">
  *       &lt;attribute name="isExpanded" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="diagramLink" type="{http://www.w3.org/2001/XMLSchema}IDREF" />
  *     &lt;/extension>

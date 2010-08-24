@@ -22,8 +22,6 @@
  */
 package de.hpi.bpmn2_0.factory;
 
-import java.util.UUID;
-
 import org.oryxeditor.server.diagram.Shape;
 
 import de.hpi.bpmn2_0.annotations.StencilId;
@@ -33,6 +31,7 @@ import de.hpi.bpmn2_0.model.data_object.DataState;
 import de.hpi.bpmn2_0.model.data_object.DataStore;
 import de.hpi.bpmn2_0.model.data_object.DataStoreReference;
 import de.hpi.bpmn2_0.model.diagram.DataStoreShape;
+import de.hpi.diagram.SignavioUUID;
 
 /**
  * Factory for DataStores 
@@ -98,7 +97,7 @@ public class DataStoreFactory extends AbstractBpmnFactory {
 		String dataStateName = shape.getProperty("state");
 		/* Set attributes of the global data store */
 		if(dataStore != null) {
-			dataStore.setId(UUID.randomUUID().toString());
+			dataStore.setId(SignavioUUID.generate());
 			dataStore.setName(shape.getProperty("name"));
 			if(shape.getProperty("capacity") != null && !shape.getProperty("capacity").isEmpty())
 				dataStore.setCapacity(Integer.valueOf(shape.getProperty("capacity")).intValue());

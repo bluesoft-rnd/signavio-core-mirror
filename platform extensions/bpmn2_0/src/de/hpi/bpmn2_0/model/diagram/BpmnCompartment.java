@@ -39,7 +39,7 @@ import javax.xml.bind.annotation.XmlType;
  * <pre>
  * &lt;complexType name="bpmnCompartmentType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://bpmndi.org}bpmnNodeType">
+ *     &lt;extension base="{http://www.omg.org/spec/BPMN/20100524/DI}bpmnNodeType">
  *       &lt;attribute name="isVisible" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="orientation">
  *         &lt;simpleType>
@@ -58,7 +58,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "bpmnCompartmentType", namespace = "http://bpmndi.org")
+@XmlType(name = "bpmnCompartmentType", namespace = "http://www.omg.org/spec/BPMN/20100524/DI")
 @XmlSeeAlso({
 //    PoolCompartment.class,
     LaneCompartment.class

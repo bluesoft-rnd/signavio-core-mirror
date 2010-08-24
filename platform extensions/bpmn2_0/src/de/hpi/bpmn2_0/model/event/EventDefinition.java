@@ -23,14 +23,14 @@
 
 package de.hpi.bpmn2_0.model.event;
 
-import java.util.UUID;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 
 import de.hpi.bpmn2_0.model.RootElement;
+import de.hpi.diagram.SignavioUUID;
+
 
 /**
  * <p>Java class for tEventDefinition complex type.
@@ -65,6 +65,23 @@ import de.hpi.bpmn2_0.model.RootElement;
 public abstract class EventDefinition
     extends RootElement
 {
+	
+	/* Constructors */
+	
+	/**
+	 * Default constructor
+	 */
+	public EventDefinition() {}
+	
+	/**
+	 * Copy constructor
+	 * 
+	 * @param timerEventDefinition
+	 */
+	public EventDefinition(EventDefinition eventDefinition) {
+		super(eventDefinition);
+	}
+
 	public static EventDefinition createEventDefinition(String eventIdentifier){
 		if(eventIdentifier == null)
 			return null;
@@ -86,7 +103,7 @@ public abstract class EventDefinition
 			evDef = new TerminateEventDefinition();
 		
 		if(evDef != null)
-			evDef.setId(UUID.randomUUID().toString());
+			evDef.setId(SignavioUUID.generate());
 		
 		return evDef;
 	}

@@ -42,6 +42,7 @@ import org.oryxeditor.server.diagram.Shape;
 
 import de.hpi.bpmn2_0.model.FlowElement;
 import de.hpi.bpmn2_0.model.diagram.BpmnConnector.Bendpoint;
+import de.hpi.diagram.SignavioUUID;
 
 /**
  * <p>
@@ -69,7 +70,7 @@ import de.hpi.bpmn2_0.model.diagram.BpmnConnector.Bendpoint;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "bpmnNodeType", namespace = "http://bpmndi.org")
+@XmlType(name = "bpmnNodeType", namespace = "http://www.omg.org/spec/BPMN/20100524/DI")
 @XmlSeeAlso( {
 // GroupShape.class,
 		// TextAnnotationShape.class,
@@ -109,6 +110,8 @@ public abstract class BpmnNode implements BpmnShape {
 
 	public List<Shape> toShape() {
 		Shape shape = new Shape("");
+		
+		shape.setResourceId(this.getId());
 
 		/* Create bounds */
 		Point lr = new Point(this.getX() + this.getWidth(), this.getY()
@@ -158,7 +161,10 @@ public abstract class BpmnNode implements BpmnShape {
 	 * 
 	 */
 	public String getId() {
-		return id;
+		if(this.id == null) {
+			this.id = SignavioUUID.generate();
+		}
+		return this.id;
 	}
 
 	/**

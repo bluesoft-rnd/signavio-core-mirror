@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<definitions id="sid-4b0f4038-0dec-4045-bede-80e695cb4abc" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.omg.org/bpmn20" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:saperion="http://www.signavio.com/saperion" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI">
+    <process isClosed="false" processType="none" id="sid-0d2ab94e-d290-4f23-8eb4-761595581eab">
+        <laneSet id="sid-8F88FADB-0F9E-4C82-A928-9A0AE7C87CB1">
+            <lane id="sid-9341DD47-69EA-4BC1-9C72-ED89EAFA6784">
+                <flowElementRef>sid-E509C8BD-B97A-46AC-B24C-17207231E5AA</flowElementRef>
+                <flowElementRef>sid-8FFF02F0-CBCF-42D7-B494-5842E4A04A16</flowElementRef>
+            </lane>
+        </laneSet>
+        <startEvent name="" id="sid-E509C8BD-B97A-46AC-B24C-17207231E5AA"/>
+        <endEvent name="" id="sid-8FFF02F0-CBCF-42D7-B494-5842E4A04A16"/>
+        <sequenceFlow targetRef="sid-8FFF02F0-CBCF-42D7-B494-5842E4A04A16" sourceRef="sid-E509C8BD-B97A-46AC-B24C-17207231E5AA" name="" id="sid-BF94F3C1-F434-420C-AA7A-F4D935FE58DD"/>
+    </process>
+    <bpmndi:processDiagram processRef="sid-0d2ab94e-d290-4f23-8eb4-761595581eab" id="sid-0d2ab94e-d290-4f23-8eb4-761595581eab_gui">
+        <bpmndi:laneCompartment laneRef="sid-9341DD47-69EA-4BC1-9C72-ED89EAFA6784" isVisible="true" height="250.0" width="570.0" y="0.0" x="30.0" name="" id="sid-9341DD47-69EA-4BC1-9C72-ED89EAFA6784_gui">
+            <bpmndi:eventShape eventRef="sid-E509C8BD-B97A-46AC-B24C-17207231E5AA" height="30.0" width="30.0" y="110.0" x="120.0" name="" id="sid-E509C8BD-B97A-46AC-B24C-17207231E5AA_gui"/>
+            <bpmndi:eventShape eventRef="sid-8FFF02F0-CBCF-42D7-B494-5842E4A04A16" height="28.0" width="28.0" y="111.0" x="195.0" name="" id="sid-8FFF02F0-CBCF-42D7-B494-5842E4A04A16_gui"/>
+        </bpmndi:laneCompartment>
+        <bpmndi:sequenceFlowConnector sequenceFlowRef="sid-BF94F3C1-F434-420C-AA7A-F4D935FE58DD" label="" targetRef="sid-8FFF02F0-CBCF-42D7-B494-5842E4A04A16_gui" sourceRef="sid-E509C8BD-B97A-46AC-B24C-17207231E5AA_gui" id="sid-BF94F3C1-F434-420C-AA7A-F4D935FE58DD_gui"/>
+    </bpmndi:processDiagram>
+</definitions>

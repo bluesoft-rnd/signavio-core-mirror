@@ -25,6 +25,7 @@ package de.hpi.bpmn2_0.transformation;
 
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
+
 /**
  * The namespace prefix mapper is responsible for the creation of user friendly
  * namespace prefixes in the BPMN 2.0 XML document. 
@@ -39,10 +40,15 @@ public class BPMNPrefixMapper extends NamespacePrefixMapper {
 	 */
 	@Override
 	public String getPreferredPrefix(String namespace, String suggestion, boolean isRequired) {
-		if(namespace.equals("http://bpmndi.org"))
+		
+		/* BPMN 2.0 Standard Namespaces */
+		if(namespace.equals("http://www.omg.org/spec/BPMN/20100524/MODEL")) 
+			return "";
+		else if(namespace.equals("http://www.omg.org/spec/BPMN/20100524/DI"))
 			return "bpmndi";
 		else if(namespace.equals("http://www.w3.org/2001/XMLSchema-instance"))
 			return "xsi";
+		
 		return null;
 	}
 

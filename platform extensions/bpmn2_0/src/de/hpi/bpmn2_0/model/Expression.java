@@ -23,13 +23,13 @@
 
 package de.hpi.bpmn2_0.model;
 
-import java.util.UUID;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+
+import de.hpi.diagram.SignavioUUID;
 
 
 /**
@@ -66,7 +66,7 @@ public class Expression
 	
 	public Expression(String text) {
 		this.getDocumentation().add(new Documentation(text));
-		this.setId(UUID.randomUUID().toString());
+		this.setId(SignavioUUID.generate());
 	}
 
 }

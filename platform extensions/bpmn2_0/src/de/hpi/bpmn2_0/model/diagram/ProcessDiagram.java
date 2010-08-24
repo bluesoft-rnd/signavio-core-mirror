@@ -47,12 +47,12 @@ import de.hpi.bpmn2_0.model.Process;
  * <pre>
  * &lt;complexType name="processDiagramType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://bpmndi.org}diagramType">
+ *     &lt;extension base="{http://www.omg.org/spec/BPMN/20100524/DI}diagramType">
  *       &lt;sequence>
- *         &lt;element ref="{http://bpmndi.org}laneCompartment" maxOccurs="unbounded"/>
- *         &lt;element ref="{http://bpmndi.org}sequenceFlowConnector" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element ref="{http://bpmndi.org}associationConnector" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element ref="{http://bpmndi.org}dataAssociationConnector" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element ref="{http://www.omg.org/spec/BPMN/20100524/DI}laneCompartment" maxOccurs="unbounded"/>
+ *         &lt;element ref="{http://www.omg.org/spec/BPMN/20100524/DI}sequenceFlowConnector" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element ref="{http://www.omg.org/spec/BPMN/20100524/DI}associationConnector" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element ref="{http://www.omg.org/spec/BPMN/20100524/DI}dataAssociationConnector" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="processRef" type="{http://www.w3.org/2001/XMLSchema}IDREF" />
  *     &lt;/extension>
@@ -64,7 +64,7 @@ import de.hpi.bpmn2_0.model.Process;
  */
 @XmlRootElement(name = "processDiagram")
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "processDiagram", namespace = "http://bpmndi.org", propOrder = {
+@XmlType(name = "processDiagram", namespace = "http://www.omg.org/spec/BPMN/20100524/DI", propOrder = {
     "laneCompartment",
     "sequenceFlowConnector",
     "associationConnector",

@@ -30,12 +30,16 @@ import de.hpi.bpmn2_0.exceptions.BpmnConverterException;
 import de.hpi.bpmn2_0.model.BaseElement;
 import de.hpi.bpmn2_0.model.FormalExpression;
 import de.hpi.bpmn2_0.model.activity.Activity;
+import de.hpi.bpmn2_0.model.activity.Task;
+import de.hpi.bpmn2_0.model.activity.misc.Operation;
+import de.hpi.bpmn2_0.model.data_object.Message;
 import de.hpi.bpmn2_0.model.diagram.EventShape;
 import de.hpi.bpmn2_0.model.event.BoundaryEvent;
 import de.hpi.bpmn2_0.model.event.CancelEventDefinition;
 import de.hpi.bpmn2_0.model.event.CompensateEventDefinition;
 import de.hpi.bpmn2_0.model.event.ConditionalEventDefinition;
 import de.hpi.bpmn2_0.model.event.ErrorEventDefinition;
+import de.hpi.bpmn2_0.model.event.Escalation;
 import de.hpi.bpmn2_0.model.event.EscalationEventDefinition;
 import de.hpi.bpmn2_0.model.event.Event;
 import de.hpi.bpmn2_0.model.event.IntermediateCatchEvent;
@@ -43,6 +47,9 @@ import de.hpi.bpmn2_0.model.event.LinkEventDefinition;
 import de.hpi.bpmn2_0.model.event.MessageEventDefinition;
 import de.hpi.bpmn2_0.model.event.SignalEventDefinition;
 import de.hpi.bpmn2_0.model.event.TimerEventDefinition;
+import de.hpi.bpmn2_0.model.misc.Error;
+import de.hpi.bpmn2_0.model.misc.Signal;
+import de.hpi.diagram.SignavioUUID;
 
 /**
  * Factory to create intermediate catching Events
@@ -106,6 +113,7 @@ public class IntermediateCatchEventFactory extends AbstractBpmnFactory {
 			icEvent.setId(shape.getResourceId());
 			icEvent.setName(shape.getProperty("name"));
 
+			
 			icEvent.setCancelActivity(shape
 					.getProperty("boundarycancelactivity"));
 
@@ -125,6 +133,23 @@ public class IntermediateCatchEventFactory extends AbstractBpmnFactory {
 	protected IntermediateCatchEvent createCompensateEvent(Shape shape) {
 		IntermediateCatchEvent icEvent = new IntermediateCatchEvent();
 		CompensateEventDefinition compEvDef = new CompensateEventDefinition();
+		
+		/* Activity Reference */
+		String activityRef = shape.getProperty("activityref");
+		if(activityRef != null && !activityRef.isEmpty()) {
+			Task taskRef = new Task();
+			taskRef.setId(activityRef);
+			compEvDef.setActivityRef(taskRef);
+		}
+		
+		/* Wait for Completion */
+		String waitForCompletion = shape.getProperty("waitforcompletion");
+		if(waitForCompletion != null && waitForCompletion.equals("false")) {
+			compEvDef.setWaitForCompletion(false);
+		} else {
+			compEvDef.setWaitForCompletion(true);
+		}
+		
 		icEvent.getEventDefinition().add(compEvDef);
 		return icEvent;
 	}
@@ -134,6 +159,28 @@ public class IntermediateCatchEventFactory extends AbstractBpmnFactory {
 		IntermediateCatchEvent icEvent = new IntermediateCatchEvent();
 
 		TimerEventDefinition timerEvDef = new TimerEventDefinition();
+		
+		/* Time Date */
+		String timeDate = shape.getProperty("timedate");
+		if(timeDate != null && !timeDate.isEmpty()) {
+			FormalExpression expr = new FormalExpression(timeDate);
+			timerEvDef.setTimeDate(expr);
+		}
+		
+		/* Time Cycle */
+		String timeCycle = shape.getProperty("timecycle");
+		if(timeCycle != null && !timeCycle.isEmpty()) {
+			FormalExpression expr = new FormalExpression(timeCycle);
+			timerEvDef.setTimeCycle(expr);
+		}
+		
+		/* Time Duration */
+		String timeDuration = shape.getProperty("timeduration");
+		if(timeDuration != null && !timeDuration.isEmpty()) {
+			FormalExpression expr = new FormalExpression(timeDuration);
+			timerEvDef.setTimeDuration(expr);
+		}
+		
 		icEvent.getEventDefinition().add(timerEvDef);
 
 		return icEvent;
@@ -144,6 +191,24 @@ public class IntermediateCatchEventFactory extends AbstractBpmnFactory {
 		IntermediateCatchEvent icEvent = new IntermediateCatchEvent();
 
 		MessageEventDefinition messageEvDef = new MessageEventDefinition();
+		
+		Message message = new Message();
+		Operation operation = new Operation();
+		
+		/* Message name */
+		String messageName = shape.getProperty("messagename");
+		if(messageName != null && !messageName.isEmpty()) {
+			message.setName(messageName);
+		}
+		
+		/* Operation name */
+		String operationName = shape.getProperty("operationname");
+		if(operationName != null && !operationName.isEmpty()) {
+			operation.setName(operationName);
+		}
+		
+		messageEvDef.setMessageRef(message);
+		messageEvDef.setOperationRef(operation);
 		icEvent.getEventDefinition().add(messageEvDef);
 
 		return icEvent;
@@ -154,6 +219,22 @@ public class IntermediateCatchEventFactory extends AbstractBpmnFactory {
 		IntermediateCatchEvent icEvent = new IntermediateCatchEvent();
 
 		EscalationEventDefinition escalDef = new EscalationEventDefinition();
+		
+		Escalation escalation = new Escalation();
+		
+		/* Escalation name */
+		String escalationName = shape.getProperty("escalationname");
+		if(escalationName != null && !escalationName.isEmpty()) {
+			escalation.setName(escalationName);
+		}
+		
+		/* Escalation code */
+		String escalationCode = shape.getProperty("escalationcode");
+		if(escalationCode != null && !escalationCode.isEmpty()) {
+			escalation.setEscalationCode(escalationCode);
+		}
+		
+		escalDef.setEscalationRef(escalation);
 		icEvent.getEventDefinition().add(escalDef);
 
 		return icEvent;
@@ -196,6 +277,23 @@ public class IntermediateCatchEventFactory extends AbstractBpmnFactory {
 		IntermediateCatchEvent icEvent = new IntermediateCatchEvent();
 
 		ErrorEventDefinition errorDef = new ErrorEventDefinition();
+		
+		Error error = new Error();
+		
+		/* Error name */
+		String errorName = shape.getProperty("errorname");
+		if(errorName != null && !errorName.isEmpty()) {
+			error.setName(errorName);
+		}
+		
+		/* Error code */
+		String errorCode = shape.getProperty("errorcode");
+		if(errorCode != null && !errorCode.isEmpty()) {
+			error.setErrorCode(errorCode);
+		}
+		
+		errorDef.setError(error);
+		
 		icEvent.getEventDefinition().add(errorDef);
 
 		return icEvent;
@@ -216,6 +314,19 @@ public class IntermediateCatchEventFactory extends AbstractBpmnFactory {
 		IntermediateCatchEvent icEvent = new IntermediateCatchEvent();
 
 		SignalEventDefinition signalDef = new SignalEventDefinition();
+		
+		Signal signal = new Signal();
+		
+		/* Signal ID */
+		signal.setId(SignavioUUID.generate());
+		
+		/* Signal name */
+		String signalName = shape.getProperty("signalname");
+		if(signalName != null && !signalName.isEmpty()) {
+			signal.setName(signalName);
+		}
+		
+		signalDef.setSignalRef(signal);
 		icEvent.getEventDefinition().add(signalDef);
 
 		return icEvent;
@@ -250,8 +361,8 @@ public class IntermediateCatchEventFactory extends AbstractBpmnFactory {
 		
 		/* Special boundary event attributes */
 		bEvent.setAttachedToRef((Activity) activity.getNode());
-		bEvent.setCancelActivity(((IntermediateCatchEvent) event.getNode())
-				.getCancelActivity().equalsIgnoreCase("true"));
+		bEvent.setCancelActivity(!((IntermediateCatchEvent) event.getNode())
+				.getCancelActivity().equalsIgnoreCase("false"));
 		
 		// bEvent.setProcessRef(event.get);
 		bEvent.setId(event.getNode().getId());
@@ -275,9 +386,9 @@ public class IntermediateCatchEventFactory extends AbstractBpmnFactory {
 		if (ice.getLane() != null) {
 			/* Exchange intermediate event with boundary event */
 			bEvent.setLane(ice.getLane());
-			int index = bEvent.getLane().getFlowElementRef().indexOf(ice);
-			bEvent.getLane().getFlowElementRef().remove(ice);
-			bEvent.getLane().getFlowElementRef().add(index, bEvent);
+			int index = bEvent.getLane().getFlowNodeRef().indexOf(ice);
+			bEvent.getLane().getFlowNodeRef().remove(ice);
+			bEvent.getLane().getFlowNodeRef().add(index, bEvent);
 		}
 	}
 }

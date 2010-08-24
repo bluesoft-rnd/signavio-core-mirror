@@ -25,6 +25,7 @@ package de.hpi.bpmn2_0.model.misc;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -56,6 +57,10 @@ public class Error
 
     @XmlElement
     protected ItemDefinition structureRef;
+    @XmlAttribute
+    protected String name;
+    @XmlAttribute
+    protected String errorCode;
 
     /**
      * Gets the value of the structureRef property.
@@ -80,5 +85,21 @@ public class Error
     public void setStructureRef(ItemDefinition value) {
         this.structureRef = value;
     }
+
+	public String getName() {
+		return name;
+	}
+
+	public String getErrorCode() {
+		return errorCode;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setErrorCode(String errorCode) {
+		this.errorCode = errorCode;
+	}
 
 }

@@ -43,7 +43,7 @@ import de.hpi.bpmn2_0.model.connector.Association;
  * <pre>
  * &lt;complexType name="associationConnectorType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://bpmndi.org}bpmnConnectorType">
+ *     &lt;extension base="{http://www.omg.org/spec/BPMN/20100524/DI}bpmnConnectorType">
  *       &lt;attribute name="isDirectional" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *     &lt;/extension>
  *   &lt;/complexContent>
@@ -54,7 +54,7 @@ import de.hpi.bpmn2_0.model.connector.Association;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "associationConnectorType", namespace = "http://bpmndi.org")
+@XmlType(name = "associationConnectorType", namespace = "http://www.omg.org/spec/BPMN/20100524/DI")
 @XmlSeeAlso({
     AssociationConnector.class,
     DataAssociationConnector.class
