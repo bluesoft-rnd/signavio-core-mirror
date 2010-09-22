@@ -277,7 +277,7 @@ public class Shape implements Stencil, Bounded{
 	/* (non-Javadoc)
 	 * @see org.oryxeditor.server.diagram.Bounded#height()
 	 */
-	@Override
+//	@Override
 	public double getHeight() {
 		return this.getLowerRight().getY() - this.getUpperLeft().getY();
 	}
@@ -285,7 +285,7 @@ public class Shape implements Stencil, Bounded{
 	/* (non-Javadoc)
 	 * @see org.oryxeditor.server.diagram.Bounded#width()
 	 */
-	@Override
+//	@Override
 	public double getWidth() {
 		return this.getLowerRight().getX() - this.getUpperLeft().getX();
 	}
