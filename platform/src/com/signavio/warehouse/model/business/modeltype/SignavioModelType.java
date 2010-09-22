@@ -112,7 +112,7 @@ public class SignavioModelType implements ModelType {
 		return false;
 	}
 
-	@Override
+	//@Override
 	public File storeModel(String path, String id, String name, String description,
 			String type, String jsonRep, String svgRep) {
 		File modelFile;
@@ -134,7 +134,7 @@ public class SignavioModelType implements ModelType {
 				"</oryxmodel>\n";
 	}
 
-	@Override
+//	@Override
 	public boolean renameFile(String parentPath, String oldName, String newName) {
 		if(parentPath != "") {
 			parentPath += File.separator;
@@ -142,7 +142,7 @@ public class SignavioModelType implements ModelType {
 		return FileSystemUtil.renameFile(parentPath + oldName + getFileExtension(), parentPath + newName + getFileExtension());
 	}
 
-	@Override
+//	@Override
 	public void deleteFile(String parentPath, String name) {
 		FileSystemUtil.deleteFileOrDirectory(parentPath + File.separator + name + getFileExtension());
 	}
