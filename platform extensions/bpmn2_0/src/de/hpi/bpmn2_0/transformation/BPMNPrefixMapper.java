@@ -23,6 +23,9 @@
 
 package de.hpi.bpmn2_0.transformation;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 
@@ -38,7 +41,7 @@ public class BPMNPrefixMapper extends NamespacePrefixMapper {
 	/* (non-Javadoc)
 	 * @see com.sun.xml.bind.marshaller.NamespacePrefixMapper#getPreferredPrefix(java.lang.String, java.lang.String, boolean)
 	 */
-	@Override
+	// @Override
 	public String getPreferredPrefix(String namespace, String suggestion, boolean isRequired) {
 		
 		/* BPMN 2.0 Standard Namespaces */
@@ -48,8 +51,23 @@ public class BPMNPrefixMapper extends NamespacePrefixMapper {
 			return "bpmndi";
 		else if(namespace.equals("http://www.w3.org/2001/XMLSchema-instance"))
 			return "xsi";
+		else if(namespace.equals("http://www.omg.org/spec/DD/20100524/DI"))
+			return "omgdi";
+		else if(namespace.equals("http://www.omg.org/spec/DD/20100524/DC"))
+			return "omgdc";
 		
-		return null;
+		/* Signavio */
+		else if(namespace.equals("http://www.signavio.com"))
+			return "signavio";
+		
+		/* Check custom extension */
+		return getCustomExtensions().get(namespace);
+	}
+	
+	public static Map<String, String> getCustomExtensions() {
+		Map<String, String> customExtensions = new HashMap<String, String>();
+		
+		return customExtensions;
 	}
 
 }

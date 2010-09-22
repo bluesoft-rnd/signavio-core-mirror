@@ -23,6 +23,9 @@
 
 package de.hpi.bpmn2_0.model.event;
 
+import java.util.ArrayList;
+
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -31,13 +34,21 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
-import de.hpi.bpmn2_0.model.activity.Activity;
+import org.oryxeditor.server.diagram.Point;
+import org.oryxeditor.server.diagram.Shape;
 
+import de.hpi.bpmn2_0.model.activity.Activity;
+import de.hpi.bpmn2_0.model.bpmndi.dc.Bounds;
+
+import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
 
 /**
- * <p>Java class for tBoundaryEvent complex type.
+ * <p>
+ * Java class for tBoundaryEvent complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within
+ * this class.
  * 
  * <pre>
  * &lt;complexType name="tBoundaryEvent">
@@ -55,67 +66,117 @@ import de.hpi.bpmn2_0.model.activity.Activity;
 @XmlRootElement(name = "boundaryEvent")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tBoundaryEvent")
-public class BoundaryEvent
-    extends IntermediateCatchEvent
-{
+public class BoundaryEvent extends IntermediateCatchEvent {
 
-    @XmlAttribute
-    protected Boolean cancelActivity;
-    @XmlAttribute(required = true)
-    @XmlIDREF
-    @XmlSchemaType(name = "IDREF")
-    protected Activity attachedToRef;
+	@XmlAttribute
+	protected Boolean cancelActivity;
+	@XmlAttribute(required = true)
+	@XmlIDREF
+	@XmlSchemaType(name = "IDREF")
+	protected Activity attachedToRef;
 
-    /**
-     * Gets the value of the cancelActivity property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    public boolean isCancelActivity() {
-        if (cancelActivity == null) {
-            return true;
-        } else {
-            return cancelActivity;
-        }
-    }
+	 public void afterUnmarshal(Unmarshaller u, Object parent) {
+		 if(this.getAttachedToRef() != null) {
+			 this.getAttachedToRef().getBoundaryEventRefs().add(this);
+		 }
+	 }
+	 
+	 /**
+		 * 
+		 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
+		 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
+		 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
+		 * 
+		 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
+		 */
+	public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
 
-    /**
-     * Sets the value of the cancelActivity property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setCancelActivity(Boolean value) {
-        this.cancelActivity = value;
-    }
+		Shape shape = super.toShape(converterForShapeCoordinateLookup);
 
-    /**
-     * Gets the value of the attachedToRef property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Activity }
-     *     
-     */
-    public Activity getAttachedToRef() {
-        return attachedToRef;
-    }
+		String attachedToObject = this.attachedToRef.getId();
+		
+		//[BPMN2.0] TODO which one is right?
+		//shape.addOutgoing(new Shape(attachedToObject));
+		shape.addIncoming(new Shape(attachedToObject));
+		
+		//add to attachedTo event as outgoing
+		Shape s = converterForShapeCoordinateLookup.getEditorShapeByID(attachedToObject);
+		if(s == null){
+			s = converterForShapeCoordinateLookup.newShape(attachedToObject);
+		}
+		s.addOutgoing(new Shape(this.getId()));
+		
+		
+		// add central docker; event size is fixed at 30 x 30
+		Bounds bounds = converterForShapeCoordinateLookup
+				.getBpmnShapeByID(this.attachedToRef.getId()).getBounds();
+		
+		Bounds thisBpmnShapeBounds = converterForShapeCoordinateLookup
+		.getBpmnShapeByID(this.getId()).getBounds();
+			
+		ArrayList<Point> dockers = shape.getDockers();
+				
+		dockers.add(new Point(thisBpmnShapeBounds.getX()
+				- bounds.getX() + 15, 
+				thisBpmnShapeBounds.getY() - bounds.getY() + 15));
+		
+				
+		shape.putProperty("boundarycancelactivity", Boolean.toString(this.isCancelActivity()));
+		
+		
+		
+		//unnecessary
+		//shape.setDockers(dockers);
+	
+		return shape;
+	}
+	
+	/* Getter & Setter */
+	
+	/**
+	 * Gets the value of the cancelActivity property.
+	 * 
+	 * @return possible object is {@link Boolean }
+	 * 
+	 */
+	public boolean isCancelActivity() {
+		if (cancelActivity == null) {
+			return true;
+		} else {
+			return cancelActivity;
+		}
+	}
 
-    /**
-     * Sets the value of the attachedToRef property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Activity }
-     *     
-     */
-    public void setAttachedToRef(Activity value) {
-        this.attachedToRef = value;
-    }
+	/**
+	 * Sets the value of the cancelActivity property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Boolean }
+	 * 
+	 */
+	public void setCancelActivity(Boolean value) {
+		this.cancelActivity = value;
+	}
+
+	/**
+	 * Gets the value of the attachedToRef property.
+	 * 
+	 * @return possible object is {@link Activity }
+	 * 
+	 */
+	public Activity getAttachedToRef() {
+		return attachedToRef;
+	}
+
+	/**
+	 * Sets the value of the attachedToRef property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Activity }
+	 * 
+	 */
+	public void setAttachedToRef(Activity value) {
+		this.attachedToRef = value;
+	}
 
 }

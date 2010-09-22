@@ -26,11 +26,18 @@ package de.hpi.bpmn2_0.model.connector;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlSeeAlso;
 
 import org.oryxeditor.server.diagram.Shape;
 
 import de.hpi.bpmn2_0.model.FlowElement;
 import de.hpi.bpmn2_0.model.FlowNode;
+
+
+import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+
+import de.hpi.bpmn2_0.model.conversation.ConversationLink;
+
 
 /**
  * Represents all types of edges in a BPMN 2.0 process.
@@ -39,17 +46,26 @@ import de.hpi.bpmn2_0.model.FlowNode;
  * @author Sven Wagner-Boysen
  *
  */
+@XmlSeeAlso({
+	SequenceFlow.class,
+	Association.class,
+	MessageFlow.class,
+	ConversationLink.class,
+	DataAssociation.class,
+	DataInputAssociation.class,
+	DataOutputAssociation.class
+})
 public abstract class Edge extends FlowElement {
 	
-	@XmlAttribute(required = true)
+	@XmlAttribute
 	@XmlIDREF
 	@XmlSchemaType(name = "IDREF")
-	protected FlowElement sourceRef;
+	public FlowElement sourceRef;
 	
-	@XmlAttribute(required = true)
+	@XmlAttribute
 	@XmlIDREF
 	@XmlSchemaType(name = "IDREF")
-	protected FlowElement targetRef;
+	public FlowElement targetRef;
 	
 	public Edge() {}
 	
@@ -106,9 +122,26 @@ public abstract class Edge extends FlowElement {
 		this.targetRef = targetRef;
 	}
 	
-	public void toShape(Shape shape) {
-    	super.toShape(shape);
-    	shape.setTarget(new Shape(this.getTargetRef().getId()));
-    	shape.getOutgoings().add(new Shape(this.getTargetRef().getId()));
+	/**
+	 * 
+	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
+	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
+	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
+	 * 
+	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. TargetRef, incomings and outgoings (from source and target) are set. 
+	 */
+	public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
+    	Shape shape = super.toShape(converterForShapeCoordinateLookup);
+    	
+    	//check for null pointers: edges may be unconnected!
+    	if(this.getTargetRef() != null){
+    		shape.setTarget(new Shape(this.getTargetRef().getId()));
+    		shape.getOutgoings().add(new Shape(this.getTargetRef().getId()));
+		}
+    	if(this.getSourceRef() != null){
+    		shape.getIncomings().add(new Shape(this.getSourceRef().getId()));
+    	}
+    	
+    	return shape;
     }
 }

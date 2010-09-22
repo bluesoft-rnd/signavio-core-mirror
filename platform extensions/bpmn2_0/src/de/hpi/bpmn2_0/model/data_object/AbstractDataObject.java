@@ -36,7 +36,10 @@ import org.oryxeditor.server.diagram.StencilType;
 import de.hpi.bpmn2_0.model.FlowElement;
 import de.hpi.bpmn2_0.model.FlowNode;
 import de.hpi.bpmn2_0.model.Process;
+import de.hpi.bpmn2_0.model.artifacts.ProcessParticipant;
 import de.hpi.bpmn2_0.model.connector.Edge;
+
+import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
 
 /**
  * The AbstractDataObject abstracts from data related elements, like
@@ -44,8 +47,15 @@ import de.hpi.bpmn2_0.model.connector.Edge;
  * 
  * @author Sven Wagner-Boysen
  */
-@XmlSeeAlso( { DataObject.class, DataInput.class, DataOutput.class,
-		ITSystem.class, DataStoreReference.class })
+@XmlSeeAlso( { 
+	DataObject.class, 
+	DataInput.class, 
+	DataOutput.class,
+	ITSystem.class, 
+	DataStoreReference.class, 
+	DataObjectReference.class,
+	ProcessParticipant.class
+})
 public abstract class AbstractDataObject extends FlowNode {
 
 	/* Common attributes of data objects */
@@ -54,17 +64,20 @@ public abstract class AbstractDataObject extends FlowNode {
 	protected Boolean isCollection;
 
 	/**
-	 * Basic method to convert a data aware item to its shape representation.
 	 * 
-	 * @param shape
-	 *            The resource shape object containing graphical information
-	 *            only.
+	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
+	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
+	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
+	 * 
+	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
 	 */
-	public void toShape(Shape shape) {
-		super.toShape(shape);
-
-		shape.setStencil(new StencilType("DataObject"));
-	}
+    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
+    	Shape shape = super.toShape(converterForShapeCoordinateLookup);
+    	
+    	shape.setStencil(new StencilType("DataObject"));
+    	
+    	return shape;
+    }
 
 	// @XmlTransient
 	// private Boolean isRequiredForStart;

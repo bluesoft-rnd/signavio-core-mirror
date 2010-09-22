@@ -35,9 +35,14 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 
+import org.oryxeditor.server.diagram.Shape;
+
 import de.hpi.bpmn2_0.model.BaseElement;
 import de.hpi.bpmn2_0.model.activity.Activity;
+import de.hpi.bpmn2_0.model.conversation.CorrelationKey;
 import de.hpi.bpmn2_0.model.participant.Participant;
+
+import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
 
 
 /**
@@ -62,34 +67,68 @@ import de.hpi.bpmn2_0.model.participant.Participant;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tChoreographyActivity", propOrder = {
-    "participant"
+    "participantRef",
+    "correlationKey",
+    "initiatingParticipantRef",
+    "loopType"
 })
 @XmlSeeAlso({
-    ChoreographyTask.class//,
-//    TCallChoreographyActivity.class,
-//    ChoreographySubProcess.class
+    ChoreographyTask.class,
+    SubChoreography.class
 })
 public abstract class ChoreographyActivity
     extends Activity
 {
 
     @XmlElement(required = true)
-    protected List<Participant> participant;
+    @XmlIDREF
+    protected List<Participant> participantRef;
+    protected List<CorrelationKey> correlationKey;
     
     @XmlIDREF
     @XmlAttribute(required = true)
     @XmlSchemaType(name = "IDREF")
     protected Participant initiatingParticipantRef;
     
+    @XmlAttribute
+    protected ChoreographyLoopType loopType;
+    
     public void addChild(BaseElement child) {
     	if(child instanceof Participant) {
-    		this.getParticipants().add((Participant) child);
+    		this.getParticipantRef().add((Participant) child);
     		if(((Participant) child).isInitiating()) {
     			this.setInitiatingParticipantRef((Participant) child);
     		}
     	}
     }
     
+	/**
+	 * 
+	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
+	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
+	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
+	 * 
+	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
+	 */
+    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
+    	Shape shape = super.toShape(converterForShapeCoordinateLookup);
+		if(this.getLoopType() != null){
+	    	if(this.getLoopType().equals(ChoreographyLoopType.MULTI_INSTANCE_PARALLEL)){
+	    		shape.putProperty("loopType", "MultiInstance");
+	    	} else if(this.getLoopType().equals(ChoreographyLoopType.MULTI_INSTANCE_SEQUENTIAL)){
+	    		shape.putProperty("loopType", "Sequential");
+	    	} else if(this.getLoopType().equals(ChoreographyLoopType.STANDARD)){
+	    		shape.putProperty("loopType", "Standard");
+	    	} else {
+	    		shape.putProperty("loopType", "None");
+	    	}
+		}
+		else{
+			shape.putProperty("loopType", "None");
+		}
+						
+		return shape;
+    }
     /* Getter & Setter */
     
     /**
@@ -114,11 +153,11 @@ public abstract class ChoreographyActivity
      * 
      * 
      */
-    public List<Participant> getParticipants() {
-        if (participant == null) {
-            participant = new ArrayList<Participant>();
+    public List<Participant> getParticipantRef() {
+        if (participantRef == null) {
+            participantRef = new ArrayList<Participant>();
         }
-        return this.participant;
+        return this.participantRef;
     }
 
     /**
@@ -144,5 +183,17 @@ public abstract class ChoreographyActivity
     public void setInitiatingParticipantRef(Participant value) {
         this.initiatingParticipantRef = value;
     }
+
+	public ChoreographyLoopType getLoopType() {
+		return loopType;
+	}
+
+	public void setLoopType(ChoreographyLoopType loopType) {
+		this.loopType = loopType;
+	}
+
+	public List<CorrelationKey> getCorrelationKey() {
+		return correlationKey;
+	}
 
 }

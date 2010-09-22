@@ -29,6 +29,12 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 
+import org.oryxeditor.server.diagram.Shape;
+import org.oryxeditor.server.diagram.StencilType;
+
+
+import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+
 
 /**
  * <p>Java class for tDataInput complex type.
@@ -52,14 +58,35 @@ import javax.xml.namespace.QName;
  * 
  * 
  */
-@XmlRootElement
+@XmlRootElement(name = "dataObject")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ITSystem
     extends AbstractDataObject
 {
+	//TODO: Implement XML-Tag under Signavio namespace, to identify a it-system
 
     @XmlAttribute
     protected QName itemSubjectRef;
+    @XmlAttribute(namespace = "http://www.signavio.com")
+    protected boolean isITSystem = true;
+    
+    /**
+	 * 
+	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
+	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
+	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
+	 * 
+	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
+	 */
+    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup)  {
+		Shape shape = super.toShape(converterForShapeCoordinateLookup);
+
+		shape.setStencil(new StencilType("ITSystem"));
+        
+        //shape.putProperty("", );
+        
+		return shape;
+	}
 
     /**
      * Gets the value of the itemSubjectRef property.
@@ -84,5 +111,6 @@ public class ITSystem
     public void setItemSubjectRef(QName value) {
         this.itemSubjectRef = value;
     }
+
 
 }

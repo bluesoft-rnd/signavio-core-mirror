@@ -24,6 +24,7 @@
 package de.hpi.bpmn2_0.model.participant;
 
 import java.util.ArrayList;
+
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -33,11 +34,13 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.hpi.bpmn2_0.annotations.ChildElements;
 import de.hpi.bpmn2_0.model.BaseElement;
 import de.hpi.bpmn2_0.model.FlowElement;
 import de.hpi.bpmn2_0.model.Process;
+import de.hpi.bpmn2_0.util.EscapingStringAdapter;
 
 
 /**
@@ -84,6 +87,7 @@ public class LaneSet
 	protected Process process;
 	
 	@XmlAttribute
+	@XmlJavaTypeAdapter(EscapingStringAdapter.class)
 	protected String name;
 	
 	@XmlTransient
@@ -136,14 +140,54 @@ public class LaneSet
 			if(lane.childLaneSet == null) 
 				/* Deepest lane in lane tree */
 				laneList.add(lane);
-			else if(lane.getChildLaneSet().lanes != null && lane.getChildLaneSet().getLanes().size() > 0) {
-				laneList.addAll(this.getDeepestLanes(lane.getChildLaneSet().getLanes()));
+			else if(lane.getChildLaneSet(false).lanes != null && lane.getChildLaneSet(false).getLanes().size() > 0) {
+				laneList.addAll(this.getDeepestLanes(lane.getChildLaneSet(false).getLanes()));
 			} else {
 //				laneList.add(lane);
 			}
 		}
 		return laneList;
 	}
+	
+	/**
+	 * Returns all contained child lane and their children.
+	 * 
+	 * @return
+	 */
+	public List<Lane> getAllLanes() {
+		List<Lane> laneList = new ArrayList<Lane>();
+		for(Lane lane : this.getLanes()) {
+			laneList.add(lane);
+			laneList.addAll(lane.getLaneList());
+		}
+		
+		return laneList;
+	}
+	
+//	/**
+//	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
+//	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
+//	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
+//	 */
+//	  public Shape toShape(BPMN2DiagramConverter converterForShapeCoordinateLookup) {
+//	    	Shape shape = super.toShape(converterForShapeCoordinateLookup);
+//	    	
+//	    	// This should not work...? according to the standard, a laneset contains lanes, it is just a container and no graphical element.
+//	    	// > Well, thus it never shows up as a BPMNShape anyway... :D
+//	    	shape.setStencil(new StencilType("Pool"));	   
+//	    	
+//	    	List<FlowElement> x = this.getChildFlowElements();
+//	    	ArrayList<Shape> children = new ArrayList<Shape>();
+//	    	for(FlowElement f : x){
+//	    		children.add(new Shape(f.getId()));
+//	    	}
+//	    	shape.setChildShapes(children);
+//	    	
+//	    	this.getParentLane().addChild(this);
+//	    	//this.getPool();
+//	    	
+//	    	return shape;
+//	  }
 	
 	/* Getter & Setter */
 	

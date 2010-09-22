@@ -63,6 +63,9 @@ import org.oryxeditor.server.diagram.StencilType;
 import de.hpi.bpmn2_0.model.Expression;
 import de.hpi.bpmn2_0.model.activity.Activity;
 import de.hpi.bpmn2_0.model.data_object.AbstractDataObject;
+import de.hpi.bpmn2_0.model.gateway.Gateway;
+
+import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
 
 /**
  * <p>
@@ -196,14 +199,74 @@ public class SequenceFlow extends Edge {
 	}
 
 	/**
-	 * Transforming a sequence flow to a JSON-based shape.
+	 * 
+	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
+	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
+	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
+	 * 
+	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. The condition type and condition expression are set, the stencil, and the isimmediate property.
 	 */
-	public void toShape(Shape shape) {
-		super.toShape(shape);
+	public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
+		Shape shape = super.toShape(converterForShapeCoordinateLookup);
 
 		shape.setStencil(new StencilType("SequenceFlow"));
+		
+		if(this.getConditionExpression() != null){
+			//condition expression is there > conditional flow!
+			if(myIsDefaultSequenceFlow()){
+				//in that case, the condition is ignored
+				shape.putProperty("ConditionType", "Default");
+				shape.putProperty("conditiontype", "Default");
+			}else{
+				shape.putProperty("ConditionType", "Expression");
+				if(this.getConditionExpression().toExportString() != null)
+					shape.putProperty("conditionexpression", this.getConditionExpression().toExportString());
+				//diamond marker at edge's non-arrow end if it does not come from a gateway
+				if(!(this.getSourceRef() instanceof Gateway )){//&& !this.isDefaultSequenceFlow()){
+					shape.putProperty("showdiamondmarker", "true");
+				}
+				else{
+					shape.putProperty("showdiamondmarker", "false");
+				}
+			}
+		}
+		else if(myIsDefaultSequenceFlow()){
+			shape.putProperty("ConditionType", "Default");
+			shape.putProperty("conditiontype", "Default");
+		}
+		else {
+			shape.putProperty("ConditionType", "None");
+		}
+		
+		shape.putProperty("isimmediate", Boolean.toString(this.isIsImmediate()));
+		
+		/*
+		String sourceObject = this.sourceRef.getId();
+		
+    	//add to source as outgoing
+		Shape s = converterForShapeCoordinateLookup.getEditorShapeByID(sourceObject);
+		if(s == null){
+			s = converterForShapeCoordinateLookup.newShape(sourceObject);
+		}
+		s.addOutgoing(new Shape(this.getId()));
+		*/
+			
+		return shape;
 	}
 
+	private boolean myIsDefaultSequenceFlow() {
+		// compute whether this is a default sequence flow! look up the respective 
+		if(this.getSourceRef() != null){
+			if(this.getSourceRef() instanceof Activity){
+				if(((Activity)this.getSourceRef()).getDefault() != null && ((Activity)this.getSourceRef()).getDefault() == this){
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
 	/* Getter & Setter */
 
 	/**

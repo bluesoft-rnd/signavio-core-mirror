@@ -45,21 +45,24 @@ import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 
+import de.hpi.bpmn2_0.model.bpmndi.BPMNDiagram;
+import de.hpi.bpmn2_0.model.bpmndi.BPMNPlane;
 import de.hpi.bpmn2_0.model.choreography.Choreography;
 import de.hpi.bpmn2_0.model.connector.Edge;
 import de.hpi.bpmn2_0.model.connector.MessageFlow;
 import de.hpi.bpmn2_0.model.conversation.Conversation;
-import de.hpi.bpmn2_0.model.conversation.ConversationLink;
+import de.hpi.bpmn2_0.model.conversation.GlobalCommunication;
 import de.hpi.bpmn2_0.model.data_object.Message;
-import de.hpi.bpmn2_0.model.diagram.BpmnDiagram;
-import de.hpi.bpmn2_0.model.diagram.ChoreographyDiagram;
-import de.hpi.bpmn2_0.model.diagram.CollaborationDiagram;
-import de.hpi.bpmn2_0.model.diagram.ConversationDiagram;
-import de.hpi.bpmn2_0.model.diagram.ProcessDiagram;
+import de.hpi.bpmn2_0.model.event.CancelEventDefinition;
 import de.hpi.bpmn2_0.model.event.CompensateEventDefinition;
+import de.hpi.bpmn2_0.model.event.ConditionalEventDefinition;
+import de.hpi.bpmn2_0.model.event.ErrorEventDefinition;
 import de.hpi.bpmn2_0.model.event.EventDefinition;
+import de.hpi.bpmn2_0.model.event.LinkEventDefinition;
+import de.hpi.bpmn2_0.model.event.SignalEventDefinition;
 import de.hpi.bpmn2_0.model.misc.Signal;
 import de.hpi.bpmn2_0.validation.BPMN2SyntaxChecker;
+import de.hpi.diagram.SignavioUUID;
 
 /**
  * <p>
@@ -113,11 +116,8 @@ public class Definitions {
 			@XmlElementRef(type = Signal.class)})
 	protected List<RootElement> rootElement;
 	
-	@XmlElementRefs( { @XmlElementRef(type = ProcessDiagram.class),
-			@XmlElementRef(type = CollaborationDiagram.class),
-			@XmlElementRef(type = ChoreographyDiagram.class),
-			@XmlElementRef(type = ConversationDiagram.class) })
-	protected List<BpmnDiagram> diagram;
+	@XmlElementRef
+	protected List<BPMNDiagram> diagram;
 	// protected List<TRelationship> relationship;
 	
 	@XmlAttribute
@@ -140,57 +140,22 @@ public class Definitions {
 	@XmlAttribute
 	@XmlSchemaType(name = "anyURI")
 	protected String typeLanguage;
+	
+	@XmlAttribute(name = "exporter")
+    protected String exporter;
+	
+    @XmlAttribute(name = "exporterVersion")
+    protected String exporterVersion;
 
 	@XmlAnyAttribute
 	private Map<QName, String> otherAttributes = new HashMap<QName, String>();
 
 	@XmlTransient
 	private Map<String, String> namespaces;
-
-	/**
-	 * 
-	 * @return
-	 */
-	public ConversationDiagram getConversationDiagram() {
-		for (BpmnDiagram dia : this.getDiagram()) {
-			if (dia instanceof ConversationDiagram) {
-				return (ConversationDiagram) dia;
-			}
-		}
-
-		return null;
-	}
-
-	public ChoreographyDiagram getChoreographyDiagram() {
-		for (BpmnDiagram dia : this.getDiagram()) {
-			if (dia instanceof ChoreographyDiagram) {
-				return (ChoreographyDiagram) dia;
-			}
-		}
-
-		return null;
-	}
-
-	public CollaborationDiagram getCollaborationDiagram() {
-		for (BpmnDiagram dia : this.getDiagram()) {
-			if (dia instanceof CollaborationDiagram) {
-				return (CollaborationDiagram) dia;
-			}
-		}
-
-		return null;
-	}
-
-	public ProcessDiagram getProcessDiagram() {
-		for (BpmnDiagram dia : this.getDiagram()) {
-			if (dia instanceof ProcessDiagram) {
-				return (ProcessDiagram) dia;
-			}
-		}
-
-		return null;
-	}
 	
+	@XmlTransient
+	public List<String> unusedNamespaceDeclarations;
+
 	/**
 	 * The {@link Marshaller} invokes this method right before marshaling to 
 	 * XML. The namespace are added as attributes to the definitions element.
@@ -204,6 +169,12 @@ public class Definitions {
 					this.getNamespaces().get(prefix));
 		}
 	}
+	
+//	public void afterMarshal(Marshaller source) {
+//		
+//		
+//		
+//	}
 
 	/* Getter & Setter */
 
@@ -367,16 +338,6 @@ public class Definitions {
 					if (flowElement instanceof Edge)
 						edges.add((Edge) flowElement);
 				}
-
-			} else if (rootElement instanceof Conversation) {
-
-				for (ConversationLink cl : ((Conversation) rootElement)
-						.getConversationLink())
-					edges.add(cl);
-
-				for (MessageFlow mf : ((Conversation) rootElement)
-						.getMessageFlow())
-					edges.add(mf);
 			}
 		}
 
@@ -402,17 +363,34 @@ public class Definitions {
 	 * 
 	 * <p>
 	 * Objects of the following type(s) are allowed in the list
-	 * {@link JAXBElement }{@code <}{@link BpmnDiagram }{@code >}
-	 * {@link JAXBElement }{@code <}{@link CollaborationDiagram }{@code >}
-	 * {@link JAXBElement }{@code <}{@link ProcessDiagram }{@code >}
-	 * 
+	 * {@link BpmnDiagram }
 	 * 
 	 */
-	public List<BpmnDiagram> getDiagram() {
+	public List<BPMNDiagram> getDiagram() {
 		if (diagram == null) {
-			diagram = new ArrayList<BpmnDiagram>();
+			diagram = new ArrayList<BPMNDiagram>();
 		}
 		return this.diagram;
+	}
+	
+	/**
+	 * Returns the first {@link BPMNPlane} or creates one if none exists.
+	 * 
+	 * @return
+	 */
+	public BPMNPlane getFirstPlane() {
+		if(this.getDiagram().size() == 0) {
+			BPMNDiagram diagram = new BPMNDiagram();
+			diagram.setId(SignavioUUID.generate());
+			this.getDiagram().add(diagram);
+		}
+		
+		BPMNDiagram diagram = this.getDiagram().get(0);
+		if(diagram.getBPMNPlane() == null) {
+			diagram.setBPMNPlane(new BPMNPlane());
+		}
+		
+		return diagram.getBPMNPlane();
 	}
 
 	public BPMN2SyntaxChecker getSyntaxChecker() {
@@ -547,6 +525,22 @@ public class Definitions {
 	 */
 	public void setTypeLanguage(String value) {
 		this.typeLanguage = value;
+	}
+
+	public String getExporter() {
+		return exporter;
+	}
+
+	public void setExporter(String exporter) {
+		this.exporter = exporter;
+	}
+
+	public String getExporterVersion() {
+		return exporterVersion;
+	}
+
+	public void setExporterVersion(String exporterVersion) {
+		this.exporterVersion = exporterVersion;
 	}
 
 	/**

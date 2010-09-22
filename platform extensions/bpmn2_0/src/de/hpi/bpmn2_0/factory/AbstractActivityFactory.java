@@ -51,7 +51,7 @@ import de.hpi.bpmn2_0.model.misc.Property;
  * @author Sven Wagner-Boysen
  * 
  */
-public abstract class AbstractActivityFactory extends AbstractBpmnFactory {
+public abstract class AbstractActivityFactory extends AbstractShapeFactory {
 
 	/**
 	 * Sets common attributes of activity (task, subprocess, event-subprocess)
@@ -63,6 +63,7 @@ public abstract class AbstractActivityFactory extends AbstractBpmnFactory {
 	 *            The source diagram shape.
 	 */
 	protected void setStandardAttributes(Activity activity, Shape shape) {
+		this.setCommonAttributes(activity, shape);
 		
 		/* Handle isCompensation Property */
 		this.setCompensationProperty(activity, shape);
@@ -103,7 +104,7 @@ public abstract class AbstractActivityFactory extends AbstractBpmnFactory {
 		
 		HashMap<String, IoOption> options = new HashMap<String, IoOption>();
 		
-		if(ioSpecString != null && !ioSpecString.isEmpty()) {
+		if(ioSpecString != null && !(ioSpecString.length() == 0)) {
 			try {
 				JSONObject ioSpecObject = new JSONObject(ioSpecString);
 				JSONArray ioSpecItems = ioSpecObject.getJSONArray("items");
@@ -116,7 +117,7 @@ public abstract class AbstractActivityFactory extends AbstractBpmnFactory {
 
 					/* Name */
 					String name = propertyItem.getString("name");
-					if(name == null || name.isEmpty())
+					if(name == null || name.length() == 0)
 						continue;
 					
 					/* Optional */
@@ -204,7 +205,7 @@ public abstract class AbstractActivityFactory extends AbstractBpmnFactory {
 
 		/* Distinguish between standard and multiple instance loop types */
 		String loopType = shape.getProperty("looptype");
-		if (loopType != null && !loopType.isEmpty()) {
+		if (loopType != null && !(loopType.length() == 0)) {
 
 			/* Loop type standard */
 			if (loopType.equalsIgnoreCase("Standard")) 
@@ -228,7 +229,7 @@ public abstract class AbstractActivityFactory extends AbstractBpmnFactory {
 		ArrayList<Property> propertiesList = new ArrayList<Property>();
 		
 		String propertiesString = shape.getProperty("properties");
-		if(propertiesString != null && !propertiesString.isEmpty()) {
+		if(propertiesString != null && !(propertiesString.length() == 0)) {
 			try {
 				JSONObject propertyObject = new JSONObject(propertiesString);
 				JSONArray propertyItems = propertyObject.getJSONArray("items");
@@ -244,22 +245,22 @@ public abstract class AbstractActivityFactory extends AbstractBpmnFactory {
 
 					/* Name */
 					String name = propertyItem.getString("name");
-					if(name != null && !name.isEmpty())
+					if(name != null && !(name.length() == 0))
 						property.setName(name);
 					
 					/* Data State */
 					String dataState = propertyItem.getString("datastate");
-					if(dataState != null && !dataState.isEmpty())
+					if(dataState != null && !(dataState.length() == 0))
 						property.setDataState(new DataState(dataState));
 					
 					/* ItemKind */
 					String itemKind = propertyItem.getString("itemkind");
-					if(itemKind != null && !itemKind.isEmpty())
+					if(itemKind != null && !(itemKind.length() == 0))
 						property.setItemKind(ItemKind.fromValue(itemKind));
 					
 					/* Structure */
 					String structureString = propertyItem.getString("structure");
-					if(structureString != null && !structureString.isEmpty())
+					if(structureString != null && !(structureString.length() == 0))
 						property.setStructure(structureString);
 					
 					/* isCollection */
@@ -299,7 +300,7 @@ public abstract class AbstractActivityFactory extends AbstractBpmnFactory {
 		/* Set loop cardinality */
 		String loopCardinalityString = shape
 				.getProperty("loopcardinality");
-		if (loopCardinalityString != null && !loopCardinalityString.isEmpty()) {
+		if (loopCardinalityString != null && !(loopCardinalityString.length() == 0)) {
 			FormalExpression loopCardinality = new FormalExpression(
 					loopCardinalityString);
 			miLoop.setLoopCardinality(loopCardinality);
@@ -314,7 +315,7 @@ public abstract class AbstractActivityFactory extends AbstractBpmnFactory {
 		String completionCondition = shape
 				.getProperty("completioncondition");
 		if (completionCondition != null
-				&& !completionCondition.isEmpty()) {
+				&& !(completionCondition.length() == 0)) {
 			FormalExpression completionConditionExpr = new FormalExpression(
 					completionCondition);
 			miLoop.setCompletionCondition(completionConditionExpr);
@@ -335,7 +336,7 @@ public abstract class AbstractActivityFactory extends AbstractBpmnFactory {
 	private void handleLoopBehaviorAttributes(Shape shape,
 			MultiInstanceLoopCharacteristics miLoop) {
 		String behavior = shape.getProperty("behavior");
-		if (behavior != null && !behavior.isEmpty()) {
+		if (behavior != null && !(behavior.length() == 0)) {
 			miLoop.setBehavior(MultiInstanceFlowCondition
 					.fromValue(behavior));
 		}
@@ -364,7 +365,7 @@ public abstract class AbstractActivityFactory extends AbstractBpmnFactory {
 					/* Condition */
 					String condition = complexDefItem
 							.getString("cexpression");
-					if (condition != null && !condition.isEmpty())
+					if (condition != null && !(condition.length() == 0))
 						comBehavDef.setCondition(new FormalExpression(
 								condition));
 
@@ -386,7 +387,7 @@ public abstract class AbstractActivityFactory extends AbstractBpmnFactory {
 				MultiInstanceFlowCondition.NONE)) {
 			String noneBehavString = shape
 					.getProperty("nonebehavioreventref");
-			if (noneBehavString != null && !noneBehavString.isEmpty()) {
+			if (noneBehavString != null && !(noneBehavString.length() == 0)) {
 				miLoop.setNoneBehaviorEventRef(EventDefinition
 						.createEventDefinition(noneBehavString));
 			}
@@ -395,7 +396,7 @@ public abstract class AbstractActivityFactory extends AbstractBpmnFactory {
 				MultiInstanceFlowCondition.ONE)) {
 			String oneBehavString = shape
 					.getProperty("onebehavioreventref");
-			if (oneBehavString != null && !oneBehavString.isEmpty()) {
+			if (oneBehavString != null && !(oneBehavString.length() == 0)) {
 				miLoop.setOneBehaviorEventRef(EventDefinition
 						.createEventDefinition(oneBehavString));
 			}
@@ -417,7 +418,7 @@ public abstract class AbstractActivityFactory extends AbstractBpmnFactory {
 		/* Set loop condition */
 		String loopConditionString = shape.getProperty("loopcondition");
 		if (loopConditionString != null
-				&& !loopConditionString.isEmpty()) {
+				&& !(loopConditionString.length() == 0)) {
 			FormalExpression loopCondition = new FormalExpression(
 					loopConditionString);
 			standardLoop.setLoopCondition(loopCondition);

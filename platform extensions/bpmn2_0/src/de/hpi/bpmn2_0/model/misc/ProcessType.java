@@ -50,10 +50,11 @@ import javax.xml.bind.annotation.XmlEnumValue;
 @XmlEnum
 public enum ProcessType {
 
-	@XmlEnumValue("none")
-	NONE("none"), @XmlEnumValue("executable")
-	EXECUTABLE("executable"), @XmlEnumValue("non-executable")
-	NON_EXECUTABLE("non-executable"), @XmlEnumValue("public")
+	@XmlEnumValue("None")
+	NONE("none"), 
+	@XmlEnumValue("Private")
+	PRIVATE("private"), 
+	@XmlEnumValue("Public")
 	PUBLIC("public");
 	private final String value;
 

@@ -23,21 +23,16 @@
 
 package de.hpi.bpmn2_0.model.conversation;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElementRef;
-import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.namespace.QName;
 
-import de.hpi.bpmn2_0.model.CallableElement;
-import de.hpi.bpmn2_0.model.artifacts.Artifact;
-import de.hpi.bpmn2_0.model.connector.MessageFlow;
-import de.hpi.bpmn2_0.model.participant.Participant;
+import org.oryxeditor.server.diagram.Shape;
+import org.oryxeditor.server.diagram.StencilType;
+
+
+import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
 
 
 /**
@@ -66,230 +61,25 @@ import de.hpi.bpmn2_0.model.participant.Participant;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "tConversation", propOrder = {
-    "conversationNode",
-    "participant",
-    "conversationLink",
-    "artifact",
-    "messageFlow",
-    "messageFlowRef",
-    "correlationKey"
-})
+@XmlType(name = "tConversation")
 public class Conversation
-    extends CallableElement
+    extends ConversationNode
 {
 
-    @XmlElementRefs({
-    	@XmlElementRef(type = CallConversation.class),
-//    	@XmlElementRef(type = Conversation.class),
-    	@XmlElementRef(type = SubConversation.class),
-    	@XmlElementRef(type = Communication.class)
-    })
-    protected List<ConversationNode> conversationNode;
-    
-    @XmlElementRef(type = ConversationLink.class)
-    protected List<ConversationLink> conversationLink;
-    
-    @XmlElementRef(type = Participant.class)
-    protected List<Participant> participant;
-    
-    @XmlElementRef()
-    protected List<Artifact> artifact;
-    
-    @XmlElementRef(type = MessageFlow.class)
-    protected List<MessageFlow> messageFlow;
-    
-    protected List<QName> messageFlowRef;
-    protected List<CorrelationKey> correlationKey;
-
-    /**
-     * Gets the value of the conversationNode property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the conversationNode property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getConversationNode().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link JAXBElement }{@code <}{@link SubConversation }{@code >}
-     * {@link JAXBElement }{@code <}{@link CallConversation }{@code >}
-     * {@link JAXBElement }{@code <}{@link Communication }{@code >}
-     * {@link JAXBElement }{@code <}{@link ConversationNode }{@code >}
-     * 
-     * 
-     */
-    public List<ConversationNode> getConversationNode() {
-        if (conversationNode == null) {
-            conversationNode = new ArrayList<ConversationNode>();
-        }
-        return this.conversationNode;
-    }
-
-    /**
-	 * @return the conversationLink
-	 */
-	public List<ConversationLink> getConversationLink() {
-		if(this.conversationLink == null) {
-			this.conversationLink = new ArrayList<ConversationLink>();
-		}
-		return this.conversationLink;
-	}
-
 	/**
-     * Gets the value of the participant property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the participant property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getParticipant().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Participant }
-     * 
-     * 
-     */
-    public List<Participant> getParticipant() {
-        if (participant == null) {
-            participant = new ArrayList<Participant>();
-        }
-        return this.participant;
-    }
+	 * 
+	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
+	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
+	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
+	 * 
+	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
+	 */
+	// @Override
+    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
+		Shape shape = super.toShape(converterForShapeCoordinateLookup);
 
-    /**
-     * Gets the value of the artifact property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the artifact property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getArtifact().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link JAXBElement }{@code <}{@link TArtifact }{@code >}
-     * {@link JAXBElement }{@code <}{@link TAssociation }{@code >}
-     * {@link JAXBElement }{@code <}{@link TGroup }{@code >}
-     * {@link JAXBElement }{@code <}{@link TTextAnnotation }{@code >}
-     * 
-     * 
-     */
-    public List<Artifact> getArtifact() {
-        if (artifact == null) {
-            artifact = new ArrayList<Artifact>();
-        }
-        return this.artifact;
-    }
-
-    /**
-     * Gets the value of the messageFlow property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the messageFlow property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getMessageFlow().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link TMessageFlow }
-     * 
-     * 
-     */
-    public List<MessageFlow> getMessageFlow() {
-        if (messageFlow == null) {
-            messageFlow = new ArrayList<MessageFlow>();
-        }
-        return this.messageFlow;
-    }
-
-    /**
-     * Gets the value of the messageFlowRef property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the messageFlowRef property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getMessageFlowRef().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link QName }
-     * 
-     * 
-     */
-    public List<QName> getMessageFlowRef() {
-        if (messageFlowRef == null) {
-            messageFlowRef = new ArrayList<QName>();
-        }
-        return this.messageFlowRef;
-    }
-
-    /**
-     * Gets the value of the correlationKey property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the correlationKey property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getCorrelationKey().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link CorrelationKey }
-     * 
-     * 
-     */
-    public List<CorrelationKey> getCorrelationKey() {
-        if (correlationKey == null) {
-            correlationKey = new ArrayList<CorrelationKey>();
-        }
-        return this.correlationKey;
-    }
-
+		shape.setStencil(new StencilType("Communication"));
+		
+		return shape;
+	}
 }

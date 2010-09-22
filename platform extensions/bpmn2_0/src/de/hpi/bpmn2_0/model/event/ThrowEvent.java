@@ -69,6 +69,14 @@ public abstract class ThrowEvent
     extends Event
 {
 
+	/* Constructors */
+	
+	public ThrowEvent() {}
+	
+	public ThrowEvent(ThrowEvent endEvent) {
+		super(endEvent);
+	}
+
 //    protected List<DataInput> dataInput;
 //    protected List<DataInputAssociation> dataInputAssociation;
 //    protected TInputSet inputSet;

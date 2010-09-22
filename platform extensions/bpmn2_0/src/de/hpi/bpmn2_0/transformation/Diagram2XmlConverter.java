@@ -3,6 +3,8 @@ package de.hpi.bpmn2_0.transformation;
 import java.io.StringWriter;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.oryxeditor.server.diagram.Diagram;
 import org.xml.sax.SAXException;
@@ -21,7 +23,7 @@ public class Diagram2XmlConverter {
 		this.bpmn20XsdPath = bpmn20XsdPath;
 	}
 	
-	public StringWriter getXml() throws BpmnConverterException, JAXBException, SAXException {
+	public StringWriter getXml() throws BpmnConverterException, JAXBException, SAXException, ParserConfigurationException, TransformerException {
 		
 		/* Build up BPMN 2.0 model */
 		Diagram2BpmnConverter converter = new Diagram2BpmnConverter(diagram, AbstractBpmnFactory.getFactoryClasses());

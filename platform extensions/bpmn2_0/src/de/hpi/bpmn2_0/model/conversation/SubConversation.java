@@ -34,7 +34,12 @@ import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import org.oryxeditor.server.diagram.Shape;
+import org.oryxeditor.server.diagram.StencilType;
+
 import de.hpi.bpmn2_0.model.artifacts.Artifact;
+
+import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
 
 
 /**
@@ -72,8 +77,7 @@ public class SubConversation
 	@XmlElementRefs({
     	@XmlElementRef(type = CallConversation.class),
     	@XmlElementRef(type = Conversation.class),
-    	@XmlElementRef(type = SubConversation.class),
-    	@XmlElementRef(type = Communication.class)
+    	@XmlElementRef(type = SubConversation.class)
     })
     protected List<ConversationNode> conversationNode;
     
@@ -82,6 +86,23 @@ public class SubConversation
     
 //    @XmlAttribute
     protected CorrelationKey correlationKeyRef;
+
+	/**
+	 * 
+	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
+	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
+	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
+	 * 
+	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
+	 */
+    // @Override    
+    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
+		Shape shape = super.toShape(converterForShapeCoordinateLookup);
+
+		shape.setStencil(new StencilType("SubConversation"));
+		
+		return shape;
+	}
 
     /**
      * Gets the value of the conversationNode property.

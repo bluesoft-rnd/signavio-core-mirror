@@ -3,6 +3,8 @@ package de.hpi.bpmn2_0.transformation;
 import java.io.StringWriter;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.json.JSONException;
 import org.oryxeditor.server.diagram.Diagram;
@@ -21,7 +23,7 @@ public class Json2XmlConverter {
 		this.bpmn20XsdPath = bpmn20XsdPath;
 	}
 	
-	public StringWriter getXml() throws JSONException, BpmnConverterException, JAXBException, SAXException {
+	public StringWriter getXml() throws JSONException, BpmnConverterException, JAXBException, SAXException, ParserConfigurationException, TransformerException {
 		Diagram diagram = DiagramBuilder.parseJson(json);
 		
 		Diagram2XmlConverter converter = new Diagram2XmlConverter(diagram, bpmn20XsdPath);

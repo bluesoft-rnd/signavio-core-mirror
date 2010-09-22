@@ -31,7 +31,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
+import org.oryxeditor.server.diagram.Shape;
+
 import de.hpi.bpmn2_0.model.activity.Task;
+import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
 
 
 /**
@@ -88,6 +91,14 @@ public class ScriptTask
     @XmlSchemaType(name = "anyURI")
     protected String scriptFormat;
 
+	public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup)  {
+		Shape shape = super.toShape(converterForShapeCoordinateLookup);
+
+        shape.putProperty("tasktype", "Script");
+        
+		return shape;
+	}
+	
     /**
      * Gets the value of the script property.
      * 

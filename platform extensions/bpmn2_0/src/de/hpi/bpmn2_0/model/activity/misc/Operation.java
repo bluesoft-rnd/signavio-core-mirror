@@ -32,10 +32,12 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.hpi.bpmn2_0.model.BaseElement;
 import de.hpi.bpmn2_0.model.data_object.Message;
 import de.hpi.bpmn2_0.model.misc.Error;
+import de.hpi.bpmn2_0.util.EscapingStringAdapter;
 
 
 /**
@@ -78,6 +80,7 @@ public class Operation
     @XmlElement
     protected List<Error> errorRef;
     @XmlAttribute(required = true)
+    @XmlJavaTypeAdapter(EscapingStringAdapter.class)
     protected String name;
 
     /**

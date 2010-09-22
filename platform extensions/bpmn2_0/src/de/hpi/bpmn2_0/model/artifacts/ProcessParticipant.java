@@ -55,15 +55,20 @@ import de.hpi.bpmn2_0.model.data_object.AbstractDataObject;
  * 
  * 
  */
-@XmlRootElement
+@XmlRootElement(name = "dataObject")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tProcessParticipant")
 public class ProcessParticipant
     extends AbstractDataObject
 {
-
+	
+	//TODO: implement XML-TAG under Signavio namespace to identify a process participant
+	
     @XmlAttribute
     protected QName itemSubjectRef;
+    
+    @XmlAttribute(namespace = "http://www.signavio.com")
+    protected boolean isProcessParticipant = true;
 
 
     /**

@@ -35,9 +35,12 @@ import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
+
+import de.hpi.bpmn2_0.util.EscapingStringAdapter;
 
 
 /**
@@ -76,14 +79,17 @@ public class FormalExpression extends Expression {
     }
     
 	@XmlMixed
-    @XmlAnyElement(lax = true) 
-    protected List<Object> content;
+    @XmlAnyElement(lax = true)
+    @XmlJavaTypeAdapter(EscapingStringAdapter.class)
+    protected List<String> content;
     
     @XmlAttribute
     @XmlSchemaType(name = "anyURI")
+    @XmlJavaTypeAdapter(EscapingStringAdapter.class)
     protected String language;
     
     @XmlAttribute
+    @XmlJavaTypeAdapter(EscapingStringAdapter.class)
     protected String evaluatesToTypeRef;
 
     /* Getter & Setter */
@@ -114,9 +120,9 @@ public class FormalExpression extends Expression {
      * 
      * 
      */
-    public List<Object> getContent() {
+    public List<String> getContent() {
         if (content == null) {
-            content = new ArrayList<Object>();
+            content = new ArrayList<String>();
         }
         return this.content;
     }
@@ -167,6 +173,14 @@ public class FormalExpression extends Expression {
      */
     public void setEvaluatesToTypeRef(String value) {
         this.evaluatesToTypeRef = value;
+    }
+    
+    /**
+     * See {@link Expression#toExportString()}.
+     */
+    // @Override
+    public String toExportString(){
+    	return this.getContent().get(0);
     }
 
 }

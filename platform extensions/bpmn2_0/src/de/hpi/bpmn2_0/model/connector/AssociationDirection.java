@@ -46,11 +46,11 @@ import javax.xml.bind.annotation.XmlEnumValue;
 @XmlEnum
 public enum AssociationDirection {
 
-    @XmlEnumValue("none")
+    @XmlEnumValue("None")
     NONE("none"),
-    @XmlEnumValue("one")
+    @XmlEnumValue("One")
     ONE("one"),
-    @XmlEnumValue("both")
+    @XmlEnumValue("Both")
     BOTH("both");
     private final String value;
 

@@ -29,7 +29,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.UUID;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,7 +41,7 @@ import de.hpi.bpmn2_0.annotations.StencilId;
 import de.hpi.bpmn2_0.exceptions.BpmnConverterException;
 import de.hpi.bpmn2_0.factory.AbstractBpmnFactory;
 import de.hpi.bpmn2_0.factory.BPMNElement;
-import de.hpi.bpmn2_0.factory.IntermediateCatchEventFactory;
+import de.hpi.bpmn2_0.factory.node.IntermediateCatchEventFactory;
 import de.hpi.bpmn2_0.model.BaseElement;
 import de.hpi.bpmn2_0.model.Collaboration;
 import de.hpi.bpmn2_0.model.Definitions;
@@ -53,8 +52,12 @@ import de.hpi.bpmn2_0.model.activity.Activity;
 import de.hpi.bpmn2_0.model.activity.SubProcess;
 import de.hpi.bpmn2_0.model.activity.Task;
 import de.hpi.bpmn2_0.model.artifacts.Artifact;
+import de.hpi.bpmn2_0.model.bpmndi.BPMNPlane;
+import de.hpi.bpmn2_0.model.bpmndi.BPMNShape;
 import de.hpi.bpmn2_0.model.choreography.Choreography;
 import de.hpi.bpmn2_0.model.choreography.ChoreographyActivity;
+import de.hpi.bpmn2_0.model.choreography.ChoreographyTask;
+import de.hpi.bpmn2_0.model.choreography.SubChoreography;
 import de.hpi.bpmn2_0.model.connector.Association;
 import de.hpi.bpmn2_0.model.connector.DataAssociation;
 import de.hpi.bpmn2_0.model.connector.DataInputAssociation;
@@ -62,26 +65,12 @@ import de.hpi.bpmn2_0.model.connector.DataOutputAssociation;
 import de.hpi.bpmn2_0.model.connector.Edge;
 import de.hpi.bpmn2_0.model.connector.MessageFlow;
 import de.hpi.bpmn2_0.model.connector.SequenceFlow;
-import de.hpi.bpmn2_0.model.conversation.Conversation;
+import de.hpi.bpmn2_0.model.conversation.ConversationElement;
 import de.hpi.bpmn2_0.model.conversation.ConversationLink;
 import de.hpi.bpmn2_0.model.conversation.ConversationNode;
 import de.hpi.bpmn2_0.model.data_object.AbstractDataObject;
 import de.hpi.bpmn2_0.model.data_object.DataStoreReference;
-import de.hpi.bpmn2_0.model.diagram.AssociationConnector;
-import de.hpi.bpmn2_0.model.diagram.BpmnConnector;
-import de.hpi.bpmn2_0.model.diagram.BpmnDiagram;
-import de.hpi.bpmn2_0.model.diagram.BpmnNode;
-import de.hpi.bpmn2_0.model.diagram.ChoreographyCompartment;
-import de.hpi.bpmn2_0.model.diagram.ChoreographyDiagram;
-import de.hpi.bpmn2_0.model.diagram.CollaborationDiagram;
-import de.hpi.bpmn2_0.model.diagram.ConversationDiagram;
-import de.hpi.bpmn2_0.model.diagram.ConversationLinkConnector;
-import de.hpi.bpmn2_0.model.diagram.ConversationParticipantShape;
-import de.hpi.bpmn2_0.model.diagram.LaneCompartment;
-import de.hpi.bpmn2_0.model.diagram.MessageFlowConnector;
-import de.hpi.bpmn2_0.model.diagram.PoolCompartment;
-import de.hpi.bpmn2_0.model.diagram.ProcessDiagram;
-import de.hpi.bpmn2_0.model.diagram.SequenceFlowConnector;
+import de.hpi.bpmn2_0.model.data_object.Message;
 import de.hpi.bpmn2_0.model.event.BoundaryEvent;
 import de.hpi.bpmn2_0.model.event.CompensateEventDefinition;
 import de.hpi.bpmn2_0.model.event.Event;
@@ -109,16 +98,11 @@ public class Diagram2BpmnConverter {
 	private List<BPMNElement> diagramChilds;
 	private List<Process> processes;
 	private Definitions definitions;
-	private LaneCompartment defaultLaneCompartment;
+	private String editorVersion;
 
 	private Collaboration collaboration;
-	private CollaborationDiagram collaborationDiagram;
-
-	private Conversation conversation;
-	private ConversationDiagram conversationDiagram;
 
 	private List<Choreography> choreography;
-	private ChoreographyDiagram choreographyDiagram;
 
 	private List<Class<? extends AbstractBpmnFactory>> factoryClasses;
 
@@ -129,6 +113,7 @@ public class Diagram2BpmnConverter {
 
 	public final static HashSet<String> edgeIds = new HashSet<String>(Arrays
 			.asList(edgeIdsArray));
+	
 
 	/* Define data related objects ids */
 	private final static String[] dataObjectIdsArray = { "DataObject",
@@ -146,7 +131,13 @@ public class Diagram2BpmnConverter {
 		this.diagram = diagram;
 		this.factoryClasses = factoryClasses;
 	}
-
+	
+	public Diagram2BpmnConverter(Diagram diagram,
+			List<Class<? extends AbstractBpmnFactory>> factoryClasses, String editorVersion) {
+		this(diagram, factoryClasses);
+		this.editorVersion = editorVersion;
+	}
+	
 	/**
 	 * Retrieves the stencil id related hashed factory.
 	 * 
@@ -355,7 +346,11 @@ public class Diagram2BpmnConverter {
 					((Edge) bpmnConnector.getNode()).getIncoming().add(
 							(Edge) this.bpmnElements.get(
 									incomingShape.getResourceId()).getNode());
-					continue;
+					
+					/* Avoids that a sequence flow has an edge element as source */
+					if(bpmnConnector.getNode() instanceof SequenceFlow) {
+						continue;
+					}
 				}
 
 				source = this.bpmnElements.get(incomingShape.getResourceId());
@@ -379,46 +374,25 @@ public class Diagram2BpmnConverter {
 			/* Update source references */
 			if (source != null) {
 				Edge edgeElement = (Edge) bpmnConnector.getNode();
-				BpmnConnector edgeShape = (BpmnConnector) bpmnConnector
-						.getShape();
 
-				/* Correct the source reference if it is an expanded pool */
-				if (source.getNode() instanceof LaneSet) {
-					PoolCompartment poolShape = (PoolCompartment) source
-							.getShape();
-					edgeElement.setSourceRef(poolShape.getParticipantRef());
-					edgeShape.setSourceRef(poolShape);
-				} else {
-					FlowElement sourceNode = (FlowElement) source.getNode();
-					sourceNode.getOutgoing()
-							.add((Edge) bpmnConnector.getNode());
+				FlowElement sourceNode = (FlowElement) source.getNode();
+				sourceNode.getOutgoing()
+						.add((Edge) bpmnConnector.getNode());
 
-					edgeElement.setSourceRef(sourceNode);
+				edgeElement.setSourceRef(sourceNode);
 
-					edgeShape.setSourceRef(source.getShape());
-				}
 			}
 
 			/* Update target references */
 			if (target != null) {
 				Edge edgeElement = (Edge) bpmnConnector.getNode();
-				BpmnConnector edgeShape = (BpmnConnector) bpmnConnector
-						.getShape();
-				/* Correct the target reference if it is an expanded pool. */
-				if (target.getNode() instanceof LaneSet) {
-					PoolCompartment poolShape = (PoolCompartment) target
-							.getShape();
-					edgeElement.setTargetRef(poolShape.getParticipantRef());
-					edgeShape.setTargetRef(poolShape);
-				} else {
-					FlowElement targetNode = (FlowElement) target.getNode();
-					targetNode.getIncoming()
-							.add((Edge) bpmnConnector.getNode());
 
-					edgeElement.setTargetRef(targetNode);
+				FlowElement targetNode = (FlowElement) target.getNode();
+				targetNode.getIncoming()
+						.add((Edge) bpmnConnector.getNode());
 
-					edgeShape.setTargetRef(target.getShape());
-				}
+				edgeElement.setTargetRef(targetNode);
+				
 			}
 		}
 	}
@@ -429,7 +403,8 @@ public class Diagram2BpmnConverter {
 	 */
 	private void updateUndirectedDataAssociationsRefs() {
 		for (Shape shape : this.diagram.getShapes()) {
-			if (!shape.getStencilId().equalsIgnoreCase("sequenceflow"))
+			if (shape.getStencilId() == null 
+					|| !shape.getStencilId().equalsIgnoreCase("sequenceflow"))
 				continue;
 
 			/* Retrieve sequence flow connector element */
@@ -501,52 +476,6 @@ public class Diagram2BpmnConverter {
 		}
 	}
 
-	/**
-	 * Retrieves all elements related to a conversation and creates a diagram
-	 * element to wrap them.
-	 */
-	private void identifyConversation() {
-
-		for (BPMNElement element : this.diagramChilds) {
-			/* Identify conversation elements */
-			if (element.getNode() instanceof ConversationLink) {
-				this.getConversation().getConversationLink().add(
-						(ConversationLink) element.getNode());
-				this.getConversationDiagram().getConnector().add(
-						(ConversationLinkConnector) element.getShape());
-			}
-
-			else if (element.getNode() instanceof ConversationNode) {
-				this.getConversation().getConversationNode().add(
-						(ConversationNode) element.getNode());
-				this.getConversationDiagram().getShape().add(
-						(BpmnNode) element.getShape());
-			}
-
-			else if (element.getNode() instanceof Participant
-					&& element.getShape() instanceof ConversationParticipantShape) {
-				this.getConversation().getParticipant().add(
-						(Participant) element.getNode());
-				this.getConversationDiagram().getParticipant().add(
-						(ConversationParticipantShape) element.getShape());
-			}
-		}
-
-		if (this.conversation != null && this.conversationDiagram != null) {
-			for (BPMNElement element : this.diagramChilds) {
-				if (element.getNode() instanceof MessageFlow) {
-					this.getConversation().getMessageFlow().add(
-							(MessageFlow) element.getNode());
-					this.getConversationDiagram().getConnector().add(
-							(BpmnConnector) element.getShape());
-				}
-			}
-		}
-
-		if (this.conversationDiagram != null)
-			this.getConversationDiagram().setConversation(
-					this.getConversation());
-	}
 
 	/**
 	 * Method to handle sub processes
@@ -554,20 +483,15 @@ public class Diagram2BpmnConverter {
 	 * @param subProcess
 	 */
 	private void handleSubProcess(SubProcess subProcess) {
-		Process process = new Process();
-		process.setId(subProcess.getId());
-		process.setSubprocessRef(subProcess);
 
 		List<BPMNElement> childs = this.getChildElements(this.bpmnElements
 				.get(subProcess.getId()));
 		for (BPMNElement ele : childs) {
 			// process.getFlowElement().add((FlowElement) ele.getNode());
-			subProcess.getFlowElement().add((FlowElement) ele.getNode());
+//			subProcess.getFlowElement().add((FlowElement) ele.getNode());
 			if (ele.getNode() instanceof SubProcess)
 				this.handleSubProcess((SubProcess) ele.getNode());
 		}
-
-		this.processes.add(process);
 	}
 	
 	/** 
@@ -580,8 +504,20 @@ public class Diagram2BpmnConverter {
 			/* Prefer the process by connecting object over process by pool 
 			 * containment. Use case: task in Pool1 text annotation in Pool2 */
 			Process containmentProcess = artifact.getProcess();
+			SubProcess subProcess = artifact.getSubProcess();
+			SubChoreography subChoreography = artifact.getSubChoreography();
 			
 			artifact.findRelatedProcess();
+			
+			/* If no process was found, check it the artifact is part of a
+			 * conversation. */
+			if(artifact.getProcess() == null && containmentProcess == null 
+					&& subProcess == null 
+					&& subChoreography == null 
+					&& artifact.isConverstionRelated()) {
+				getCollaboration().getArtifact().add(artifact);
+				continue;
+			}
 			
 			/* If a new process was assigned, delete the artifact as a child 
 			 * element from the old process */
@@ -589,16 +525,21 @@ public class Diagram2BpmnConverter {
 				containmentProcess.removeChild(artifact);
 			}
 			
+			/* Remove from subprocess if e.g. a Textannotation was missplaced */
+			if(subProcess != null && artifact.getProcess() != null) {
+				subProcess.removeChild(artifact);
+			}
+			
 			/*
 			 * If no related process was found, add assign to the default
 			 * process.
 			 */
-			if (artifact.getProcess() == null && this.processes.size() > 0) {
+			if (subProcess == null && artifact.getProcess() == null && this.processes.size() > 0) {
 				artifact.setProcess(this.processes
 						.get(this.processes.size() - 1));
 				this.processes.get(this.processes.size() - 1).addChild(
 						artifact);
-			} else if (artifact.getProcess() == null) {
+			} else if (subProcess == null && artifact.getProcess() == null) {
 				Process process = new Process();
 				this.processes.add(process);
 				process.setId(SignavioUUID.generate());
@@ -674,19 +615,6 @@ public class Diagram2BpmnConverter {
 	}
 
 	/**
-	 * @return All {@link Activity} contained in the diagram.
-	 */
-	private List<Activity> getAllActivities() {
-		ArrayList<Activity> activities = new ArrayList<Activity>();
-		for (BPMNElement element : this.bpmnElements.values()) {
-			if (element.getNode() instanceof Activity)
-				activities.add((Activity) element.getNode());
-		}
-
-		return activities;
-	}
-	
-	/**
 	 * 
 	 * @return All {@link Artifact} contained in the diagram.
 	 */
@@ -732,29 +660,39 @@ public class Diagram2BpmnConverter {
 
 		/* Handle pools, current solution: only one process per pool */
 		for (BPMNElement element : this.diagramChilds) {
-			if (element.getNode() instanceof LaneSet) {
-				LaneSet laneSet = (LaneSet) element.getNode();
+			if (element.getNode() instanceof Participant && ((Participant) element.getNode()).getLaneSet() != null) {
+				Participant participant = (Participant) element.getNode();
+				LaneSet laneSet = participant.getLaneSet();
 
 				Process process = new Process();
-				process.setId(UUID.randomUUID().toString());
+				process.setId(SignavioUUID.generate());
 
 				/* Process attributes derived from lane set */
-				if (laneSet._isClosed != null
-						&& laneSet._isClosed.equalsIgnoreCase("true"))
+				/* isCloased */
+				if (participant._isClosed != null
+						&& participant._isClosed.equalsIgnoreCase("true"))
 					process.setIsClosed(true);
 				else
 					process.setIsClosed(false);
-
-				if (laneSet._processType != null) {
+				
+				/* Process Type */
+				if (participant._processType != null) {
 					process.setProcessType(ProcessType
-							.fromValue(laneSet._processType));
+							.fromValue(participant._processType));
 				}
+				
+				/* isExecutable */
+				if (participant._isExecutable != null
+						&& participant._isExecutable.equalsIgnoreCase("true"))
+					process.setExecutable(true);
+				else
+					process.setExecutable(false);
 
 				process.getLaneSet().add(laneSet);
-				laneSet.setProcess(process);
+				participant.setProcessRef(process);
 
 				process.getFlowElement().addAll(
-						((LaneSet) element.getNode()).getChildFlowElements());
+						laneSet.getChildFlowElements());
 
 				this.processes.add(process);
 			}
@@ -764,7 +702,7 @@ public class Diagram2BpmnConverter {
 		/* Identify components within allNodes */
 		while (allNodes.size() > 0) {
 			Process currentProcess = new Process();
-			currentProcess.setId(UUID.randomUUID().toString());
+			currentProcess.setId(SignavioUUID.generate());
 			this.processes.add(currentProcess);
 
 			addNode(currentProcess,
@@ -806,14 +744,33 @@ public class Diagram2BpmnConverter {
 		/* Find process for edge */
 		for (Process process : this.processes) {
 			List<FlowElement> flowElements;
-			if (process.isSubprocess())
-				flowElements = process.getSubprocessRef().getFlowElement();
-			else
-				flowElements = process.getFlowElement();
+			
+			flowElements = process.getFlowElement();
 
 			if (flowElements.contains(edge.getSourceRef())
 					|| flowElements.contains(edge.getTargetRef())) {
 				return flowElements;
+			}
+			
+			/* Look up in subprocesses */
+			
+			for(SubProcess subProcess : process.getSubprocessList()) {
+				flowElements = subProcess.getFlowElement();
+				
+				if (flowElements.contains(edge.getSourceRef())
+						|| flowElements.contains(edge.getTargetRef())) {
+					return flowElements;
+				}
+			}
+			
+			/* Look up in subchoreographies */
+			for(SubChoreography subChoreography : process.getSubChoreographyList()) {
+				flowElements = subChoreography.getFlowElement();
+				
+				if (flowElements.contains(edge.getSourceRef())
+						|| flowElements.contains(edge.getTargetRef())) {
+					return flowElements;
+				}
 			}
 		}
 		
@@ -831,7 +788,40 @@ public class Diagram2BpmnConverter {
 			Edge edge = (Edge) element.getNode();
 			List<FlowElement> flowElements = findProcessFlowElementListForEdge(edge);
 			if(flowElements != null) {
+				((Association) edge)._containedInProcess = true;
 				flowElements.add(edge);
+			}
+		}
+	}
+	
+	/**
+	 * Assigns {@link Association} to the collaboration element in case of
+	 * a conversation.
+	 */
+	private void addAssociationsToConversation() {
+		for(BPMNElement element : this.diagramChilds) {
+			if(!(element.getNode() instanceof Association))
+				continue;
+			
+			Association edge = (Association) element.getNode();
+			
+			if(edge._containedInProcess) {
+				continue;
+			}
+			
+			/* Check source */
+			if(edge.getSourceRef() != null && edge.getSourceRef() instanceof ConversationElement 
+					&& (edge.getSourceRef().getProcess() == null 
+							|| (edge.getSourceRef().getProcess() != null
+							&& !edge.getSourceRef().getProcess().isChoreographyProcess()))) {
+				this.getCollaboration().getAssociation().add(edge);
+				continue;
+			}
+			
+			/* Check target */
+			if(edge.getTargetRef() != null && edge.getTargetRef() instanceof ConversationElement) {
+				this.getCollaboration().getAssociation().add(edge);
+				continue;
 			}
 		}
 	}
@@ -965,32 +955,22 @@ public class Diagram2BpmnConverter {
 
 		return childElements;
 	}
-
-	private void insertSubprocessIntoDefinitions(ProcessDiagram processDia,
-			Process process) {
-		LaneCompartment lane = new LaneCompartment();
-		lane.setId(UUID.randomUUID().toString() + "_gui");
-		lane.setIsVisible(false);
-
-		/* Insert elements */
-		for (FlowElement flowEle : process.getSubprocessRef().getFlowElement()) {
-			if (flowEle instanceof FlowNode) {
-				lane.getBpmnShape().add(
-						(BpmnNode) this.bpmnElements.get(flowEle.getId())
-								.getShape());
+	
+	/**
+	 * Inserts the shapes of nodes as children of the {@link BPMNPlane}. 
+	 * @param subProcess
+	 */
+	private void insertSubprocessShapes(SubProcess subProcess) {
+		for(FlowElement flowEle : subProcess.getFlowElement()) {
+			if(flowEle instanceof FlowNode) {
+				this.definitions.getFirstPlane().getDiagramElement().add(this.bpmnElements.get(flowEle.getId()).getShape());
 			}
-			/* Insert sequence flows */
-			else if (flowEle instanceof SequenceFlow) {
-				processDia.getSequenceFlowConnector().add(
-						(SequenceFlowConnector) this.bpmnElements.get(
-								flowEle.getId()).getShape());
+			
+			/* Subprocess elements */
+			if(flowEle instanceof SubProcess) {
+				insertSubprocessShapes((SubProcess) flowEle);
 			}
 		}
-
-		processDia.getLaneCompartment().add(lane);
-
-		/* Insert process into document */
-		this.definitions.getDiagram().add(processDia);
 	}
 
 	/**
@@ -1000,72 +980,32 @@ public class Diagram2BpmnConverter {
 		for (Process process : this.processes) {
 			if (process.isChoreographyProcess())
 				continue;
-
-			ProcessDiagram processDia = new ProcessDiagram();
-			processDia.setProcessRef(process);
-			processDia.setName(process.getName());
-			processDia.setId(process.getId() + "_gui");
-
-			/* Handle subprocesses */
-			if (process.isSubprocess()) {
-				this.insertSubprocessIntoDefinitions(processDia, process);
-				continue;
+			
+			/* First insert LaneSets */
+			for(Lane lane : process.getAllLanes()) {
+				this.definitions.getFirstPlane().getDiagramElement().add(this.bpmnElements.get(lane.getId()).getShape());
 			}
-
-			/* Insert lane compartments */
-			for (LaneSet laneSet : process.getLaneSet()) {
-				PoolCompartment poolComp = (PoolCompartment) this.bpmnElements
-						.get(laneSet.getId()).getShape();
-				for (LaneCompartment laneComp : poolComp.getLane()) {
-					processDia.getLaneCompartment().add(laneComp);
+			
+			/* Second process elements like tasks */
+			
+			for(FlowElement flowEle : process.getFlowElement()) {
+				if(!(flowEle instanceof Edge)) {
+					this.definitions.getFirstPlane().getDiagramElement().add(this.bpmnElements.get(flowEle.getId()).getShape());
+				}
+				
+				/* Subprocess elements */
+				if(flowEle instanceof SubProcess) {
+					insertSubprocessShapes((SubProcess) flowEle);
 				}
 			}
-
-			/* Insert default lane set with one lane */
-			if (process.getLaneSet().size() == 0) {
-
-				LaneSet defaultLaneSet = new LaneSet();
-				defaultLaneSet.setProcess(process);
-				defaultLaneSet.setId(UUID.randomUUID().toString());
-
-				Lane defaultLane = new Lane();
-				defaultLaneSet.getLanes().add(defaultLane);
-				defaultLane.setId(UUID.randomUUID().toString());
-				defaultLane.setName("DefaultLane");
-				defaultLane.setLaneSet(defaultLaneSet);
-
-				LaneCompartment defaultLaneComp = new LaneCompartment();
-				defaultLaneComp.setId(defaultLane.getId() + "_gui");
-				defaultLaneComp.setIsVisible(false);
-				defaultLaneComp.setName(defaultLane.getName());
-
-				processDia.getLaneCompartment().add(defaultLaneComp);
-
-				for (FlowElement node : process.getFlowElement()) {
-					if (node instanceof FlowNode) {
-						defaultLane.getFlowNodeRef().add((FlowNode) node);
-						defaultLaneComp.getBpmnShape().add(
-								(BpmnNode) this.bpmnElements.get(node.getId())
-										.getShape());
-					}
-				}
-
-				process.getLaneSet().add(defaultLaneSet);
-				this.defaultLaneCompartment = defaultLaneComp;
-			}
-
-			/* Insert Sequence Flow */
-			for (FlowElement flowEle : process.getFlowElement()) {
-				if (flowEle instanceof SequenceFlow) {
-					processDia.getSequenceFlowConnector().add(
-							(SequenceFlowConnector) this.bpmnElements.get(
-									flowEle.getId()).getShape());
-				}
-			}
-
+			
+			
 			/* Insert process into document */
 			this.definitions.getRootElement().add(process);
-			this.definitions.getDiagram().add(processDia);
+			
+			/* Set diagram shape reference for the process. This reference
+			 * will be overwritten, if a collaboration is contained. */
+			this.definitions.getFirstPlane().setBpmnElement(process);
 		}
 	}
 
@@ -1102,7 +1042,7 @@ public class Diagram2BpmnConverter {
 			if (element.getNode() instanceof ChoreographyActivity) {
 				ChoreographyActivity activity = (ChoreographyActivity) element
 						.getNode();
-				for (Participant partici : activity.getParticipants()) {
+				for (Participant partici : activity.getParticipantRef()) {
 					if (partici.isInitiating()) {
 						activity.setInitiatingParticipantRef(partici);
 						break;
@@ -1113,91 +1053,108 @@ public class Diagram2BpmnConverter {
 	}
 
 	/**
-	 * Searches elements that are only allowed in a collaboration diagram and
-	 * creates one if necessary.
+	 * Inserts {@link Participant} to the {@link Collaboration} element and 
+	 * assigns the collaboration to the appropriate {@link BPMNPlane} element.
 	 */
 	private void insertCollaborationElements() {
-		boolean collaborationIncluded = false;
-		for (BPMNElement element : this.diagramChilds) {
-			if (element.getShape() instanceof PoolCompartment) {
-				PoolCompartment pool = (PoolCompartment) element.getShape();
-				this.setProcessForPool(pool);
-				this.getCollaborationDiagram().getPool().add(pool);
-				this.getCollaboration().getParticipant().add(
-						pool.getParticipantRef());
-
-				collaborationIncluded = true;
+		for(BPMNElement bpmnElement : this.bpmnElements.values()) {
+			/* Insert participants */
+			if(bpmnElement.getNode() instanceof Participant && !((Participant) bpmnElement.getNode())._isChoreographyParticipant) {
+				/* Insert semantics element */
+				getCollaboration().getParticipant().add((Participant) bpmnElement.getNode());
+				
+				/* Insert diagram element */
+				this.definitions.getFirstPlane().getDiagramElement().add(bpmnElement.getShape());
 			}
-			if (element.getNode() instanceof MessageFlow) {
-				this.getCollaborationDiagram().getMessageFlowConnector().add(
-						(MessageFlowConnector) element.getShape());
-				this.getCollaboration().getMessageFlow().add(
-						(MessageFlow) element.getNode());
-
-				collaborationIncluded = true;
+			
+			/* Conversation elements */
+			else if(this.insertConversationElements(bpmnElement)) {
+				
 			}
+			
+			/* Message Flows */
+			else if(bpmnElement.getNode() instanceof MessageFlow) {
+				getCollaboration().getMessageFlow().add((MessageFlow) bpmnElement.getNode());
+			}
+			
+			
 		}
-
-		if (collaborationIncluded && this.defaultLaneCompartment != null) {
-			PoolCompartment poolComp = new PoolCompartment();
-			poolComp.setIsVisible(false);
-			poolComp.setId(UUID.randomUUID().toString() + "_gui");
-			poolComp.getLane().add(this.defaultLaneCompartment);
-
-			Participant participant = new Participant();
-			participant.setId(UUID.randomUUID().toString());
-			poolComp.setParticipantRef(participant);
-			this.getCollaborationDiagram().getPool().add(poolComp);
-			this.getCollaboration().getParticipant().add(participant);
+		
+		/* Set collaboration references */
+		if(this.collaboration != null) {
+			
+			/* Insert shapes of artifacts */
+			for(Artifact a : getCollaboration().getArtifact()) {
+				this.definitions.getFirstPlane().getDiagramElement().add(bpmnElements.get(a.getId()).getShape());
+			}
+			
+			/* Insert association shapes */
+			for(Association a : getCollaboration().getAssociation()) {
+				this.definitions.getFirstPlane().getDiagramElement().add(bpmnElements.get(a.getId()).getShape());
+			}
+			
+			this.definitions.getRootElement().add(this.collaboration);
+			this.definitions.getFirstPlane().setBpmnElement(this.collaboration);
 		}
-
-		/*
-		 * Assure that the constrained of at least two pools in a collaboration
-		 * diagram is fulfilled
-		 */
-		if (collaborationIncluded
-				&& this.getCollaborationDiagram().getPool().size() >= 2) {
-			this.definitions.getDiagram().add(this.getCollaborationDiagram());
-			this.definitions.getRootElement().add(this.getCollaboration());
-		}
+		
 	}
 
 	/**
-	 * Based on the passed pool, it searches for the appropriate process
-	 * diagram, to retrieve the related process object.
+	 * Checks if the element is an conversation elements and appends it to the 
+	 * appropriate list.
+	 */
+	private boolean insertConversationElements(BPMNElement element) {
+//		this.identifyConversation();
+
+		/* Conversation nodes */
+		if(element.getNode() instanceof ConversationNode) {
+			/* Semantics element */
+			getCollaboration().getConversationNode().add((ConversationNode) element.getNode());
+			
+			/* Insert diagram element */
+			this.definitions.getFirstPlane().getDiagramElement().add(element.getShape());
+			
+			return true;
+		}
+		
+		/* Conversation link */
+		else if(element.getNode() instanceof ConversationLink) {
+			getCollaboration().getConversationLink().add((ConversationLink) element.getNode());
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Sets the message is visible flag to the first participant
 	 * 
-	 * @param pool
-	 *            Resource pool
+	 * @param association
 	 */
-	private void setProcessForPool(PoolCompartment pool) {
-		for (BpmnDiagram dia : this.definitions.getDiagram()) {
-			if (!(dia instanceof ProcessDiagram))
-				continue;
-			for (LaneCompartment lane : ((ProcessDiagram) dia)
-					.getLaneCompartment()) {
-				for (LaneCompartment poolLane : pool.getLane()) {
-					if (lane.equals(poolLane)) {
-						pool.getParticipantRef().setProcessRef(
-								((ProcessDiagram) dia).getProcessRef());
-						return;
-					}
-				}
-			}
+	public void handleMessageAssociationOnChoreographyActivity(Association association) {
+		/* Retrieve choreography acitivity */
+		ChoreographyActivity choreoActivity = null;
+		if(association.getSourceRef() instanceof ChoreographyActivity) {
+			choreoActivity = (ChoreographyActivity) association.getSourceRef();
+		} else if(association.getTargetRef() instanceof ChoreographyActivity) {
+			choreoActivity = (ChoreographyActivity) association.getTargetRef();
+		} else {
+			return;
 		}
-	}
-
-	/**
-	 * If the diagram contains conversation elements, this method appends them
-	 * to in definitions element
-	 */
-	private void insertConversationIntoDefinitions() {
-		this.identifyConversation();
-
-		if (this.conversation != null && this.conversationDiagram != null) {
-			this.definitions.getRootElement().add(this.conversation);
-			this.definitions.getDiagram().add(this.conversationDiagram);
+		
+		if(choreoActivity.getParticipantRef().size() > 0) {
+			/* Take first participant and set the flag on its shape element */
+			Participant p = choreoActivity.getParticipantRef().get(0);
+			BPMNShape pShape = (BPMNShape) bpmnElements.get(p.getId()).getShape();
+			pShape.setIsMessageVisible(Boolean.TRUE);
+			
+			/* 
+			 * Remove association edge from bpmnElement list, because the 
+			 * occurrence in the exported XML is not allowed.
+			 */
+			
+			removeBpmnElement(association);
 		}
-
 	}
 
 	/**
@@ -1210,42 +1167,106 @@ public class Diagram2BpmnConverter {
 				continue;
 
 			Choreography choreo = new Choreography();
-			choreo.setId(UUID.randomUUID().toString());
-
-			ChoreographyCompartment choreoComp = new ChoreographyCompartment();
-			choreoComp.setIsVisible(false);
-			choreoComp.setId(choreo.getId() + "_gui");
-			choreoComp.setChoreographyRef(choreo);
-
-			for (FlowElement flowEle : p.getFlowElementsForChoreography()) {
-				choreo.getFlowElement().add(flowEle);
-				Object shape = this.bpmnElements.get(flowEle.getId())
-						.getShape();
-				if (shape instanceof BpmnNode)
-					choreoComp.getBpmnShape().add((BpmnNode) shape);
-				else if (shape instanceof SequenceFlowConnector)
-					this.getChoreographyDiagram().getSequenceFlowConnector()
-							.add((SequenceFlowConnector) shape);
-				else if (shape instanceof AssociationConnector)
-					this.getChoreographyDiagram().getAssociationConnector()
-							.add((AssociationConnector) shape);
-			}
-
-			/* Insert into choreography diagram */
-			this.getChoreographyDiagram().getChoreographyCompartment().add(
-					choreoComp);
 			this.getChoreography().add(choreo);
-
+			choreo.setId(p.getId());
+			choreo.setName(p.getName());
+			choreo.setIsClosed(p.isIsClosed());
+			
+			/* Insert shapes of the choreograhy elements except edge shape, 
+			 * they will be appended later to appear on most top layer of the
+			 * diagram.
+			 */
+			for (FlowElement flowEle : p.getFlowElement()) {
+				/* Move association into other list */
+				if(flowEle instanceof Association) {
+					Association association = (Association) flowEle;
+					
+					/* Check whether the association depicts a message to the
+					 * choreography activity */
+					if((association.getSourceRef() instanceof ChoreographyActivity 
+							&& association.getTargetRef() instanceof Message)
+							|| (association.getSourceRef() instanceof Message 
+									&& association.getTargetRef() instanceof ChoreographyActivity)) {
+						handleMessageAssociationOnChoreographyActivity(association);
+						
+						continue;
+					}
+					
+					choreo.getAssociation().add((Association) flowEle);
+					continue;
+				}
+				
+				choreo.getFlowElement().add(flowEle);
+				if(!(flowEle instanceof Edge) && !(flowEle instanceof Message)) {
+					this.definitions.getFirstPlane().getDiagramElement().add(this.bpmnElements.get(flowEle.getId()).getShape());
+					
+					/* Insert participant band elements */
+					if(flowEle instanceof ChoreographyActivity) {
+						for(Participant participant : ((ChoreographyActivity) flowEle).getParticipantRef()) {
+							this.definitions.getFirstPlane().getDiagramElement().add(this.bpmnElements.get(participant.getId()).getShape());
+						}
+					}
+				}
+				
+				/* Insert participants of activities into choreography */
+				if(flowEle instanceof ChoreographyTask) {
+					ChoreographyTask choreoAct = (ChoreographyTask) flowEle;
+					
+					/* Insert a message flow from first to last participant */
+					choreoAct.createMessageFlows(choreo);
+						
+					choreo.getParticipant().addAll(((ChoreographyActivity) flowEle).getParticipantRef());
+				}
+				
+				/* Handle subchoreographies recursively */
+				if(flowEle instanceof SubChoreography) {
+					choreo.getParticipant().addAll(((ChoreographyActivity) flowEle).getParticipantRef());
+					
+					((SubChoreography) flowEle).setParticipantsAndMessageFlows(choreo, this.bpmnElements, this);
+					
+					/* Insert child shape element of a sub choreography */
+					List<String> idList = ((SubChoreography) flowEle).getIdsOfDiagramElements();
+					for(String id : idList) {
+						this.definitions.getFirstPlane().getDiagramElement().add(this.bpmnElements.get(id).getShape());
+					}
+				}
+				
+			}
+			/* Remove Message elements, because they are not represented
+			 * by a shape element */
+			for(FlowElement flowEle : p.getFlowElement()) {
+				if(flowEle instanceof Message) {
+					this.bpmnElements.remove(this.bpmnElements.get(flowEle.getId()));
+					Association msgAssociation = ((Message) flowEle).getDataConnectingAssociation();
+					if(msgAssociation != null) {
+						this.bpmnElements.remove(this.bpmnElements.get(msgAssociation.getId()));
+					}
+				}
+			}
+			
+			/* Insert Artifact elements */
+			for(Artifact artifact : p.getArtifact()) {
+				if(artifact.getSubChoreography() != null)
+					continue;
+				
+				/* Semantic element */
+				choreo.getArtifact().add(artifact);
+				
+				/* DI element */
+				this.definitions.getFirstPlane().getDiagramElement().add(bpmnElements.get(artifact.getId()).getShape());
+			}
+			
+			/* Set bpmn plane reference, maybe overwritten by another collaboration
+			 * later */
+			this.definitions.getFirstPlane().setBpmnElement(choreo);
 		}
-
-		/* Insert into definitions */
-		if (this.choreography == null || this.choreographyDiagram == null)
-			return;
-
-		this.definitions.getRootElement().addAll(this.choreography);
-		this.definitions.getDiagram().add(this.choreographyDiagram);
+		
+		if (this.choreography != null) {
+			/* Insert into definitions */
+			this.definitions.getRootElement().addAll(this.choreography);
+		}
 	}
-
+	
 	/**
 	 * Sets attributes of the {@link Definitions} element.
 	 */
@@ -1255,7 +1276,11 @@ public class Diagram2BpmnConverter {
 		if (targetnamespace == null)
 			targetnamespace = "http://www.omg.org/bpmn20";
 		this.definitions.setTargetNamespace(targetnamespace);
-
+		
+		/* Export Tool Information */
+		this.definitions.setExporter("Signavio Process Editor, http://www.signavio.com");
+		this.definitions.setExporterVersion((editorVersion != null ? editorVersion : ""));
+		
 		/* Additional namespace definitions */
 		try {
 			String namespacesProperty = this.diagram.getProperty("namespaces");
@@ -1280,12 +1305,12 @@ public class Diagram2BpmnConverter {
 
 		/* Expression Language */
 		String exprLanguage = diagram.getProperty("expressionlanguage");
-		if (exprLanguage != null && !exprLanguage.isEmpty())
+		if (exprLanguage != null && !(exprLanguage.length() == 0))
 			this.definitions.setExpressionLanguage(exprLanguage);
 
 		/* Type Language */
 		String typeLanguage = diagram.getProperty("typelanguage");
-		if (typeLanguage != null && !typeLanguage.isEmpty())
+		if (typeLanguage != null && !(typeLanguage.length() == 0))
 			this.definitions.setTypeLanguage(typeLanguage);
 	}
 
@@ -1307,6 +1332,36 @@ public class Diagram2BpmnConverter {
 			if(element.getNode() instanceof Event && ((Event) element.getNode()).isSignalEvent()) {
 				SignalEventDefinition sigEvDev = (SignalEventDefinition) ((Event) element.getNode()).getEventDefinitionOfType(SignalEventDefinition.class);
 				sigEvDev.insertSignalIntoDefinitions(definitions);
+			}
+		}
+	}
+	
+	/**
+	 * Inserts all edge diagram element of the BPMN diagram.
+	 */
+	private void insertEdgeDiagramElements() {
+		for(BPMNElement element : this.bpmnElements.values()) {
+			if(element.getNode() instanceof Edge) {
+				
+				/* Associations */
+				if(element.getNode() instanceof Association && ((Association) element.getNode())._containedInProcess) {
+					definitions.getFirstPlane().getDiagramElement().add(element.getShape());
+				}
+				
+				/* Sequence flows */
+				if(element.getNode() instanceof SequenceFlow) {
+					definitions.getFirstPlane().getDiagramElement().add(element.getShape());
+				}
+				
+				/* Message flows */
+				if(element.getNode() instanceof MessageFlow) {
+					definitions.getFirstPlane().getDiagramElement().add(element.getShape());
+				}
+				
+				/* Conversation Links */
+				if(element.getNode() instanceof ConversationLink) {
+					definitions.getFirstPlane().getDiagramElement().add(element.getShape());
+				}
 			}
 		}
 	}
@@ -1346,19 +1401,27 @@ public class Diagram2BpmnConverter {
 		this.setDefaultSequenceFlowOfExclusiveGateway();
 		this.setCompensationEventActivityRef();
 		this.putGlobalElementsIntoDefinitions();
-		this.setConversationParticipants();
+//		this.setConversationParticipants();
 
 		this.identifyProcesses();
 
-		this.insertChoreographyProcessesIntoDefinitions();
-		this.insertConversationIntoDefinitions();
 
 		this.handleDataObjects();
 		this.handleArtifacts();
 		this.addAssociationsToProcess();
-
+		this.addAssociationsToConversation();
+		
+		/* Insert elements into diagram */
+		
+		this.insertChoreographyProcessesIntoDefinitions();
 		this.insertProcessesIntoDefinitions();
 		this.insertCollaborationElements();
+		
+		/* Insert diagram element of edge last, because they are on top of all 
+		 * other elements */
+		this.insertEdgeDiagramElements();
+		
+		this.determineUnusedNamespaceDeclarations();
 
 		return definitions;
 	}
@@ -1373,71 +1436,71 @@ public class Diagram2BpmnConverter {
 	}
 
 	/**
-	 * @return the collaborationDiagram
-	 */
-	private CollaborationDiagram getCollaborationDiagram() {
-		if (this.collaborationDiagram == null) {
-			this.collaborationDiagram = new CollaborationDiagram();
-			this.collaborationDiagram.setId(this.getCollaboration().getId()
-					+ "_gui");
-			this.collaborationDiagram.setCollaborationRef(this
-					.getCollaboration());
-		}
-		return collaborationDiagram;
-	}
-
-	/**
 	 * @return the collaboration
 	 */
 	private Collaboration getCollaboration() {
 		if (this.collaboration == null) {
 			this.collaboration = new Collaboration();
-			this.collaboration.setId(UUID.randomUUID().toString());
+			this.collaboration.setId(SignavioUUID.generate());
 		}
 		return this.collaboration;
 	}
 
 	/**
-	 * @return the choreography
+	 * @return the choreography element. If an collaboration already exists it
+	 * it converts the collaboration to an choreography element.
 	 */
 	private List<Choreography> getChoreography() {
-		if (this.choreography == null) {
+//		/* Neither collaboration nor choreography existing */
+//		if (this.collaboration == null) {
+//			this.collaboration = new Choreography();
+//		} 
+//		/* Collaboration exiting */
+//		else if(this.collaboration instanceof Collaboration)
+//		return (Choreography) this.collaboration;
+		
+		if(this.choreography == null) {
 			this.choreography = new ArrayList<Choreography>();
 		}
+		
 		return this.choreography;
 	}
-
+	
 	/**
-	 * @return the choreographyDiagram
+	 * Removes the {@link BPMNElement} identified by the contained {@link BaseElement}
+	 * from the list of all BPMNElements.
+	 * 
+	 * @param node
 	 */
-	private ChoreographyDiagram getChoreographyDiagram() {
-		if (this.choreographyDiagram == null) {
-			this.choreographyDiagram = new ChoreographyDiagram();
-			this.choreographyDiagram.setId(UUID.randomUUID().toString() + "_gui");
+	private void removeBpmnElement(BaseElement node) {
+		BPMNElement bpmnElement = null;
+		for(BPMNElement element : bpmnElements.values()) {
+			if(element.getNode().equals(node)) {
+				bpmnElement = element;
+				break;
+			}
 		}
-		return this.choreographyDiagram;
+		
+		if(bpmnElement != null) {
+			bpmnElements.remove(bpmnElement);
+		}
 	}
-
+	
 	/**
-	 * @return the conversation
+	 * Checks if a vendor specific namespace declaration is not in use and 
+	 * marks it for removal.
 	 */
-	private Conversation getConversation() {
-		if (this.conversation == null) {
-			this.conversation = new Conversation();
-			this.conversation.setId(UUID.randomUUID().toString());
+	private void determineUnusedNamespaceDeclarations() {
+		List<String> unusedNamespacePrefixes = new ArrayList<String>(BPMNPrefixMapper.getCustomExtensions().values());
+		
+		for(BPMNElement element : this.bpmnElements.values()) {
+			if(element.getCustomNamespaces() != null) {
+				for(String prefix : Arrays.asList(element.getCustomNamespaces())) {
+					unusedNamespacePrefixes.remove(prefix);
+				}
+			}
 		}
-		return this.conversation;
-	}
-
-	/**
-	 * @return the conversationDiagram
-	 */
-	private ConversationDiagram getConversationDiagram() {
-		if (this.conversationDiagram == null) {
-			this.conversationDiagram = new ConversationDiagram();
-			this.conversationDiagram.setId(this.getConversation().getId()
-					+ "_gui");
-		}
-		return this.conversationDiagram;
+		
+		this.definitions.unusedNamespaceDeclarations = unusedNamespacePrefixes;
 	}
 }

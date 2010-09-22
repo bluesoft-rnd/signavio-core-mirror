@@ -28,9 +28,11 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 
 import de.hpi.bpmn2_0.model.RootElement;
+import de.hpi.bpmn2_0.util.EscapingStringAdapter;
 
 
 /**
@@ -60,6 +62,7 @@ public class Escalation
     @XmlAttribute
     protected QName structureRef;
     @XmlAttribute
+    @XmlJavaTypeAdapter(EscapingStringAdapter.class)
     protected String name;
     @XmlAttribute
     protected String escalationCode;

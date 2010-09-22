@@ -33,7 +33,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
@@ -51,9 +50,12 @@ import de.hpi.bpmn2_0.model.activity.type.SendTask;
 import de.hpi.bpmn2_0.model.activity.type.ServiceTask;
 import de.hpi.bpmn2_0.model.activity.type.UserTask;
 import de.hpi.bpmn2_0.model.artifacts.Artifact;
+import de.hpi.bpmn2_0.model.artifacts.Group;
+import de.hpi.bpmn2_0.model.artifacts.TextAnnotation;
 import de.hpi.bpmn2_0.model.choreography.ChoreographyActivity;
-import de.hpi.bpmn2_0.model.choreography.ChoreographySubProcess;
 import de.hpi.bpmn2_0.model.choreography.ChoreographyTask;
+import de.hpi.bpmn2_0.model.choreography.SubChoreography;
+import de.hpi.bpmn2_0.model.connector.Association;
 import de.hpi.bpmn2_0.model.connector.Edge;
 import de.hpi.bpmn2_0.model.connector.SequenceFlow;
 import de.hpi.bpmn2_0.model.data_object.DataObject;
@@ -71,6 +73,7 @@ import de.hpi.bpmn2_0.model.gateway.ExclusiveGateway;
 import de.hpi.bpmn2_0.model.gateway.InclusiveGateway;
 import de.hpi.bpmn2_0.model.gateway.ParallelGateway;
 import de.hpi.bpmn2_0.model.misc.ProcessType;
+import de.hpi.bpmn2_0.model.participant.Lane;
 import de.hpi.bpmn2_0.model.participant.LaneSet;
 
 
@@ -111,7 +114,9 @@ import de.hpi.bpmn2_0.model.participant.LaneSet;
     "laneSet",
     "flowElement",
     "artifact",
-    "supports"
+    "supports",
+    "isClosed",
+    "isExecutable"
 })
 public class Process
     extends CallableElement
@@ -166,18 +171,12 @@ public class Process
     @XmlAttribute
     protected Boolean isClosed;
     @XmlAttribute
+    protected boolean isExecutable;
+    @XmlAttribute
     protected QName definitionalCollaborationRef;
     
     @XmlElement(type = LaneSet.class)
     protected List<LaneSet> laneSet;
-    
-    @XmlTransient
-    private SubProcess subprocessRef; 
-    
-    
-    public boolean isSubprocess() {
-    	return this.subprocessRef != null;
-    }
     
     /**
      * Adds the child to the process's flow elements if possible.
@@ -244,22 +243,66 @@ public class Process
     	return elements;
     }
     
+    /**
+     * Retrieve all subprocesses and child subprocesses recursively.
+     * 
+     * @return
+     * 		A flat list of the contained subprocesses.
+     */
+    public List<SubProcess> getSubprocessList() {
+    	List<SubProcess> subprocesses = new ArrayList<SubProcess>();
+    	
+    	for(FlowElement flowEle : getFlowElement()) {
+    		/* Process subprocess */
+    		if(flowEle instanceof SubProcess) {
+    			subprocesses.add((SubProcess) flowEle);
+    			subprocesses.addAll(((SubProcess) flowEle).getSubprocessList());
+    		}
+    	}
+    	
+    	return subprocesses;
+    }
+    
+    /**
+     * Retrieves a list of subchoreographies contained in the process including
+     * children.
+     * 
+     * @return
+     */
+    public List<SubChoreography> getSubChoreographyList() {
+    	List<SubChoreography> subchoreographies = new ArrayList<SubChoreography>();
+    	
+    	for(FlowElement flowEle : getFlowElement()) {
+    		/* Subchoreography */
+    		if(flowEle instanceof SubChoreography) {
+    			subchoreographies.add((SubChoreography) flowEle);
+    			
+    		}
+    	}
+    	
+    	return subchoreographies;
+    }
+    
+    /**
+     * Returns a list of {@link Lane} participating in this process.
+     * @return
+     */
+    public List<Lane> getAllLanes() {
+    	List<Lane> laneList = new ArrayList<Lane>();
+    	
+    	if(this.getLaneSet() == null) {
+    		return laneList;
+    	}
+    	
+    	for(LaneSet laneSet : getLaneSet()) {
+    		laneList.addAll(laneSet.getAllLanes());
+    	}
+    	
+    	return laneList;
+    }
     
     /* Getter & Setter */
-    public String getName() {
-    	if(this.isSubprocess()) {
-    		return this.getSubprocessRef().getName();
-    	}
-    	return super.getName();
-    }
     
-//    @XmlID
-    public String getId() {
-    	if(this.isSubprocess()) {
-    		return this.getSubprocessRef().getId();
-    	}
-    	return super.getId();
-    }
     
     public List<LaneSet> getLaneSet() {
     	if(this.laneSet == null) {
@@ -551,7 +594,15 @@ public class Process
         this.isClosed = value;
     }
 
-    /**
+    public boolean isExecutable() {
+		return isExecutable;
+	}
+
+	public void setExecutable(boolean isExecutable) {
+		this.isExecutable = isExecutable;
+	}
+
+	/**
      * Gets the value of the definitionalCollaborationRef property.
      * 
      * @return
@@ -574,20 +625,6 @@ public class Process
     public void setDefinitionalCollaborationRef(QName value) {
         this.definitionalCollaborationRef = value;
     }
-
-	/**
-	 * @param subprocessRef the subprocessRef to set
-	 */
-	public void setSubprocessRef(SubProcess subprocessRef) {
-		this.subprocessRef = subprocessRef;
-	}
-
-	/**
-	 * @return the subprocessRef
-	 */
-	public SubProcess getSubprocessRef() {
-		return subprocessRef;
-	}
 
 	/**
 	 * @return the processType

@@ -27,8 +27,13 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.oryxeditor.server.diagram.Shape;
+import org.oryxeditor.server.diagram.StencilType;
+
 import de.hpi.bpmn2_0.model.FlowElement;
 import de.hpi.bpmn2_0.model.connector.Edge;
+
+import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
 
 /**
  * Class representing a conversation link.
@@ -38,7 +43,35 @@ import de.hpi.bpmn2_0.model.connector.Edge;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ConversationLink extends Edge {
+public class ConversationLink extends Edge implements ConversationElement {
+	
+	/**
+	 * 
+	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
+	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
+	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
+	 * 
+	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
+	 */
+	public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
+		Shape shape = super.toShape(converterForShapeCoordinateLookup);
+
+		shape.setStencil(new StencilType("ConversationLink"));
+		
+		String sourceObject = this.sourceRef.getId();
+		
+		Shape s = converterForShapeCoordinateLookup.getEditorShapeByID(sourceObject);
+		if(s == null){
+			s = converterForShapeCoordinateLookup.newShape(sourceObject);
+		}
+		s.addOutgoing(new Shape(this.getId()));
+		
+		//As, otherwise, the conversation link shows ugly forks once you start editing...
+		shape.putProperty("showforkstart", "false");
+		shape.putProperty("showforkend", "false");
+		
+		return shape;
+	}
 	
 	/**
 	 * Ensures that the target element is of the type conversation element and 

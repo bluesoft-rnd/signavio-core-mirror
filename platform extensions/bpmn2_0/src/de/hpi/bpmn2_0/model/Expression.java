@@ -68,5 +68,14 @@ public class Expression
 		this.getDocumentation().add(new Documentation(text));
 		this.setId(SignavioUUID.generate());
 	}
+	
+	/**
+	 * Is used for exporting the expression.
+	 * 
+	 * @return Returns a string, or null if there is no expression.
+	 */
+	public String toExportString(){
+		return this.getDocumentation().size() == 0? null : this.getDocumentation().get(0).getText();
+	}
 
 }

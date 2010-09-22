@@ -24,10 +24,15 @@
 package de.hpi.bpmn2_0.model.event;
 
 import javax.xml.bind.annotation.XmlAccessType;
+
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+
+import org.oryxeditor.server.diagram.Shape;
+
+import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
 
 
 /**
@@ -186,5 +191,12 @@ public abstract class CatchEvent
     public void setParallelMultiple(Boolean value) {
         this.parallelMultiple = value;
     }
+    
+    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup)  {
+		Shape shape = super.toShape(converterForShapeCoordinateLookup);
+		
+        
+		return shape;
+	}
 
 }

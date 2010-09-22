@@ -24,6 +24,7 @@
 package de.hpi.bpmn2_0.model;
 
 import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,9 +44,14 @@ import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 
+import org.oryxeditor.server.diagram.Shape;
 import org.w3c.dom.Element;
 
+import de.hpi.bpmn2_0.model.data_object.DataInput;
+import de.hpi.bpmn2_0.model.data_object.DataOutput;
 import de.hpi.bpmn2_0.model.participant.Lane;
+
+import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
 
 /**
  * <p>
@@ -90,7 +96,7 @@ import de.hpi.bpmn2_0.model.participant.Lane;
 // TInputOutputBinding.class,
 // TResourceParameter.class,
 // TProperty.class,
-// DataInput.class,
+ DataInput.class,
 // TComplexBehaviorDefinition.class,
 // MessageFlowAssociation.class,
 // DataAssociation.class,
@@ -113,7 +119,7 @@ import de.hpi.bpmn2_0.model.participant.Lane;
 // RootElement.class,
 // TAuditing.class,
 // Artifact.class,
-// DataOutput.class
+DataOutput.class
 })
 public abstract class BaseElement {
 	
@@ -134,6 +140,7 @@ public abstract class BaseElement {
     
 	@XmlTransient
     private Process processRef;
+	
 	
 	/**
 	 * Default constructor
@@ -174,7 +181,29 @@ public abstract class BaseElement {
 	public void addChild(BaseElement child) {
 	}
 
-	public List<BaseElement> getChilds() {
+	/**
+	 * Another helper for the import. If the element is of fixed size, then it
+	 * may have to be adjusted after import from other tools.
+	 */
+	public boolean isElementWithFixedSize(){
+		return false;
+	}
+
+   /**
+     * For a fixed-size shape, return the fixed width.
+     */
+    public double getStandardWidth(){
+    	return 0;
+    }
+    
+    /**
+     * For a fixed-size shape, return the fixed height.
+     */
+    public double getStandardHeight(){
+    	return 0;
+    }
+    
+    public List<BaseElement> getChilds() {
 		return null;
 	}
 
@@ -203,6 +232,33 @@ public abstract class BaseElement {
 		return lane;
 	}
 
+	/**
+	 * 
+	 * Basic method for the conversion of BPMN2.0 to the editor's internal format.
+	 * Extensions are not yet supported for import. 
+	 * 
+	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
+	 * 
+	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. In BaseElement#toShape, the shape's ID and documentation property is set.
+	 */
+	public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup){
+		//get pre-defined object, and just adjust it!
+		//or, make a new one, and initialize its bounds! (useful if its position has to be adjusted later...)
+		
+		Shape shape;
+		if(converterForShapeCoordinateLookup.getEditorShapeByID(getId()) != null)
+			shape = converterForShapeCoordinateLookup.getEditorShapeByID(getId());
+		else{
+			shape = converterForShapeCoordinateLookup.newShape(getId());
+		}
+		
+		//CONVENTION: take the first item
+		if(this.getDocumentation().size() != 0)
+			shape.putProperty("documentation", this.getDocumentation().get(0).getText());
+
+		return shape;			
+	}
+	
 	/* Getter & Setter */
 
 	/**
@@ -326,6 +382,9 @@ public abstract class BaseElement {
 	}
 
 	/**
+	 * 
+	 * Returns the lane that contains this element.
+	 * 
 	 * @return the lane
 	 */
 	public Lane getLane() {

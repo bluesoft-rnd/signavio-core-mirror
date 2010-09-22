@@ -30,7 +30,12 @@ import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import org.oryxeditor.server.diagram.Shape;
+import org.oryxeditor.server.diagram.StencilType;
+
 import de.hpi.bpmn2_0.model.CallableElement;
+
+import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
 
 
 /**
@@ -67,6 +72,33 @@ public class CallConversation
 	@XmlAttribute
     protected CallableElement calledElementRef;
 
+    
+    
+	/**
+	 * 
+	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
+	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
+	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
+	 * 
+	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
+	 */
+    // @Override
+    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
+		Shape shape = super.toShape(converterForShapeCoordinateLookup);
+
+		shape.putProperty("iscallconversation", "true");
+		
+		if(this.getCalledElementRef() instanceof GlobalCommunication){
+			shape.setStencil(new StencilType("Communication"));
+		}else{
+			shape.setStencil(new StencilType("SubConversation"));
+			
+			//shape.putProperty("", "");
+		}
+		
+		return shape;
+	}
+    
     /**
      * Gets the value of the participantAssociation property.
      * 

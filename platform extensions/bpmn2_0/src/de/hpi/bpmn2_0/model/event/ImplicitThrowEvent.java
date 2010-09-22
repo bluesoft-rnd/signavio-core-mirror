@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 20010
+ * Copyright (c) 2010
  * Sven Wagner-Boysen
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -68,5 +68,7 @@ public class ImplicitThrowEvent extends ThrowEvent {
 		this.getEventDefinition().add(
 				EventDefinition.createEventDefinition(eventIdentifier));
 	}
+	
+	//DO NOT ADD a separate toShape method here - it is a non-graphical element! (Standard BPMN 2.0, 10.4.1 very last part)
 
 }

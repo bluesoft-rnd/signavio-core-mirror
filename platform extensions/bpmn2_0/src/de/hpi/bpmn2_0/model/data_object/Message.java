@@ -23,15 +23,24 @@
 
 package de.hpi.bpmn2_0.model.data_object;
 
+import java.util.ArrayList;
+
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
+
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import de.hpi.bpmn2_0.model.FlowElement;
 import de.hpi.bpmn2_0.model.FlowNode;
+import de.hpi.bpmn2_0.model.choreography.ChoreographyActivity;
+import de.hpi.bpmn2_0.model.connector.Association;
 import de.hpi.bpmn2_0.model.misc.ItemDefinition;
+import de.hpi.bpmn2_0.model.participant.Participant;
 
 
 /**
@@ -60,40 +69,67 @@ public class Message
 {
 
     @XmlAttribute
-    protected String name;
-    
-    @XmlAttribute
     @XmlIDREF
     protected ItemDefinition structureRef;
     
     @XmlAttribute
     private boolean isInitiating;
     
-    /* Getter & Setter */
-
+    
+	/**
+	 * 
+	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
+	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
+	 * 
+	 * Actually, it is useless here, as the message shape is not an element referenced by a BPMNShape... it has to be put manually.
+	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
+	 * 
+	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
+	 */
+//    
+//    public Shape toShape(BPMN2DiagramConverter converterForShapeCoordinateLookup)  {
+//		Shape shape = super.toShape(converterForShapeCoordinateLookup);
+//
+//		shape.setStencil(new StencilType("Message"));
+//        
+//        //shape.putProperty("", );
+//        
+//		return shape;
+//	}
+    
     /**
-     * Gets the value of the name property.
+     * Retrieves the association edge connecting the message object with an 
+     * choreography activity or participant.
      * 
      * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
-    public String getName() {
-        return name;
+    public Association getDataConnectingAssociation() {
+    	List<Association> associationList = new ArrayList<Association>();
+    	
+    	for(FlowElement element : this.getIncoming()) {
+    		if(element instanceof Association)
+    			associationList.add((Association) element);
+    	}
+    	
+    	for(FlowElement element : this.getOutgoing()) {
+    		if(element instanceof Association)
+    			associationList.add((Association) element);
+    	}
+    	
+    	for(Association msgAssociation : associationList) {
+    		if(msgAssociation.getSourceRef() instanceof ChoreographyActivity 
+    			|| msgAssociation.getSourceRef() instanceof Participant 
+    			|| msgAssociation.getTargetRef() instanceof ChoreographyActivity 
+    			|| msgAssociation.getTargetRef() instanceof Participant) {
+    			
+    			return msgAssociation;
+    		}
+    	}
+    	
+    	return null;
     }
-
-    /**
-     * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setName(String value) {
-        this.name = value;
-    }
+    
+    /* Getter & Setter */
 
     /**
      * Gets the value of the structureRef property.

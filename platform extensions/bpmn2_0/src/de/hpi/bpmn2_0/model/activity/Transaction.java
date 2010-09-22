@@ -29,6 +29,10 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import org.oryxeditor.server.diagram.Shape;
+
+import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+
 
 /**
  * <p>Java class for tTransaction complex type.
@@ -57,6 +61,18 @@ public class Transaction
     @XmlAttribute
     protected TransactionMethod method;
 
+    
+    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
+		Shape shape = super.toShape(converterForShapeCoordinateLookup);
+		
+		//what about the transaction reference?
+		shape.putProperty("isatransaction", "true");
+		
+		shape.putProperty("transactionmethod", this.getMethod().toString());
+		
+		return shape;
+	}
+    
     /**
      * Gets the value of the method property.
      * 

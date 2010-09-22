@@ -29,12 +29,23 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.namespace.QName;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import de.hpi.bpmn2_0.model.artifacts.Artifact;
+import de.hpi.bpmn2_0.model.choreography.Choreography;
+import de.hpi.bpmn2_0.model.connector.Association;
 import de.hpi.bpmn2_0.model.connector.MessageFlow;
+import de.hpi.bpmn2_0.model.conversation.ConversationLink;
+import de.hpi.bpmn2_0.model.conversation.ConversationNode;
+import de.hpi.bpmn2_0.model.conversation.CorrelationKey;
 import de.hpi.bpmn2_0.model.participant.Participant;
+import de.hpi.bpmn2_0.util.EscapingStringAdapter;
 
 
 /**
@@ -68,33 +79,78 @@ import de.hpi.bpmn2_0.model.participant.Participant;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tCollaboration", propOrder = {
-    "participant",
-    "messageFlow"//,
-//    "artifact",
-//    "conversation",
-//    "conversationAssociation",
-//    "participantAssociation",
-//    "messageFlowAssociation"
+		"participant",
+	    "messageFlow",
+	    "artifact",
+	    "association",
+	    "conversationNode",
+//	    "conversationAssociation",
+//	    "participantAssociation",
+//	    "messageFlowAssociation",
+	    "correlationKey",
+	    "choreographyRef",
+	    "conversationLink"
+})
+@XmlSeeAlso({
+	Choreography.class
 })
 public class Collaboration
     extends RootElement
 {
-
-    protected List<Participant> participant;
+	
+	@XmlElement(type = Participant.class)
+	protected List<Participant> participant;
     protected List<MessageFlow> messageFlow;
-//    @XmlElementRef(name = "artifact", namespace = "http://www.omg.org/bpmn20", type = JAXBElement.class)
-//    protected List<JAXBElement<? extends TArtifact>> artifact;
-//    protected List<tConversation> conversation;
-//    protected List<TConversationAssociation> conversationAssociation;
-//    protected List<TParticipantAssociation> participantAssociation;
-//    protected List<TMessageFlowAssociation> messageFlowAssociation;
-    @XmlAttribute
+    @XmlElementRef
+    protected List<Artifact> artifact;
+    @XmlElementRef
+    protected List<ConversationNode> conversationNode;
+    @XmlElementRef
+    protected List<Association> association;
+//    protected List<ConversationAssociation> conversationAssociation;
+//    protected List<ParticipantAssociation> participantAssociation;
+//    protected List<MessageFlowAssociation> messageFlowAssociation;
+    protected List<CorrelationKey> correlationKey;
+    
+    @XmlIDREF
+    @XmlElement
+    protected List<Choreography> choreographyRef;
+    protected List<ConversationLink> conversationLink;
+    
+    @XmlAttribute(name = "name")
+    @XmlJavaTypeAdapter(EscapingStringAdapter.class)
     protected String name;
-    @XmlAttribute
+    @XmlAttribute(name = "isClosed")
     protected Boolean isClosed;
-    @XmlAttribute
-    protected QName choreographyRef;
-
+    
+    /* Constructors */
+    
+    /**
+     * Default constructor
+     */
+    public Collaboration() {
+    	super();
+    }
+    
+    public Collaboration(Collaboration collaboration) {
+    	super(collaboration);
+    	
+    	this.getParticipant().addAll(collaboration.getParticipant());
+    	this.getMessageFlow().addAll(collaboration.getMessageFlow());
+    	this.getArtifact().addAll(collaboration.getArtifact());
+    	this.getConversationNode().addAll(collaboration.getConversationNode());
+    	this.getAssociation().addAll(collaboration.getAssociation());
+    	this.getCorrelationKey().addAll(collaboration.getCorrelationKey());
+    	this.getChoreographyRef().addAll(collaboration.getChoreographyRef());
+    	
+    	this.setName(collaboration.getName());
+    	this.setIsClosed(collaboration.isIsClosed());
+    	
+    }
+    
+    /* Getter & Setter */
+    
+    
     /**
      * Gets the value of the participant property.
      * 
@@ -178,12 +234,12 @@ public class Collaboration
      * 
      * 
      */
-//    public List<JAXBElement<? extends TArtifact>> getArtifact() {
-//        if (artifact == null) {
-//            artifact = new ArrayList<JAXBElement<? extends TArtifact>>();
-//        }
-//        return this.artifact;
-//    }
+    public List<Artifact> getArtifact() {
+        if (artifact == null) {
+            artifact = new ArrayList<Artifact>();
+        }
+        return this.artifact;
+    }
 
     /**
      * Gets the value of the conversation property.
@@ -358,23 +414,36 @@ public class Collaboration
      * 
      * @return
      *     possible object is
-     *     {@link QName }
+     *     {@link Choreography }
      *     
      */
-    public QName getChoreographyRef() {
-        return choreographyRef;
+    public List<Choreography> getChoreographyRef() {
+        if(choreographyRef == null)
+        	choreographyRef = new ArrayList<Choreography>();
+    	return choreographyRef;
     }
 
-    /**
-     * Sets the value of the choreographyRef property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link QName }
-     *     
-     */
-    public void setChoreographyRef(QName value) {
-        this.choreographyRef = value;
-    }
+	public List<ConversationNode> getConversationNode() {
+		if(conversationNode == null)
+			conversationNode = new ArrayList<ConversationNode>();
+		return conversationNode;
+	}
 
+	public List<CorrelationKey> getCorrelationKey() {
+		if(correlationKey == null)
+			correlationKey = new ArrayList<CorrelationKey>();
+		return correlationKey;
+	}
+
+	public List<ConversationLink> getConversationLink() {
+		if(conversationLink == null)
+			conversationLink = new ArrayList<ConversationLink>();
+		return conversationLink;
+	}
+
+	public List<Association> getAssociation() {
+		if(association == null)
+			association = new ArrayList<Association>();
+		return association;
+	}
 }

@@ -37,6 +37,8 @@ import org.oryxeditor.server.diagram.StencilType;
 
 import de.hpi.bpmn2_0.model.data_object.Message;
 
+import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+
 
 /**
  * <p>Java class for tMessageFlow complex type.
@@ -70,10 +72,29 @@ public class MessageFlow
     @XmlSchemaType(name = "IDREF")
     protected Message messageRef;
     
-    public void toShape(Shape shape) {
-    	super.toShape(shape);
+	/**
+	 * 
+	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
+	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
+	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
+	 * 
+	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
+	 */
+    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
+    	Shape shape = super.toShape(converterForShapeCoordinateLookup);
     	
     	shape.setStencil(new StencilType("MessageFlow"));
+    	
+    	String sourceObject = this.sourceRef.getId();
+		
+    	//add to source as outgoing
+		Shape s = converterForShapeCoordinateLookup.getEditorShapeByID(sourceObject);
+		if(s == null){
+			s = converterForShapeCoordinateLookup.newShape(sourceObject);
+		}
+		s.addOutgoing(new Shape(this.getId()));
+    	
+    	return shape;
     }
     
     /* Getter & Setter */

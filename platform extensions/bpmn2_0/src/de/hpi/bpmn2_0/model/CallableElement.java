@@ -15,7 +15,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
+
+import de.hpi.bpmn2_0.model.data_object.InputOutputBinding;
+import de.hpi.bpmn2_0.model.data_object.InputOutputSpecification;
+import de.hpi.bpmn2_0.util.EscapingStringAdapter;
 
 
 /**
@@ -42,9 +47,9 @@ import javax.xml.namespace.QName;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tCallableElement", propOrder = {
-//    "supportedInterfaceRef",
-//    "ioSpecification",
-//    "ioBinding"
+    "supportedInterfaceRef",
+    "ioSpecification",
+    "ioBinding"
 })
 @XmlSeeAlso({
 //    Conversation.class,
@@ -59,9 +64,10 @@ public class CallableElement
 {
 
     protected List<QName> supportedInterfaceRef;
-//    protected TInputOutputSpecification ioSpecification;
-//    protected List<TInputOutputBinding> ioBinding;
+    protected InputOutputSpecification ioSpecification;
+    protected List<InputOutputBinding> ioBinding;
     @XmlAttribute
+    @XmlJavaTypeAdapter(EscapingStringAdapter.class)
     protected String name;
 
     /**
@@ -101,50 +107,50 @@ public class CallableElement
      *     {@link TInputOutputSpecification }
      *     
      */
-//    public TInputOutputSpecification getIoSpecification() {
-//        return ioSpecification;
-//    }
-//
-//    /**
-//     * Sets the value of the ioSpecification property.
-//     * 
-//     * @param value
-//     *     allowed object is
-//     *     {@link TInputOutputSpecification }
-//     *     
-//     */
-//    public void setIoSpecification(TInputOutputSpecification value) {
-//        this.ioSpecification = value;
-//    }
-//
-//    /**
-//     * Gets the value of the ioBinding property.
-//     * 
-//     * <p>
-//     * This accessor method returns a reference to the live list,
-//     * not a snapshot. Therefore any modification you make to the
-//     * returned list will be present inside the JAXB object.
-//     * This is why there is not a <CODE>set</CODE> method for the ioBinding property.
-//     * 
-//     * <p>
-//     * For example, to add a new item, do as follows:
-//     * <pre>
-//     *    getIoBinding().add(newItem);
-//     * </pre>
-//     * 
-//     * 
-//     * <p>
-//     * Objects of the following type(s) are allowed in the list
-//     * {@link TInputOutputBinding }
-//     * 
-//     * 
-//     */
-//    public List<TInputOutputBinding> getIoBinding() {
-//        if (ioBinding == null) {
-//            ioBinding = new ArrayList<TInputOutputBinding>();
-//        }
-//        return this.ioBinding;
-//    }
+    public InputOutputSpecification getIoSpecification() {
+        return ioSpecification;
+    }
+
+    /**
+     * Sets the value of the ioSpecification property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link InputOutputSpecification }
+     *     
+     */
+    public void setIoSpecification(InputOutputSpecification value) {
+        this.ioSpecification = value;
+    }
+
+    /**
+     * Gets the value of the ioBinding property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the ioBinding property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getIoBinding().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link TInputOutputBinding }
+     * 
+     * 
+     */
+    public List<InputOutputBinding> getIoBinding() {
+        if (ioBinding == null) {
+            ioBinding = new ArrayList<InputOutputBinding>();
+        }
+        return this.ioBinding;
+    }
 
     /**
      * Gets the value of the name property.

@@ -31,7 +31,12 @@ import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import org.oryxeditor.server.diagram.Shape;
+import org.oryxeditor.server.diagram.StencilType;
+
 import de.hpi.bpmn2_0.model.CallableElement;
+
+import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
 
 
 /**
@@ -85,5 +90,49 @@ public class CallActivity
     public void setCalledElement(CallableElement value) {
         this.calledElement = value;
     }
+    
+	/**
+	 * 
+	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
+	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
+	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
+	 * 
+	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
+	 */
+    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup)  {    	
+    	
+    	Shape shape = super.toShape(converterForShapeCoordinateLookup);
+
+		shape.putProperty("callacitivity", "true");
+		
+		if(this.getCalledElement() != null){
+			//[BPMN2.0] TODO set all properties of called activity! 
+			// > impossible, the called element is none of the "graphical" elements, which have all the attributes. 
+			//    the info should be contained in "this"...
+			//System.out.println("+ Call activity with calledELement!");
+		}else{
+			//System.out.println("- Call activity without calledELement!");	
+		}
+		
+		if(this.getCalledElement() != null && this.getCalledElement() instanceof de.hpi.bpmn2_0.model.Process){
+			if(converterForShapeCoordinateLookup.isChoreography()){
+				shape.setStencil(new StencilType("ChoreographySubprocessCollapsed"));
+			}else if(converterForShapeCoordinateLookup.isConversation()){
+				shape.setStencil(new StencilType("SubConversation"));
+			}else{
+				shape.setStencil(new StencilType("CollapsedSubprocess"));
+			}
+		}else{
+			if(converterForShapeCoordinateLookup.isChoreography()){
+				shape.setStencil(new StencilType("ChoreographyTask"));
+			}else if(converterForShapeCoordinateLookup.isConversation()){
+				shape.setStencil(new StencilType("Communication"));
+			}else{
+				shape.setStencil(new StencilType("Task"));
+			}
+		}
+		
+		return shape;
+	}
 
 }

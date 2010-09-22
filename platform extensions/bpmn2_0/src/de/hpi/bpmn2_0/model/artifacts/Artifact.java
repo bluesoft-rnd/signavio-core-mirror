@@ -36,6 +36,7 @@ import de.hpi.bpmn2_0.model.FlowElement;
 import de.hpi.bpmn2_0.model.FlowNode;
 import de.hpi.bpmn2_0.model.Process;
 import de.hpi.bpmn2_0.model.connector.Edge;
+import de.hpi.bpmn2_0.model.conversation.ConversationElement;
 
 
 /**
@@ -58,7 +59,7 @@ import de.hpi.bpmn2_0.model.connector.Edge;
 @XmlType(name = "tArtifact")
 @XmlSeeAlso({
 //    Association.class,
-//    TGroup.class,
+    Group.class,
     TextAnnotation.class
 })
 public abstract class Artifact
@@ -85,6 +86,12 @@ public abstract class Artifact
 		this.processedElements = new ArrayList<FlowElement>();
 		Process process = this.findRelatedProcessRecursivly(this);
 		if (process != null) {
+			
+			/* Remove from other containment based process reference */
+			if(this.getProcess() != null) {
+				this.getProcess().removeChild(this);
+			}
+			
 			this.setProcess(process);
 			process.addChild(this);
 		}
@@ -146,6 +153,78 @@ public abstract class Artifact
 		}
 
 		return null;
+	}
+	
+	/**
+	 * Checks whether the Artifact is contained in an conversation.
+	 * 
+	 * The algorithm checks the source and target neighborhood nodes of the data
+	 * object.
+	 * 
+	 * Navigates into both directions.
+	 */
+	public boolean isConverstionRelated() {
+		this.processedElements = new ArrayList<FlowElement>();
+		return this.isConversationConversationRecursivly(this);
+	}
+	
+	/**
+	 * Navigates into both directions.
+	 * 
+	 * @param flowElement
+	 *            The {@link FlowElement} to investigate.
+	 */
+	private boolean isConversationConversationRecursivly(FlowElement flowElement) {
+		if (flowElement == null)
+			return false;
+
+		/* Check if element is processed already */
+		if (this.processedElements.contains(flowElement))
+			return false;
+
+		this.processedElements.add(flowElement);
+
+		/*
+		 * Check if one of the neighbors is assigned to a Process, otherwise
+		 * continue with the after next.
+		 */
+
+		for (Edge edge : flowElement.getIncoming()) {
+			FlowElement sourceRef = edge.getSourceRef();
+			if (sourceRef == null)
+				continue;
+
+			if(sourceRef instanceof ConversationElement) {
+				return true;	
+			}
+		}
+
+		for (Edge edge : flowElement.getOutgoing()) {
+			FlowElement targetRef = edge.getTargetRef();
+			if (targetRef == null)
+				continue;
+			if(targetRef instanceof ConversationElement) {
+				return true;
+			}
+		}
+
+		/* Continue with the after next nodes */
+		
+		for (Edge edge : flowElement.getIncoming()) {
+			boolean result = this.isConversationConversationRecursivly(edge
+					.getSourceRef());
+			if (result)
+				return result;
+		}
+
+		for (Edge edge : flowElement.getOutgoing()) {
+			boolean result = this.isConversationConversationRecursivly(edge
+					.getTargetRef());
+			if (result)
+				return result;
+		}
+
+		return false;
 	}
 
 }

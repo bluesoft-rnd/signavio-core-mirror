@@ -45,6 +45,8 @@ import de.hpi.bpmn2_0.model.BaseElement;
 import de.hpi.bpmn2_0.model.FlowElement;
 import de.hpi.bpmn2_0.model.FlowNode;
 import de.hpi.bpmn2_0.model.connector.Edge;
+
+import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
 import de.hpi.diagram.SignavioUUID;
 
 
@@ -126,28 +128,78 @@ public class Lane
     @XmlSchemaType(name = "IDREF")
     protected Object partitionElementRef;
 
+    /*
+     * Constructor
+     */
     
     /**
+     * Default constructor
+     */
+    public Lane() {
+    	super();
+    }
+    
+    /**
+     * Copy constructor
+     * 
+     * @param l
+     * 		template {@link Lane}
+     */
+    public Lane(Lane l) {
+    	super(l);
+    	
+		this.setPartitionElement(l.getPartitionElement());
+		this.getFlowNodeRef().addAll(l.getFlowNodeRef());
+		this.setChildLaneSet(l.childLaneSet);
+		this.setLaneSet(l.getLaneSet());
+		this.setPartitionElementRef(l.getPartitionElementRef());
+	}
+    
+    /* Methods */
+    
+    /**
+     * Retrieves all child lane.
+     */
+    public List<Lane> getLaneList() {
+    	List<Lane> laneList = new ArrayList<Lane>();
+    	if(getChildLaneSet(false) == null)
+    		return laneList;
+    	
+    	laneList.addAll(getChildLaneSet(false).getAllLanes());
+    	
+    	return laneList;
+    }
+
+	/**
      * Adds the child to the lane's flow elements if possible.
      */
     public void addChild(BaseElement child) {
     	if(child instanceof Lane) {
-    		this.getChildLaneSet().getLanes().add((Lane) child);
-    		((Lane) child).setLaneSet(this.getChildLaneSet());
+    		this.getChildLaneSet(true).getLanes().add((Lane) child);
+    		((Lane) child).setLaneSet(this.getChildLaneSet(true));
     	} else if (!(child instanceof Edge)) {
     		this.getFlowNodeRef().add((FlowNode) child);
     	}
     }
     
-    /**
-     * Set general properties of a lane while generating its json 
-     * representation
-     */
-    public void toShape(Shape shape) {
-    	super.toShape(shape);
+	/**
+	 * 
+	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
+	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
+	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
+	 * 
+	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
+	 */
+    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
+    	Shape shape = super.toShape(converterForShapeCoordinateLookup);
     	
     	shape.setStencil(new StencilType("Lane"));
-    } 
+    	
+    	//if there is no parent process, get yourself a pool!
+    	//TBD in converter
+    	
+    	return shape;
+    }
     
     /* Getter & Setter */
     
@@ -176,6 +228,8 @@ public class Lane
     }
 
     /**
+     * 
+     * Returns a LaneSet, containing sub-Lanes (even if it is only one). Not to be confused with {@link #getLane()}, which returns the <b> containing </b> lane. 
 	 * @return the laneSet
 	 */
 	public LaneSet getLaneSet() {
@@ -222,14 +276,16 @@ public class Lane
     /**
      * Gets the value of the childLaneSet property.
      * 
+     * If createIfMissing is set to true, an childLaneSet is created on demand.
+     * 
      * @return
      *     possible object is
      *     {@link LaneSet }
      *     
      */
     @ChildElements
-    public LaneSet getChildLaneSet() {
-    	if(childLaneSet == null) {
+    public LaneSet getChildLaneSet(boolean createIfMissing) {
+    	if(childLaneSet == null && createIfMissing) {
     		childLaneSet = new LaneSet();
     		childLaneSet.setId(SignavioUUID.generate());
     		childLaneSet.setParentLane(this);

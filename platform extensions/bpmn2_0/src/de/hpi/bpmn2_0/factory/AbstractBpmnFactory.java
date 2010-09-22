@@ -34,10 +34,34 @@ import org.oryxeditor.server.diagram.Shape;
 import de.hpi.bpmn2_0.annotations.Property;
 import de.hpi.bpmn2_0.annotations.StencilId;
 import de.hpi.bpmn2_0.exceptions.BpmnConverterException;
+import de.hpi.bpmn2_0.factory.edge.AssociationFactory;
+import de.hpi.bpmn2_0.factory.edge.ConversationLinkFactory;
+import de.hpi.bpmn2_0.factory.edge.MessageFlowFactory;
+import de.hpi.bpmn2_0.factory.edge.SequenceFlowFactory;
+import de.hpi.bpmn2_0.factory.node.ChoreographyActivityFactory;
+import de.hpi.bpmn2_0.factory.node.ChoreographyParticipantFactory;
+import de.hpi.bpmn2_0.factory.node.ConversationFactory;
+import de.hpi.bpmn2_0.factory.node.ConversationParticipantFactory;
+import de.hpi.bpmn2_0.factory.node.DataObjectFactory;
+import de.hpi.bpmn2_0.factory.node.DataStoreFactory;
+import de.hpi.bpmn2_0.factory.node.EndEventFactory;
+import de.hpi.bpmn2_0.factory.node.GatewayFactory;
+import de.hpi.bpmn2_0.factory.node.GroupFactory;
+import de.hpi.bpmn2_0.factory.node.ITSystemFactory;
+import de.hpi.bpmn2_0.factory.node.IntermediateCatchEventFactory;
+import de.hpi.bpmn2_0.factory.node.IntermediateThrowEventFactory;
+import de.hpi.bpmn2_0.factory.node.LaneFactory;
+import de.hpi.bpmn2_0.factory.node.MessageFactory;
+import de.hpi.bpmn2_0.factory.node.ParticipantFactory;
+import de.hpi.bpmn2_0.factory.node.ProcessParticipantFactory;
+import de.hpi.bpmn2_0.factory.node.StartEventFactory;
+import de.hpi.bpmn2_0.factory.node.SubprocessFactory;
+import de.hpi.bpmn2_0.factory.node.TaskFactory;
+import de.hpi.bpmn2_0.factory.node.TextannotationFactory;
 import de.hpi.bpmn2_0.model.BaseElement;
 import de.hpi.bpmn2_0.model.Documentation;
 import de.hpi.bpmn2_0.model.FlowElement;
-import de.hpi.bpmn2_0.model.diagram.BpmnNode;
+import de.hpi.bpmn2_0.model.bpmndi.di.DiagramElement;
 import de.hpi.bpmn2_0.model.misc.Auditing;
 import de.hpi.bpmn2_0.model.misc.Monitoring;
 
@@ -64,7 +88,6 @@ public abstract class AbstractBpmnFactory {
 		factoryClasses.add(ConversationLinkFactory.class);
 		factoryClasses.add(MessageFlowFactory.class);
 		factoryClasses.add(SequenceFlowFactory.class);
-		factoryClasses.add(AssociationFactory.class);
 		factoryClasses.add(AssociationFactory.class);
 		factoryClasses.add(ChoreographyActivityFactory.class);
 		factoryClasses.add(ChoreographyParticipantFactory.class);
@@ -107,7 +130,7 @@ public abstract class AbstractBpmnFactory {
 	 *            The resource shape
 	 * @return The constructed diagram element.
 	 */
-	protected abstract Object createDiagramElement(Shape shape);
+	protected abstract DiagramElement createDiagramElement(Shape shape);
 
 	/**
 	 * Creates BPMNElement that contains DiagramElement and ProcessElement
@@ -129,10 +152,11 @@ public abstract class AbstractBpmnFactory {
 	 *            The resource shape
 	 */
 	protected void setCommonAttributes(BaseElement element, Shape shape) {
+		element.setId(shape.getResourceId());
 		
 		/* Documentation */
 		String documentation = shape.getProperty("documentation");
-		if (documentation != null && !documentation.isEmpty())
+		if (documentation != null && !(documentation.length() == 0) && element.getDocumentation().size() == 0)
 			element.getDocumentation().add(new Documentation(documentation));
 		
 		/* Common FlowElement attributes */
@@ -140,34 +164,32 @@ public abstract class AbstractBpmnFactory {
 			
 			/* Auditing */
 			String auditing = shape.getProperty("auditing");
-			if (auditing != null && !auditing.isEmpty())
+			if (auditing != null && !(auditing.length() == 0))
 				((FlowElement) element).setAuditing(new Auditing(auditing));
 			
 			/* Monitoring */
 			String monitoring = shape.getProperty("monitoring");
-			if (monitoring != null && !monitoring.isEmpty())
+			if (monitoring != null && !(monitoring.length() == 0))
 				((FlowElement) element).setMonitoring(new Monitoring(monitoring));
+			
+			/* Name */
+			String name = shape.getProperty("name");
+			if(name != null && !(name.length() == 0)) {
+				((FlowElement) element).setName(name);
+			}
 		}
 	}
 
 	/**
-	 * Sets the fields for the visual representation e.g. x and y coordinates,
-	 * height and width
+	 * Sets common fields for the visual representation.
 	 * 
 	 * @param diaElement
 	 *            The BPMN 2.0 diagram element
 	 * @param shape
 	 *            The resource shape
 	 */
-	protected void setVisualAttributes(BpmnNode diaElement, Shape shape) {
+	protected void setVisualAttributes(DiagramElement diaElement, Shape shape) {
 		diaElement.setId(shape.getResourceId() + "_gui");
-		diaElement.setName(shape.getProperty("name"));
-
-		/* Graphic fields */
-		diaElement.setX(shape.getUpperLeft().getX());
-		diaElement.setY(shape.getUpperLeft().getY());
-		diaElement.setHeight(shape.getHeight());
-		diaElement.setWidth(shape.getWidth());
 	}
 
 	protected BaseElement invokeCreatorMethod(Shape shape)
@@ -176,7 +198,7 @@ public abstract class AbstractBpmnFactory {
 
 		/* Retrieve the method to create the process element */
 		for (Method method : Arrays
-				.asList(this.getClass().getDeclaredMethods())) {
+				.asList(this.getClass().getMethods())) {
 			StencilId stencilIdA = method.getAnnotation(StencilId.class);
 			if (stencilIdA != null
 					&& Arrays.asList(stencilIdA.value()).contains(

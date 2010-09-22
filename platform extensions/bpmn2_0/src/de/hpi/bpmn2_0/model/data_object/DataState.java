@@ -27,8 +27,10 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.hpi.bpmn2_0.model.BaseElement;
+import de.hpi.bpmn2_0.util.EscapingStringAdapter;
 
 
 /**
@@ -71,6 +73,7 @@ public class DataState
 	}
 	
     @XmlAttribute
+    @XmlJavaTypeAdapter(EscapingStringAdapter.class)
     protected String name;
 
     /**

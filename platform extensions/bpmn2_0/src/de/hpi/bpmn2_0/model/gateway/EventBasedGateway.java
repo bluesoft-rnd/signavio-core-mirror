@@ -29,7 +29,12 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import org.oryxeditor.server.diagram.Shape;
+import org.oryxeditor.server.diagram.StencilType;
+
 import de.hpi.bpmn2_0.annotations.StencilId;
+
+import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
 
 
 /**
@@ -63,6 +68,41 @@ public class EventBasedGateway
     @XmlAttribute
     protected EventBasedGatewayType eventGatewayType;
 
+    
+    /**
+	 * 
+	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
+	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
+	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
+	 * 
+	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
+	 */
+    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup)  {
+		Shape shape = super.toShape(converterForShapeCoordinateLookup);
+
+		shape.setStencil(new StencilType("EventbasedGateway"));
+        
+		if(this.getEventGatewayType().equals(EventBasedGatewayType.EXCLUSIVE)){
+			if(this.isInstantiate()){
+				shape.putProperty("eventtype", "instantiate_exclusive");
+			}	
+			else{
+				shape.putProperty("eventtype", "exclusive");
+			}
+		}
+		else{ //if(this.getEventGatewayType().equals(EventBasedGatewayType.PARALLEL)){
+			if(this.isInstantiate()){
+				shape.putProperty("eventtype", "instantiate_parallel");
+			}
+			else{
+				//this cannot happen, actually! setting a value for the sake of robustness
+				shape.putProperty("eventtype", "exclusive");
+			}
+		}
+       
+		return shape;
+	}
+    
     /**
      * Gets the value of the instantiate property.
      * 

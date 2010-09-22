@@ -26,19 +26,29 @@ package de.hpi.bpmn2_0.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlIDREF;
+import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+
+import org.oryxeditor.server.diagram.Shape;
 
 import de.hpi.bpmn2_0.model.activity.Activity;
 import de.hpi.bpmn2_0.model.connector.Association;
 import de.hpi.bpmn2_0.model.connector.AssociationDirection;
+import de.hpi.bpmn2_0.model.connector.Edge;
 import de.hpi.bpmn2_0.model.connector.SequenceFlow;
+import de.hpi.bpmn2_0.model.data_object.AbstractDataObject;
 import de.hpi.bpmn2_0.model.event.BoundaryEvent;
 import de.hpi.bpmn2_0.model.event.CompensateEventDefinition;
 import de.hpi.bpmn2_0.model.event.Event;
 import de.hpi.bpmn2_0.model.gateway.Gateway;
+
+import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
 
 /**
  * <p>
@@ -67,25 +77,60 @@ import de.hpi.bpmn2_0.model.gateway.Gateway;
 @XmlType(name = "tFlowNode")
 @XmlSeeAlso( { Event.class,
 // ChoreographyActivity.class,
-		Gateway.class, Activity.class })
+		Gateway.class, Activity.class, AbstractDataObject.class })
 public abstract class FlowNode extends FlowElement {
-	
+
+	/* Attributes */
+
+	@XmlIDREF
+	@XmlSchemaType(name = "IDREF")
+	@XmlElement(name = "incoming")
+	protected List<SequenceFlow> _incomingSequenceFlows;
+
+	@XmlIDREF
+	@XmlSchemaType(name = "IDREF")
+	@XmlElement(name = "outgoing")
+	protected List<SequenceFlow> _outgoingSequenceFlows;
+
 	/**
 	 * Default constructor
 	 */
 	public FlowNode() {
-		
+
 	}
-	
+
 	/**
 	 * Copy constructor
 	 * 
 	 * @param flowNode
-	 * 		The {@link FlowNode} to copy
+	 *            The {@link FlowNode} to copy
 	 */
 	public FlowNode(FlowNode flowNode) {
 		super(flowNode);
 	}
+	
+	/**
+	 * 
+	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
+	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
+	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
+	 * 
+	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
+	 */
+    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
+    	Shape shape = super.toShape(converterForShapeCoordinateLookup);
+    	
+    	//more needed here??
+    	for(Edge edge : this.get_outgoingSequenceFlows()) {
+    		shape.getOutgoings().add(new Shape(edge.getId()));
+    	}
+    	
+    	for(Edge edge : this.getOutgoingCompensationFlows()) {
+    		shape.getOutgoings().add(new Shape(edge.getId()));
+    	}
+    	
+    	return shape;
+    }
 
 	/**
 	 * Convenience method to retrieve all incoming {@link SequenceFlow}
@@ -105,6 +150,29 @@ public abstract class FlowNode extends FlowElement {
 		}
 
 		return incomingSeq;
+	}
+
+	/**
+	 * The {@link Marshaller} invokes this method right before marshaling to
+	 * XML. Add sequenceflow to the reference list.
+	 * 
+	 * @param marshaller
+	 *            The marshaling context
+	 */
+	public void beforeMarshal(Marshaller marshaller) {
+		/* Incoming sequence flows */
+		for (Edge edge : this.getIncoming()) {
+			if (edge instanceof SequenceFlow) {
+				get_incomingSequenceFlows().add((SequenceFlow) edge);
+			}
+		}
+
+		/* Outgoing sequence flows */
+		for (Edge edge : this.getOutgoing()) {
+			if (edge instanceof SequenceFlow) {
+				get_outgoingSequenceFlows().add((SequenceFlow) edge);
+			}
+		}
 	}
 
 	/**
@@ -145,10 +213,10 @@ public abstract class FlowNode extends FlowElement {
 				compensationFlows.add((Association) edge);
 			}
 		}
-		
+
 		return compensationFlows;
 	}
-	
+
 	/**
 	 * @return The outcoming compensation Flow.
 	 */
@@ -167,7 +235,23 @@ public abstract class FlowNode extends FlowElement {
 				compensationFlows.add((Association) edge);
 			}
 		}
-		
+
 		return compensationFlows;
+	}
+
+	public List<SequenceFlow> get_incomingSequenceFlows() {
+		if (_incomingSequenceFlows == null) {
+			_incomingSequenceFlows = new ArrayList<SequenceFlow>();
+		}
+
+		return _incomingSequenceFlows;
+	}
+
+	public List<SequenceFlow> get_outgoingSequenceFlows() {
+		if (_outgoingSequenceFlows == null) {
+			_outgoingSequenceFlows = new ArrayList<SequenceFlow>();
+		}
+
+		return _outgoingSequenceFlows;
 	}
 }

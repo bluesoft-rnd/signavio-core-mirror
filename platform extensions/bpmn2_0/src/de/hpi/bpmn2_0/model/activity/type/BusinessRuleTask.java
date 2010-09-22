@@ -29,8 +29,11 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import org.oryxeditor.server.diagram.Shape;
+
 import de.hpi.bpmn2_0.model.activity.Task;
 import de.hpi.bpmn2_0.model.activity.misc.BusinessRuleTaskImplementation;
+import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
 
 
 /**
@@ -74,6 +77,14 @@ public class BusinessRuleTask
 	public BusinessRuleTask(BusinessRuleTask brTask) {
 		super(brTask);
 		this.setImplementation(brTask.getImplementation());
+	}
+	
+	public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup)  {
+		Shape shape = super.toShape(converterForShapeCoordinateLookup);
+
+        shape.putProperty("tasktype", "Business Rule");
+        
+		return shape;
 	}
 
 	/* Getter & Setter */

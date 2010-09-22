@@ -67,6 +67,18 @@ public class MessageEventDefinition
     protected Operation operationRef;
     @XmlElement
     protected Message messageRef;
+    
+    /* Constructors */
+    public MessageEventDefinition() {
+    	super();
+    }
+    
+    public MessageEventDefinition(MessageEventDefinition msgEvDef) {
+    	this.setOperationRef(msgEvDef.getOperationRef());
+    	this.setMessageRef(msgEvDef.getMessageRef());
+    }
+    
+    /* Getter & Setter */
 
     /**
      * Gets the value of the operationRef property.

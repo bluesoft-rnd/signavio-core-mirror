@@ -24,13 +24,16 @@
 package de.hpi.bpmn2_0.model.data_object;
 
 import javax.xml.bind.annotation.XmlAccessType;
+
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 
 import de.hpi.bpmn2_0.model.RootElement;
+import de.hpi.bpmn2_0.util.EscapingStringAdapter;
 
 
 /**
@@ -68,11 +71,28 @@ public class DataStore
     protected DataState dataState;
     
     @XmlAttribute
+    @XmlJavaTypeAdapter(EscapingStringAdapter.class)
     protected String name;
     @XmlAttribute
     protected int capacity;
     @XmlAttribute
     protected boolean isUnlimited;
+    
+//	/**
+//	 * 
+//	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
+//	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
+//	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
+//	 */
+//    public Shape toShape(BPMN2DiagramConverter converterForShapeCoordinateLookup)  {
+//		Shape shape = super.toShape(converterForShapeCoordinateLookup);
+//
+//		shape.setStencil(new StencilType("DataStore"));
+//        
+//        //shape.putProperty("", );
+//        
+//		return shape;
+//	}	
     
     /* Getter & Setter */
     

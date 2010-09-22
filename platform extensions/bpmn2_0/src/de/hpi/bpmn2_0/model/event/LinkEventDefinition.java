@@ -28,6 +28,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import de.hpi.bpmn2_0.util.EscapingStringAdapter;
 
 
 /**
@@ -55,6 +58,7 @@ public class LinkEventDefinition
 {
 
     @XmlAttribute(required = true)
+    @XmlJavaTypeAdapter(EscapingStringAdapter.class)
     protected String name;
 
     /**

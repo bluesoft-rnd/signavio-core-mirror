@@ -40,6 +40,8 @@ import de.hpi.bpmn2_0.model.activity.type.SendTask;
 import de.hpi.bpmn2_0.model.activity.type.ServiceTask;
 import de.hpi.bpmn2_0.model.activity.type.UserTask;
 
+import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+
 
 /**
  * <p>Java class for tTask complex type.
@@ -91,12 +93,19 @@ public class Task
 	}
 	
 	/**
-	 * Transforming a task to its JSON-based shape representation.
+	 * 
+	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
+	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
+	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
+	 * 
+	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
 	 */
-	public void toShape(Shape shape) {
-    	super.toShape(shape);
+	public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
+    	Shape shape = super.toShape(converterForShapeCoordinateLookup);
     	
     	shape.setStencil(new StencilType("Task"));
+    	shape.putProperty("tasktype", "None");
+    	
+    	return shape;
     }
-
 }

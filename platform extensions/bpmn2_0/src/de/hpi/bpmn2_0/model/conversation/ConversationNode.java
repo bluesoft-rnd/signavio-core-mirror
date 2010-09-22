@@ -24,24 +24,31 @@
 package de.hpi.bpmn2_0.model.conversation;
 
 import java.util.ArrayList;
+
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
+import org.oryxeditor.server.diagram.Shape;
+
 import de.hpi.bpmn2_0.model.FlowNode;
+import de.hpi.bpmn2_0.model.connector.MessageFlow;
 import de.hpi.bpmn2_0.model.participant.Participant;
 
+import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
 
 /**
- * <p>Java class for tConversationNode complex type.
+ * <p>
+ * Java class for tConversationNode complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within
+ * this class.
  * 
  * <pre>
  * &lt;complexType name="tConversationNode">
@@ -59,78 +66,105 @@ import de.hpi.bpmn2_0.model.participant.Participant;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "tConversationNode", propOrder = {
-    "participantRef"
-})
-@XmlSeeAlso({
-    CallConversation.class,
-    SubConversation.class,
-    Communication.class
-})
-public abstract class ConversationNode
-    extends FlowNode implements ConversationElement
-{
-	
+@XmlType(name = "tConversationNode", propOrder = { "participantRef",
+		"messageFlowRef", "correlationKey" })
+@XmlSeeAlso({ CallConversation.class, SubConversation.class, Conversation.class })
+public abstract class ConversationNode extends FlowNode implements
+		ConversationElement {
+
 	@XmlIDREF
-	@XmlAttribute
-    protected List<Participant> participantRef;
-    @XmlAttribute
-    protected String name;
+	protected List<MessageFlow> messageFlowRef;
+	protected List<CorrelationKey> correlationKey;
+
+	@XmlIDREF
+	protected List<Participant> participantRef;
+
+	@XmlTransient
+	public List<String> participantsIds;
+
+	/**
+	 * Helper for the import, see {@link FlowElement#isElementWithFixedSize().
+	 */
+    // @Override
+    public boolean isElementWithFixedSize() {
+		return true;
+	}
     
-    @XmlTransient
-    public List<String> participantsIds;
-
     /**
-     * Gets the value of the participantRef property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the participantRef property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getParticipantRef().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Participant }
-     * 
-     * 
+     * For the fixed-size shape, return the fixed width.
      */
-    public List<Participant> getParticipantRef() {
-        if (participantRef == null) {
-            participantRef = new ArrayList<Participant>();
-        }
-        return this.participantRef;
+    public double getStandardWidth(){
+    	return 33.5;
     }
-
+    
     /**
-     * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     * For the fixed-size shape, return the fixed height.
      */
-    public String getName() {
-        return name;
+    public double getStandardHeight(){
+    	return 29.0;
     }
+    
+	/**
+	 * 
+	 * Basic method for the conversion of BPMN2.0 to the editor's internal
+	 * format. {@see BaseElement#toShape(BPMN2DiagramConverter)}
+	 * 
+	 * @param converterForShapeCoordinateLookup
+	 *            an instance of {@link BPMN2DiagramConverter}, offering several
+	 *            lookup methods needed for the conversion.
+	 * 
+	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be
+	 *         used for the output. Its bounds are set, as they are fixed in the
+	 *         editor, but not necessarily in external ones.
+	 */
+	public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
+		Shape shape = super.toShape(converterForShapeCoordinateLookup);
 
-    /**
-     * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setName(String value) {
-        this.name = value;
-    }
+		converterForShapeCoordinateLookup.setIsConversation(true);
 
+		// also a fixed size!
+		// width="33.5"
+		// height="29"
+		// > but, gets cut if there is a white rim, so:
+		// y : 0.5 - 28.43 > 27.93
+		// x : 0.578 - 32.828 > 32.250
+		// >> looks better with the SUM of both...
+		// Point upperLeft = shape.getBounds().getUpperLeft();
+
+		// new Bounds(new Point(upperLeft.getX() + 33.5, upperLeft.getY() + 29),
+		// upperLeft)
+		shape.setBounds(getMiddleBounds(this.getStandardWidth(), this.getStandardHeight(), shape.getBounds()));
+
+		return shape;
+	}
+
+	/**
+	 * Gets the value of the participantRef property.
+	 * 
+	 * <p>
+	 * This accessor method returns a reference to the live list, not a
+	 * snapshot. Therefore any modification you make to the returned list will
+	 * be present inside the JAXB object. This is why there is not a
+	 * <CODE>set</CODE> method for the participantRef property.
+	 * 
+	 * <p>
+	 * For example, to add a new item, do as follows:
+	 * 
+	 * <pre>
+	 * getParticipantRef().add(newItem);
+	 * </pre>
+	 * 
+	 * 
+	 * <p>
+	 * Objects of the following type(s) are allowed in the list
+	 * {@link Participant }
+	 * 
+	 * 
+	 */
+	public List<Participant> getParticipantRef() {
+		if (participantRef == null) {
+			participantRef = new ArrayList<Participant>();
+		}
+		return this.participantRef;
+	}
 }

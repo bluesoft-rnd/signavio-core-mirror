@@ -47,13 +47,13 @@ import javax.xml.bind.annotation.XmlEnumValue;
 @XmlEnum
 public enum GatewayDirection {
 
-    @XmlEnumValue("unspecified")
+    @XmlEnumValue("Unspecified")
     UNSPECIFIED("unspecified"),
-    @XmlEnumValue("converging")
+    @XmlEnumValue("Converging")
     CONVERGING("converging"),
-    @XmlEnumValue("diverging")
+    @XmlEnumValue("Diverging")
     DIVERGING("diverging"),
-    @XmlEnumValue("mixed")
+    @XmlEnumValue("Mixed")
     MIXED("mixed");
     private final String value;
 

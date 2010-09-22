@@ -28,8 +28,10 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.hpi.bpmn2_0.model.RootElement;
+import de.hpi.bpmn2_0.util.EscapingStringAdapter;
 
 
 /**
@@ -58,8 +60,10 @@ public class Error
     @XmlElement
     protected ItemDefinition structureRef;
     @XmlAttribute
+    @XmlJavaTypeAdapter(EscapingStringAdapter.class)
     protected String name;
     @XmlAttribute
+    @XmlJavaTypeAdapter(EscapingStringAdapter.class)
     protected String errorCode;
 
     /**
