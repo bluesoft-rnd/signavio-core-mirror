@@ -84,7 +84,12 @@
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/platform-extension-diagram.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/platform-extension-syntaxchecker.jar" sourcepath="/syntaxchecker"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/jaxb-impl.jar"/>
-	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/platform-extension-bpmn2_0.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/platform-extension-jpdl.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/platform-extension-bpmn2_0.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/activation-1.1.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jaxb-api.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jsr173_1.0_api.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/stax-api-1.0-2.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/xalan-2.7.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

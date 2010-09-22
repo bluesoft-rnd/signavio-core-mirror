@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.json.JSONException;
 import org.xml.sax.SAXException;
@@ -37,6 +39,10 @@ public class BPMN2_0XMLModelType extends SignavioModelType {
 				throw new IllegalStateException("Cannot save BPMN2.0 XML", e);
 			} catch (SAXException e) {
 				throw new IllegalStateException("Cannot save BPMN2.0 XML", e);
+			} catch (ParserConfigurationException e) {
+				throw new IllegalStateException("Cannot save BPMN2.0 XML", e);
+			} catch (TransformerException e) {
+				throw new IllegalStateException("Cannot save BPMN2.0 XML", e);
 			}
 		}
 	}
@@ -56,6 +62,10 @@ public class BPMN2_0XMLModelType extends SignavioModelType {
 		} catch (JAXBException e) {
 			throw new IllegalStateException("Cannot save BPMN2.0 XML", e);
 		} catch (SAXException e) {
+			throw new IllegalStateException("Cannot save BPMN2.0 XML", e);
+		} catch (ParserConfigurationException e) {
+			throw new IllegalStateException("Cannot save BPMN2.0 XML", e);
+		} catch (TransformerException e) {
 			throw new IllegalStateException("Cannot save BPMN2.0 XML", e);
 		}
 	}
@@ -86,6 +96,10 @@ public class BPMN2_0XMLModelType extends SignavioModelType {
 		} catch (JAXBException e) {
 			throw new IllegalStateException("Cannot save BPMN2.0 XML", e);
 		} catch (SAXException e) {
+			throw new IllegalStateException("Cannot save BPMN2.0 XML", e);
+		} catch (ParserConfigurationException e) {
+			throw new IllegalStateException("Cannot save BPMN2.0 XML", e);
+		} catch (TransformerException e) {
 			throw new IllegalStateException("Cannot save BPMN2.0 XML", e);
 		}
         return file;
