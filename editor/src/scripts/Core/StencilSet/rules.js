@@ -236,7 +236,7 @@ ORYX.Core.StencilSet.Rules = {
 					if (!conr[conrKey]) {
 						conr[conrKey] = [];
 					}
-					rules.contains.each((function(containRole){
+					(rules.contains||[]).each((function(containRole){
 						if (this._isRoleOfOtherNamespace(containRole)) {
 							conr[conrKey].push(containRole);
 						}
