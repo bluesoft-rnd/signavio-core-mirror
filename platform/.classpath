@@ -82,7 +82,6 @@
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/xercesImpl.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/serializer.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/platform-extension-diagram.jar"/>
-	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/platform-extension-syntaxchecker.jar" sourcepath="/syntaxchecker"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/jaxb-impl.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/platform-extension-jpdl.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/platform-extension-bpmn2_0.jar"/>
