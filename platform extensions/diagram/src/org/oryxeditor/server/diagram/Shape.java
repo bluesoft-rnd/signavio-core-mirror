@@ -2,6 +2,8 @@ package org.oryxeditor.server.diagram;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -17,6 +19,7 @@ public class Shape implements Stencil, Bounded{
 	private ArrayList<Shape> outgoings;
 	private ArrayList<Point> dockers;
 	private ArrayList<String> glossaryIds;
+	private List<Map<String,String>> labels;
 	private Bounds bounds;
 	private Shape target;
 	private Shape parent;
@@ -94,6 +97,18 @@ public class Shape implements Stencil, Bounded{
 	public void setResourceId(String resourceId) {
 		this.resourceId = resourceId;
 	}
+	
+	/**
+	 * returns the layouting information for labels of the shape.
+	 * @return
+	 */
+	public List<Map<String,String>> getLabels() {
+		if(labels == null) {
+			labels = new ArrayList<Map<String,String>>();
+		}
+		return labels;
+	}
+	
 	/** Gives the value of the property with the given name
 	 * @param name name of the property
 	 * @return value of the property or null if no mapping available for the name

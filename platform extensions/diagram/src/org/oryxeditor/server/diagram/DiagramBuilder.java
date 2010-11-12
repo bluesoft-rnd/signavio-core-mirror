@@ -3,6 +3,7 @@ package org.oryxeditor.server.diagram;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -89,11 +90,44 @@ public class DiagramBuilder {
 		parseStencil(modelJSON, current);
 
 		parseProperties(modelJSON, current, keepGlossaryLink);
+		parseLabelPosition(modelJSON, current);
 		parseOutgoings(shapes, modelJSON, current);
 		parseChildShapes(shapes, modelJSON, current);
 		parseDockers(modelJSON, current);
 		parseBounds(modelJSON, current);
 		parseTarget(shapes, modelJSON, current);
+	}
+	
+	/**
+	 * Parses the label field in the JSONObject and assigns it the current 
+	 * stencil.
+	 * 
+	 * @param modelJSON
+	 * @param current
+	 */
+	private static void parseLabelPosition(JSONObject modelJSON, Shape current) {
+		/*
+		 * Check the label position information exists.
+		 */
+		if(!modelJSON.has("labels")) {
+			return;
+		}
+		
+		JSONArray labels = modelJSON.optJSONArray("labels");
+		for(int i = 0; i < labels.length(); i++) {
+			Map<String, String> labelDetails = new HashMap<String, String>();
+			JSONObject labelDetailJSON = labels.optJSONObject(i);
+			
+			if(labelDetailJSON != null) {
+				Iterator iter = labelDetailJSON.keys();
+				while(iter.hasNext()) {
+					String key = iter.next().toString();
+					String value = labelDetailJSON.optString(key);
+					labelDetails.put(key, value);
+				}
+				current.getLabels().add(labelDetails);
+			}
+		}
 	}
 
 	/** parse the stencil out of a JSONObject and set it to the current shape

@@ -25,6 +25,8 @@ package org.oryxeditor.server.diagram;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -94,6 +96,7 @@ public class JSONBuilder {
 				childShapeObject.put("outgoing", 	parseOutgoings(childShape.getOutgoings()));
 				childShapeObject.put("bounds", 		parseBounds(childShape.getBounds()));
 				childShapeObject.put("dockers", 	parseDockers(childShape.getDockers()));
+				childShapeObject.put("labels", 		parseLabels(childShape.getLabels()));
 				
 				if(childShape.getTarget() != null) 
 					childShapeObject.put("target", parseTarget(childShape.getTarget()));
@@ -105,6 +108,19 @@ public class JSONBuilder {
 		}
 		
 		return new JSONArray();
+	}
+	
+	private static JSONArray parseLabels(List<Map<String,String>> labels) throws JSONException {
+		JSONArray labelsJSON = new JSONArray();
+		for(Map<String, String> label : labels) {
+			JSONObject labelJSON = new JSONObject();
+			for(String key : label.keySet()) {
+				labelJSON.put(key, label.get(key));
+			}
+			labelsJSON.put(labelJSON);
+		}
+		
+		return labelsJSON;
 	}
 	
 	/**
