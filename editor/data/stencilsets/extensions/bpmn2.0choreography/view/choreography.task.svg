@@ -59,6 +59,10 @@
 			oryx:anchors="bottom" />
 		</g>
 	</g>
+	
+	<g id="sequential" display="none">
+		<path id="mi_sequential_path" oryx:anchors="bottom" fill="none" stroke="#000000" stroke-width="2" d="M70,76 h10 M70,72 h10 M70,68 h10"/>
+	</g>
     
   </g>
 </svg>

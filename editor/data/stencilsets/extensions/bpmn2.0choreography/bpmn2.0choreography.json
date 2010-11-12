@@ -80,6 +80,14 @@
 							"value":"MultiInstance",
 							"icon" : "/activity/list/mi.parallel.png",
 							"refToView":"mi"
+						},
+						{
+							"id":"c4",
+							"title":"MI Sequential",
+							"title_de":"MI sequentialisiert",
+							"value":"Sequential",
+							"icon" : "activity/list/mi.sequential.png",
+							"refToView":"sequential"
 						}
 					]
 				},
@@ -204,6 +212,14 @@
 							"value":"MultiInstance",
 							"icon" : "/activity/list/mi.parallel.png",
 							"refToView":"mi"
+						},
+						{
+							"id":"c4",
+							"title":"MI Sequential",
+							"title_de":"MI sequentialisiert",
+							"value":"sequential",
+							"icon" : "activity/list/mi.sequential.png",
+							"refToView":"sequential"
 						}
 					]
 				},
@@ -340,6 +356,14 @@
 							"value":"MultiInstance",
 							"icon" : "/activity/list/mi.parallel.png",
 							"refToView":"mi"
+						},
+						{
+							"id":"c4",
+							"title":"MI Sequential",
+							"title_de":"MI sequentialisiert",
+							"value":"sequential",
+							"icon" : "activity/list/mi.sequential.png",
+							"refToView":"sequential"
 						}
 					]
 				},
@@ -441,16 +465,38 @@
 					"optional" : true
 				},
 				{
-					"id":"multiple_instance",
-					"type":"Boolean",
-					"title":"is Multiple Participants",
-					"title_de":"ist Mehrfach-Beteiligter",
-					"value":false,
-					"description":"The Multiple Participants Marker denotes a set of participants of the same kind.",
-					"description_de":"Eine Mehrfach-Beteiligter Markierung beschreibt eine Reihe von Beteiligten derselben Sorte.",
-					"readonly":false,
-					"optional":"true",
-					"refToView":"mi"
+					"id" : "multiple_instance",
+					"type" : "Boolean",
+					"title" : "is Multi Instance Participant",
+					"title_de" : "ist Mehrfach-Beteiligung",
+					"value" : false,
+					"description" : "Is used to define the multiplicity of a participant.",
+					"description_de" : "Legt fest, ob der Teilnehmer mehrfach beteiligt ist (Multi Instance).",
+					"readonly" : false,
+					"optional" : true,
+					"refToView" : "mi"
+				},
+				{
+					"id" : "minimum",
+					"type" : "Integer",
+					"title" : "Minimum",
+					"title_de" : "Minimal-Anzahl",
+					"value" : 2,
+					"description" : "The minimum attribute defines minimum number of participants that must be involved in the collaboration.",
+					"description_de" : "Legt die minimale Anzahl der Beteiligten an dieser Kollaboration fest.",
+					"readonly" : false,
+					"optional" : true
+				},
+				{
+					"id" : "maximum",
+					"type" : "Integer",
+					"title" : "Maximum",
+					"title_de" : "Maximal-Anzahl",
+					"value" : 2,
+					"description" : "The maximum attribute defines maximum number of participants that may be involved in the Collaboration.",
+					"description_de" : "Legt die maximale Anzahl der Beteiligten fest, die an dieser Kollaboration teilnehmen.",
+					"readonly" : false,
+					"optional" : true
 				},
 				{
 					"id":"corners",
@@ -529,7 +575,6 @@
 		"StartEscalationEvent",
 		"StartCompensationEvent",
 		"MessageFlow",
-		"Association_Unidirectional",
 		"Association_Bidirectional",
 		"IntermediateSignalEventThrowing",
 		"IntermediateMultipleEventThrowing",

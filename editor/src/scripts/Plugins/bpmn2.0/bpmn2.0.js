@@ -404,6 +404,12 @@ new function(){
 				return;
 			}
 			
+			// Check if the lane is within the pool and is not removed lately 
+			if (currentShape !== pool && !currentShape.isParent(pool) && !this.hashedBounds[pool.id][currentShape.id]){
+				return;
+			}
+			
+			
 			if (!this.hashedBounds[pool.id]) {
 				this.hashedBounds[pool.id] = {};
 			}
@@ -536,8 +542,17 @@ new function(){
 					}
 				}
 				
+				// Cache all bounds
+				var changes = allLanes.map(function(lane){ return {
+					shape: lane,
+					bounds: lane.bounds.clone()
+				} });
+				
 				// Get height and adjust child heights
 				height = this.adjustHeight(lanes, currentShape);
+				// Check if something has changed and maybe create a command
+				this.checkForChanges(allLanes, changes);
+				
 				// Set width from the current shape
 				width = this.adjustWidth(lanes, currentShape.bounds.width()+(this.getDepth(currentShape,pool)*30));
 			}
@@ -618,6 +633,42 @@ new function(){
 		shouldScale: function(element){
 			var childLanes = element.getChildNodes().findAll(function(shape){ return shape.getStencil().id().endsWith("Lane") })
 			return childLanes.length > 1 || childLanes.any(function(lane){ return this.shouldScale(lane) }.bind(this)) 
+		},
+		
+		/**
+		 * Lookup if some bounds has changed
+		 * @param {Object} lanes
+		 * @param {Object} changes
+		 */
+		checkForChanges: function(lanes, changes){
+			// Check if something has changed
+			if (this.facade.isExecutingCommands() && changes.any(function(change){
+				return change.shape.bounds.toString() !== change.bounds.toString();
+			})){
+				
+				var Command = ORYX.Core.Command.extend({
+							construct: function(changes) {
+								this.oldState = changes;
+								this.newState = changes.map(function(s){ return {shape:s.shape, bounds:s.bounds.clone()}});
+							}, 
+							execute: function(){
+								if (this.executed){
+									this.applyState(this.newState);
+								}
+								this.executed = true;
+							}, 
+							rollback: function(){
+								this.applyState(this.oldState);
+							},
+							applyState: function(state){
+								state.each(function(s){
+									s.shape.bounds.set(s.bounds.upperLeft(), s.bounds.lowerRight());
+								})
+							}
+						});
+						
+				this.facade.executeCommands([new Command(changes)]);
+			}
 		},
 		
 		isResized: function(shape, bounds){
@@ -857,7 +908,7 @@ new function(){
 		
 		updateDockers: function(lanes, pool){
 			
-			var absPool = pool.absoluteBounds();
+			var absPool = pool.absoluteBounds(), movedShapes = [];
 			var oldPool = (this.hashedPoolPositions[pool.id]||absPool).clone();
 			
 			var i=-1, j=-1, k=-1, l=-1, docker;
@@ -889,6 +940,7 @@ new function(){
 				while (++j < children.length) {
 					
 					if (xOffsetDepth && !children[j].getStencil().id().endsWith("Lane")) {
+						movedShapes.push({xOffset:xOffsetDepth, shape: children[j]});
 						children[j].bounds.moveBy(xOffsetDepth, 0);
 					}
 					
@@ -966,8 +1018,29 @@ new function(){
 				}
 			}
 			
+			// Move the moved children 
+			var MoveChildCommand = ORYX.Core.Command.extend({
+				construct: function(state){
+					this.state = state;
+				},
+				execute: function(){
+					if (this.executed){
+						this.state.each(function(s){
+							s.shape.bounds.moveBy(s.xOffset, 0);
+						});
+					}
+					this.executed = true;
+				}, 
+				rollback: function(){
+					this.state.each(function(s){
+						s.shape.bounds.moveBy(-s.xOffset, 0);
+					});
+				}
+			})
+			
+			
 			// Set dockers
-			this.facade.executeCommands([new ORYX.Core.MoveDockersCommand(dockers)]);
+			this.facade.executeCommands([new ORYX.Core.MoveDockersCommand(dockers), new MoveChildCommand(movedShapes)]);
 	
 		},
 		
@@ -1199,6 +1272,10 @@ new function(){
 						
 					}.bind(this));
 				}
+				
+				
+
+				
 			}
 					
 			/*
@@ -1211,6 +1288,14 @@ new function(){
 			// Set height
 			this.setHeight(newHeight, oldHeight, this.parent, this.parentHeight, true);
 			
+			// Cache all sibling lanes
+			//this.changes[this.shape.getId()] = this.computeChanges(this.shape, this.parent, this.parent, 0);
+			this.plugin.getLanes(this.parent).each(function(childLane){
+				if(!this.changes[childLane.getId()] && childLane !== this.lane && childLane !== this.shape) {
+					this.changes[childLane.getId()] = this.computeChanges(childLane, this.parent, this.parent, 0);
+				}
+			}.bind(this))
+				
 			// Update
 			this.update();
 		},
@@ -1258,6 +1343,11 @@ new function(){
 				var oldHeight 		= pair.value.oldHeight;
 				var newHeight 		= pair.value.newHeight;
 				
+				// Move siblings
+				if (shape.getStencil().id().endsWith("Lane")){
+					shape.bounds.moveTo(pair.value.oldPosition);	
+				}
+				
 				// If lane
 				if(oldHeight) {					
 					this.setHeight(oldHeight, newHeight, parent, parent.bounds.height() + (oldHeight - newHeight));
@@ -1266,9 +1356,10 @@ new function(){
 					}
 				} else {
 					parent.add(shape);
-					shape.bounds.moveTo(pair.value.oldPosition);	
+					shape.bounds.moveTo(pair.value.oldPosition);
+					
 				}
-				
+
 				
 			}.bind(this));
 			

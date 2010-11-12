@@ -688,6 +688,7 @@ ORYX.Plugins.Bpmn2_0Choreography = {
 		
 		/* Handle MI and loop marker position */
 		
+		/* Loop marker */
 		var loopMarker = choreographyTask._svgShapes.find(function(svgShape) {
 			return svgShape.element.id == choreographyTask.getId() + 'loop_path';
 		});
@@ -696,6 +697,7 @@ ORYX.Plugins.Bpmn2_0Choreography = {
 				loopMarker.y = choreographyTaskMeta.bottomYStartValue - 7;
 		}
 		
+		/* MI parallel marker */
 		var miMarker = choreographyTask._svgShapes.find(function(svgShape) {
 			return svgShape.element.id == choreographyTask.getId() + 'mi_path';
 		}); 
@@ -704,6 +706,14 @@ ORYX.Plugins.Bpmn2_0Choreography = {
 			miMarker.y = choreographyTaskMeta.bottomYStartValue - 11;
 		}
 		
+		/* MI sequential marker */
+		var miSeqMarker = choreographyTask._svgShapes.find(function(svgShape) {
+			return svgShape.element.id == choreographyTask.getId() + 'mi_sequential_path';
+		}); 
+		if(miSeqMarker) {
+			miSeqMarker._isYLocked = true;
+			miSeqMarker.y = choreographyTaskMeta.bottomYStartValue - 11;
+		}
 	},
 	
 	/**
@@ -914,7 +924,7 @@ ORYX.Plugins.Bpmn2_0Choreography = {
 			if (shape.getStencil().id() === "http://b3mn.org/stencilset/bpmn2.0choreography#ChoreographyParticipant" &&
 			propertyKey === "oryx-initiating") {
 			
-				if (!propertyValue) {
+				if (!propertyValue || propertyValue === "false") {
 					shape.setProperty("oryx-color", "#acacac");
 				}
 				else {

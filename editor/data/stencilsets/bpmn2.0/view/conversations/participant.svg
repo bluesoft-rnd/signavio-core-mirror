@@ -24,15 +24,24 @@
 			</radialGradient>
 		</defs>
 		
-		<rect id="bg_frame" oryx:resie="horizonatal vertical" oryx:anchors="top bottom left right" x="0" y="0" fill="url(#background) #FFFFFF" stroke="#000000" width="150" height="100"/>
+		<rect id="bg_frame" oryx:anchors="top bottom left right" x="0" y="0" fill="url(#background) #FFFFFF" stroke="#000000" width="150" height="100"/>
+		
+		<rect id="caption" oryx:resize="horizonatal vertical" 
+			oryx:anchors="top left right" 
+			fill="url(#background) #FFFFFF" 
+			stroke="#000000" 
+			x="0" y="0" 
+			width="150" 
+			height="30"/>
 
 		<text 
 			font-size="12"
 			id="text_name" 
 			x="75" 
-			y="50" 
+			y="13" 
+			oryx:anchors="top"
 			oryx:align="middle center"
-			oryx:fittoelem="bg_frame"
+			oryx:fittoelem="caption"
 			stroke="black">
 		</text>
 		

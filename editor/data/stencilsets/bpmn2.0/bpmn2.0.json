@@ -99,7 +99,7 @@
 			"name":"boundaryevent",
 			"properties":[
 				{
-					"id":"boundarycancelactivity",
+					"id":"boundarycancelactivity2",
 					"type":"Boolean",
 					"title":"CancelActivity",
 					"title_de":"Aktivität abbrechen",
@@ -415,8 +415,7 @@
 					"description":"This defines the Version number of the Diagram.",
 					"description_de":"Setzt die Versionsnummer des Diagramms.",
 					"readonly":false,
-					"optional":true,
-					"length":"50"
+					"optional":true
 				},
 				{
 					"id":"author",
@@ -427,8 +426,7 @@
 					"description":"This holds the name of the author of the Diagram.",
 					"description_de": "Name des Autors des Diagramms.",
 					"readonly":false,
-					"optional":true,
-					"length":"50"
+					"optional":true
 				},
 				{
 					"id":"language",
@@ -440,8 +438,7 @@
 					"description":"This holds the name of the language in which text is written.",
 					"description_de":"Sprache, in welcher der Text geschrieben ist.",
 					"readonly":false,
-					"optional":true,
-					"length":"50"
+					"optional":true
 				},
 				{	
 					"id":"namespaces",
@@ -476,12 +473,11 @@
 					"type":"String",
 					"title":"Target Namespace",
 					"title_de":"Ziel-Namensraum",
-					"value":"http://www.omg.org/bpmn20",
+					"value":"http://www.signavio.com/bpmn20",
 					"description":"Defines the XML namespace of the elements inside the document.",
 					"description_de":"Definiert den XML-Namensraum, der für die Elemente im Dokument verwendet wird.",
 					"readonly":false,
-					"optional":true,
-					"length":"50"
+					"optional":true
 				},
 				{
 					"id":"expressionlanguage",
@@ -492,8 +488,7 @@
 					"description":"A Language may be provided so that the syntax of expressions used in the Diagram can be understood.",
 					"description_de":"Sprache, mit welcher im Diagramm verwendete Ausdrücke beschrieben sind.",
 					"readonly":false,
-					"optional":true,
-					"length":"50"
+					"optional":true
 				},
 				{
 					"id":"typelanguage",
@@ -504,8 +499,7 @@
 					"description":"This attribute identifies the type system used by the elements of this Definition.",
 					"description_de":"Definiert das Typsystem der Elemente dieses Diagramms.",
 					"readonly":false,
-					"optional":true,
-					"length":"50"
+					"optional":true
 				},
 				{
 					"id":"creationdate",
@@ -546,7 +540,6 @@
 					"readonly":false,
 					"optional":true,
 					"refToView":"",
-					"length":"50",
 					"wrapLines":true
 				}
 			]
@@ -1136,17 +1129,17 @@
 					"title":"LoopDataInput",
 					"title_de":"Schleifen-Datan-Eingabe",
 					"value":"",
-					"description":"A reference to a DataInput which is part of the Activity’s InputOutputSpecification. This DataInput is used to determine the number of Activity instances, one Activity instance per item in the collection of data stored in that DataInput element.",
+					"description":"A reference to a DataInput which is part of the Activity's InputOutputSpecification. This DataInput is used to determine the number of Activity instances, one Activity instance per item in the collection of data stored in that DataInput element.",
 					"readonly":false,
 					"optional":true
 				},
 				{
 					"id":"loopdataoutput",
 					"type":"String",
-					"title":"LoopDataInput",
+					"title":"LoopDataOutput",
 					"title_de":"Schleifen-Datan-Ausgabe",
 					"value":"",
-					"description":"A reference to a DataOutput which is part of the Activity’s InputOutputSpecification.",
+					"description":"A reference to a DataOutput which is part of the Activity's InputOutputSpecification.",
 					"readonly":false,
 					"optional":true
 				},
@@ -1163,7 +1156,7 @@
 				{
 					"id":"outputdataitem",
 					"type":"String",
-					"title":"InputDataItem",
+					"title":"OutputDataItem",
 					"title_de":"Ausgabe-Daten-Element",
 					"value":"",
 					"description":"A Property, representing for every Activity instance the single item of the collection stored in the loopDataOutput.",
@@ -1590,8 +1583,7 @@
 					"description":"",
 					"readonly":false,
 					"optional":false,
-					"refToView":"",
-					"length":"50"
+					"refToView":""
 				},
 				{
 					"id":"operationref",
@@ -1607,13 +1599,14 @@
 				{
 					"id":"instantiate",
 					"type":"Boolean",
+					"dependsOn": {"tasktype":"Receive"},
 					"title":"Instantiate",
 					"title_de":"Instanziieren",
 					"value":false,
 					"description":"",
 					"readonly":false,
 					"optional":false,
-					"refToView":""
+					"refToView":"instantiate"
 				},
 				{
 					"id":"script",
@@ -1701,8 +1694,7 @@
 					"description":"",
 					"readonly":false,
 					"optional":true,
-					"refToView":"",
-					"length":"50"
+					"refToView":""
 				},
 				{
 					"id":"transactionmethod",
@@ -1932,7 +1924,6 @@
 					"readonly":false,
 					"optional":true,
 					"refToView":"",
-					"length":"50",
 					"wrapLines":true
 				},
 				{
@@ -1945,7 +1936,6 @@
 					"readonly":false,
 					"optional":true,
 					"refToView":"",
-					"length":"50",
 					"wrapLines":true
 				},
 				{
@@ -1958,7 +1948,6 @@
 					"readonly":false,
 					"optional":true,
 					"refToView":"",
-					"length":"50",
 					"wrapLines":true
 				}
 			]
@@ -2010,13 +1999,8 @@
 						},
 						{
 							"id":"c2",
-							"title":"Executable",
-							"value":"Executable"
-						},
-						{
-							"id":"c3",
-							"title":"Non-Executable",
-							"value":"Non-Executable"
+							"title":"Private",
+							"value":"Private"
 						},
 						{
 							"id":"c4",
@@ -2033,12 +2017,23 @@
 					"value":false,
 					"description":"A Boolean value specifying whether interactions, such as sending and receiving Messages and Events, not modeled in the Process can occur when the Process is executed or performed. If the value is true, they MAY NOT occur. If the value is false, they MAY occur.",
 					"readonly":false,
-					"optional":false
+					"optional":true
+				},
+				{
+					"id":"isexecutable",
+					"type":"Boolean",
+					"title":"isExecutable",
+					"title_de":"IstAusführbar",
+					"value":false,
+					"description":"An optional Boolean value specifying whether the Process is executable.",
+					"description_de":"Ein optionales Attribut, um anzuzeigen ob der Prozess ausführbar ist.",
+					"readonly":false,
+					"optional":true
 				}
 			]
 		},
 		{
-			"name" : "pool",
+			"name" : "participantmultiplicity",
 			"properties" : [
 				{
 					"id" : "multiinstance",
@@ -2046,12 +2041,39 @@
 					"title" : "is Multi Instance Participant",
 					"title_de" : "ist Mehrfach-Beteiligung",
 					"value" : false,
-					"description" : "",
+					"description" : "Is used to define the multiplicity of a participant.",
 					"description_de" : "Legt fest, ob der Teilnehmer mehrfach beteiligt ist (Multi Instance).",
 					"readonly" : false,
 					"optional" : true,
 					"refToView" : "multiInstance"
 				},
+				{
+					"id" : "minimum",
+					"type" : "Integer",
+					"title" : "Minimum",
+					"title_de" : "Minimal-Anzahl",
+					"value" : 2,
+					"description" : "The minimum attribute defines minimum number of participants that must be involved in the collaboration.",
+					"description_de" : "Legt die minimale Anzahl der Beteiligten an dieser Kollaboration fest.",
+					"readonly" : false,
+					"optional" : true
+				},
+				{
+					"id" : "maximum",
+					"type" : "Integer",
+					"title" : "Maximum",
+					"title_de" : "Maximal-Anzahl",
+					"value" : 2,
+					"description" : "The maximum attribute defines maximum number of participants that may be involved in the Collaboration.",
+					"description_de" : "Legt die maximale Anzahl der Beteiligten fest, die an dieser Kollaboration teilnehmen.",
+					"readonly" : false,
+					"optional" : true
+				}
+			]
+		},
+		{
+			"name" : "pool",
+			"properties" : [
 				{
 					"id":"boundaryvisible",
 					"type":"Boolean",
@@ -2172,8 +2194,7 @@
 					"description":"",
 					"readonly":false,
 					"optional":true,
-					"refToView":"",
-					"length":"50"
+					"refToView":""
 				},
 				{
 					"id":"suppressjoinfailure",
@@ -2202,7 +2223,6 @@
 					"readonly":false,
 					"optional":true,
 					"refToView":"",
-					"length":"50",
 					"wrapLines":true
 				},
 				{
@@ -2742,7 +2762,6 @@
 					"readonly":false,
 					"optional":true,
 					"refToView":"",
-					"length":"50",
 					"wrapLines":true
 				},
 				{
@@ -2754,8 +2773,7 @@
 					"description":"",
 					"readonly":false,
 					"optional":true,
-					"refToView":"",
-					"length":"50"
+					"refToView":""
 				},
 				{
 					"id":"gate_assignments",
@@ -2767,7 +2785,6 @@
 					"readonly":false,
 					"optional":true,
 					"refToView":"",
-					"length":"50",
 					"wrapLines":true
 				}	
 			],
@@ -2923,7 +2940,6 @@
 					"readonly":false,
 					"optional":true,
 					"refToView":"",
-					"length":"50",
 					"wrapLines":true
 				},
 				{
@@ -2935,8 +2951,7 @@
 					"description":"",
 					"readonly":false,
 					"optional":true,
-					"refToView":"",
-					"length":"50"
+					"refToView":""
 				},
 				{
 					"id":"gate_assignments",
@@ -2948,7 +2963,6 @@
 					"readonly":false,
 					"optional":true,
 					"refToView":"",
-					"length":"50",
 					"wrapLines":true
 				}
 			],
@@ -3010,8 +3024,7 @@
 					"description":"",
 					"readonly":false,
 					"optional":true,
-					"refToView":"",
-					"length":"50"
+					"refToView":""
 				},
 				{
 					"id":"outgoingcondition",
@@ -3022,8 +3035,7 @@
 					"description":"",
 					"readonly":false,
 					"optional":true,
-					"refToView":"",
-					"length":"50"
+					"refToView":""
 				}
 			],
 			"roles": [
@@ -3052,6 +3064,7 @@
 			"propertyPackages": [
 				"baseAttributes",
 				"pool",
+				"participantmultiplicity",
 				"process",
 				"bgColor"
 			],
@@ -3078,6 +3091,7 @@
 			"propertyPackages": [
 				"baseAttributes",
 				"pool",
+				"participantmultiplicity",
 				"process",
 				"bgColor"
 			],
@@ -4001,6 +4015,7 @@
 				"IntermediateEventOnSubprocessBoundary",
 				"IntermediateEventOnActivityBoundary",
 				"EventOnChoreographyActivityBoundary",
+				"choreography_sequence_start",
 				"IntermediateEventsMorph"
 			],
 			"properties": [
@@ -4274,6 +4289,7 @@
 				"to_task_event",
 				"from_task_event",
 				"fromtoall",
+				"choreography_sequence_start",
 				"IntermediateEventOnSubprocessBoundary",
 				"EventOnChoreographyActivityBoundary",
 				"IntermediateEventsMorph"
@@ -5139,6 +5155,7 @@
 			"propertyPackages":[
 				"baseAttributes"
 			],
+			"layout" : [{"type" : "layout.bpmn2_0.sequenceflow"}],
 			"roles": [
 				"all",
 				"ConnectingObjectsMorph",
@@ -5190,7 +5207,6 @@
 					"readonly":false,
 					"optional":true,
 					"length":"",
-					"refToView":"condition",
 					"wrapLines":true
 				},
 				{
@@ -5371,6 +5387,7 @@
 			"propertyPackages":[
 				"baseAttributes"
 			],
+			"layout" : [{"type" : "layout.bpmn2_0.messageflow"}],
 			"roles": [
 				"ConnectingObjectsMorph",
 				"MessageContainer",
@@ -5511,6 +5528,10 @@
 					{
 						"from" : "IntermediateCompensationEventCatching",
 						"to" : ["to_task_event"]
+					},
+					{
+						"from" : "IntermediateCompensationEventCatching",
+						"to" : ["ChoreographyMorph"]
 					}
 				]
 			},
@@ -5601,6 +5622,8 @@
 				"role" : "EventSubprocess",
 				"contains" : [
 					"eventSubprocessElement",
+					"EventSubprocess",
+					"CollapsedEventSubprocess",
 					"sequence_start",
 					"sequence_end"
 				]
@@ -5619,7 +5642,9 @@
 					"sequence_end",
 					"DataObjectMorph",
 					"TextAnnotationMorph",
-					"from_participant"
+					"from_participant",
+					"EventSubprocess",
+					"CollapsedEventSubprocess"
 				]
 			},
 			{
@@ -5653,6 +5678,10 @@
 								"TextAnnotation"
 																
 							]
+			},
+			{
+				"role" : "Group",
+				"exclude": true
 			}
 		],
 		"morphingRules": [

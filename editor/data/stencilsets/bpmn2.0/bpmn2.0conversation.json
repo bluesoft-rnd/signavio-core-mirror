@@ -14,8 +14,7 @@
 					"description":"This attribute is used to uniquely identify BPMN elements.",
 					"description_de":"Definiert eine eindeutig Nummer, um einzelne BPMN-Elemente unterscheiden zu können.",
 					"readonly":false,
-					"optional":false,
-					"length":"50"
+					"optional":false
 				},
 				{
 					"id":"name",
@@ -101,8 +100,7 @@
 					"description":"This defines the Version number of the Diagram.",
 					"description_de":"Setzt die Versionsnummer des Diagramms.",
 					"readonly":false,
-					"optional":true,
-					"length":"50"
+					"optional":true
 				},
 				{
 					"id":"author",
@@ -113,8 +111,7 @@
 					"description":"This holds the name of the author of the Diagram.",
 					"description_de": "Name des Autors des Diagramms.",
 					"readonly":false,
-					"optional":true,
-					"length":"50"
+					"optional":true
 				},
 				{
 					"id":"language",
@@ -126,8 +123,18 @@
 					"description":"This holds the name of the language in which text is written.",
 					"description_de":"Sprache, in welcher der Text verfasst ist.",
 					"readonly":false,
-					"optional":true,
-					"length":"50"
+					"optional":true
+				},
+				{
+					"id":"targetnamespace",
+					"type":"String",
+					"title":"Target Namespace",
+					"title_de":"Ziel-Namensraum",
+					"value":"http://www.signavio.com/bpmn20",
+					"description":"Defines the XML namespace of the elements inside the document.",
+					"description_de":"Definiert den XML-Namensraum, der für die Elemente im Dokument verwendet wird.",
+					"readonly":false,
+					"optional":true
 				},
 				{
 					"id":"expressionlanguage",
@@ -138,8 +145,7 @@
 					"description":"A Language may be provided so that the syntax of expressions used in the Diagram can be understood.",
 					"description_de":"Sprache, mit welcher im Diagramm verwendete Ausdrücke beschrieben sind.",
 					"readonly":false,
-					"optional":true,
-					"length":"50"
+					"optional":true
 				},
 				{
 					"id":"querylanguage",
@@ -150,8 +156,7 @@
 					"description":"A Language may be provided so that the syntax of queries used in the Diagram can be understood.",
 					"description_de":"Sprache, mit welcher im Diagramm verwendete Abfragen beschrieben sind.",
 					"readonly":false,
-					"optional":true,
-					"length":"50"
+					"optional":true
 				},
 				{
 					"id":"creationdate",
@@ -185,7 +190,6 @@
 					"description":"A Business Process Diagram shall contain one or more Pools.",
 					"readonly":false,
 					"optional":false,
-					"length":"50",
 					"wrapLines":true
 				}
 			]
@@ -208,6 +212,45 @@
 			]
 		},
 		{
+			"name" : "participantmultiplicity",
+			"properties" : [
+				{
+					"id" : "multiinstance",
+					"type" : "Boolean",
+					"title" : "is Multi Instance Participant",
+					"title_de" : "ist Mehrfach-Beteiligung",
+					"value" : false,
+					"description" : "Is used to define the multiplicity of a participant.",
+					"description_de" : "Legt fest, ob der Teilnehmer mehrfach beteiligt ist (Multi Instance).",
+					"readonly" : false,
+					"optional" : true,
+					"refToView" : "mi"
+				},
+				{
+					"id" : "minimum",
+					"type" : "Integer",
+					"title" : "Minimum",
+					"title_de" : "Minimal-Anzahl",
+					"value" : 2,
+					"description" : "The minimum attribute defines minimum number of participants that must be involved in the collaboration.",
+					"description_de" : "Legt die minimale Anzahl der Beteiligten an dieser Kollaboration fest.",
+					"readonly" : false,
+					"optional" : true
+				},
+				{
+					"id" : "maximum",
+					"type" : "Integer",
+					"title" : "Maximum",
+					"title_de" : "Maximal-Anzahl",
+					"value" : 2,
+					"description" : "The maximum attribute defines maximum number of participants that may be involved in the Collaboration.",
+					"description_de" : "Legt die maximale Anzahl der Beteiligten fest, die an dieser Kollaboration teilnehmen.",
+					"readonly" : false,
+					"optional" : true
+				}
+			]
+		},
+		{
 			"name": "flowElement",
 			"properties" : [
 				{
@@ -220,7 +263,6 @@
 					"readonly":false,
 					"optional":true,
 					"refToView":"",
-					"length":"50",
 					"wrapLines":true
 				}
 			]
@@ -382,20 +424,12 @@
 			"description_de" : 	"Ein Beteiligter an der Kommunikation. Jeder Kommunikationspartner, der am Nachrichtenaustausch beteiligt ist, wird durch einen Teilnehmer im Diagramm repräsentiert.",
 			"view" : 			"conversations/participant.svg",
 			"icon" : 			"conversations/participant.png",
-			"propertyPackages": ["baseAttributes","bgColor", "conversationNode"],
+			"propertyPackages": [
+				"baseAttributes",
+				"participantmultiplicity",
+				"bgColor", 
+				"conversationNode"],
 			"properties" : 		[
-				{
-					"id" : "multiinstance",
-					"type" : "Boolean",
-					"title" : "Multi Instance",
-					"title_de" : "Mehrfach-Instanz",
-					"description" : "Indicates if more communication participants of the same type can be involved within the conversation.",
-					"description_de" : "Zeigt an, ob mehrere Kommunikationspartner desselben Typs an der Konversation beteiligt sein können.",
-					"value" : false,
-					"readonly" : false,
-					"optional" : true,
-					"refToView" : "mi"
-				},
 				{
 					"id":"bgColor",
 					"type":"Color",
@@ -527,7 +561,7 @@
 					"value" : false,
 					"readonly" : false,
 					"optional" : false,
-					"refToView" : "forkStart"
+					"visible" : false
 				},
 				{
 					"id" : "showforkend",
@@ -539,7 +573,7 @@
 					"value" : false,
 					"readonly" : false,
 					"optional" : false,
-					"refToView" : "forkEnd"
+					"visible" : false
 				}
 			],
 			"roles": 			[
