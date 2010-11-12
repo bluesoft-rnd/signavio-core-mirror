@@ -32,6 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import de.hpi.bpmn2_0.model.bpmndi.di.Diagram;
+import de.hpi.diagram.SignavioUUID;
 
 
 /**
@@ -69,6 +70,15 @@ public class BPMNDiagram
     @XmlElement(name = "BPMNLabelStyle")
     protected List<BPMNLabelStyle> bpmnLabelStyle;
 
+    /* Constructor */
+    public BPMNDiagram() {
+    	super();
+    	id = SignavioUUID.generate();
+    	bpmnPlane = new BPMNPlane();
+    }
+    
+    /* Getter & Setter */
+    
     /**
      * Gets the value of the bpmnPlane property.
      * 

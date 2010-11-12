@@ -23,19 +23,23 @@
 
 package de.hpi.bpmn2_0.model.conversation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
-import org.oryxeditor.server.diagram.Shape;
-import org.oryxeditor.server.diagram.StencilType;
-
-import de.hpi.bpmn2_0.model.CallableElement;
-
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.annotations.CallingElement;
+import de.hpi.bpmn2_0.model.BaseElement;
+import de.hpi.bpmn2_0.model.Collaboration;
+import de.hpi.bpmn2_0.model.bpmndi.di.DiagramElement;
+import de.hpi.bpmn2_0.model.callable.GlobalConversation;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 
 /**
@@ -64,40 +68,38 @@ import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
 //    "participantAssociation"
 })
 public class CallConversation
-    extends ConversationNode
+    extends ConversationNode implements CallingElement
 {
 
 //    protected List<TParticipantAssociation> participantAssociation;
     @XmlIDREF
 	@XmlAttribute
-    protected CallableElement calledElementRef;
-
+    protected Collaboration calledElementRef;
     
-    
-	/**
-	 * 
-	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
-	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
-	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
-	 * 
-	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
-	 */
-    // @Override
-    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
-		Shape shape = super.toShape(converterForShapeCoordinateLookup);
+    @XmlTransient
+    public List<DiagramElement> _diagramElements = new ArrayList<DiagramElement>();
 
-		shape.putProperty("iscallconversation", "true");
+    /*
+     * Constructors
+     */
+    
+    public CallConversation() {
+    	super();
+    }
+    
+	public CallConversation(ConversationNode node) {
+		super(node);
 		
-		if(this.getCalledElementRef() instanceof GlobalCommunication){
-			shape.setStencil(new StencilType("Communication"));
-		}else{
-			shape.setStencil(new StencilType("SubConversation"));
-			
-			//shape.putProperty("", "");
+		if(node instanceof Conversation) {
+			setCalledElementRef(new GlobalConversation());
 		}
-		
-		return shape;
 	}
+
+
+	public void acceptVisitor(Visitor v){
+		v.visitCallConversation(this);
+	}
+	
     
     /**
      * Gets the value of the participantAssociation property.
@@ -133,10 +135,10 @@ public class CallConversation
      * 
      * @return
      *     possible object is
-     *     {@link CallableElement }
+     *     {@link Collaboration }
      *     
      */
-    public CallableElement getCalledElementRef() {
+    public Collaboration getCalledElementRef() {
         return calledElementRef;
     }
 
@@ -145,11 +147,22 @@ public class CallConversation
      * 
      * @param value
      *     allowed object is
-     *     {@link CallableElement }
+     *     {@link Collaboration }
      *     
      */
-    public void setCalledElementRef(CallableElement value) {
+    public void setCalledElementRef(Collaboration value) {
         this.calledElementRef = value;
     }
+
+
+	public List<BaseElement> getCalledElements() {
+		List<BaseElement> calledElements = new ArrayList<BaseElement>();
+		
+		if(calledElementRef != null) {
+			calledElements.add(getCalledElementRef());
+		}
+		
+		return calledElements;
+	}
 
 }

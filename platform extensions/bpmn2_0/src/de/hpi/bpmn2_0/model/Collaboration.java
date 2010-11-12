@@ -148,6 +148,20 @@ public class Collaboration
     	
     }
     
+    public List<BaseElement> getChilds() {
+    	List<BaseElement> childs = super.getChilds();
+    	
+    	childs.addAll(this.getParticipant());
+    	childs.addAll(this.getMessageFlow());
+    	childs.addAll(this.getArtifact());
+    	childs.addAll(this.getConversationNode());
+    	childs.addAll(this.getConversationLink());
+    	childs.addAll(this.getAssociation());
+    	childs.addAll(this.getCorrelationKey());
+    	
+    	return childs;
+    }
+    
     /* Getter & Setter */
     
     

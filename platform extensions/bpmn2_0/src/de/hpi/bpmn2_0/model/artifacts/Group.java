@@ -29,12 +29,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.oryxeditor.server.diagram.Shape;
-import org.oryxeditor.server.diagram.StencilType;
-
 import de.hpi.bpmn2_0.model.CategoryValue;
-
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 
 /**
@@ -90,31 +86,9 @@ public class Group
 	        this.categoryValueRef = value;
 	    }
 	
-	/**
-	 * 
-	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
-	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
-	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
-	 * 
-	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
-	 */
-    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup)  {
-		Shape shape = super.toShape(converterForShapeCoordinateLookup);
-
-		shape.setStencil(new StencilType("Group"));
-        
-		//workaround: shape does not support category value reference for group, 
-		//nor can I access its children, to set the category values
-		//Thus, for now, I just set the categories to the category value.
-//		if(this.getCategoryValueRef() != null){
-//			if(this.getCategoryValueRef().getValue() != null){
-//				shape.putProperty("categories", this.getCategoryValueRef().getValue());
-//			}
-//		}
-        //shape.putProperty("", );
-        
-		return shape;
-	}
+		public void acceptVisitor(Visitor v){
+			v.visitGroup(this);
+		}
 
 
 

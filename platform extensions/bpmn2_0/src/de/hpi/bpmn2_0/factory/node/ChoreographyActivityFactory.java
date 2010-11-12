@@ -28,11 +28,20 @@ import org.oryxeditor.server.diagram.Shape;
 import de.hpi.bpmn2_0.annotations.StencilId;
 import de.hpi.bpmn2_0.exceptions.BpmnConverterException;
 import de.hpi.bpmn2_0.factory.AbstractShapeFactory;
+import de.hpi.bpmn2_0.factory.BPMNElement;
+import de.hpi.bpmn2_0.factory.configuration.Configuration;
+import de.hpi.bpmn2_0.model.BaseElement;
+import de.hpi.bpmn2_0.model.Definitions;
+import de.hpi.bpmn2_0.model.FlowElement;
+import de.hpi.bpmn2_0.model.artifacts.Artifact;
 import de.hpi.bpmn2_0.model.bpmndi.BPMNShape;
+import de.hpi.bpmn2_0.model.choreography.CallChoreography;
+import de.hpi.bpmn2_0.model.choreography.Choreography;
 import de.hpi.bpmn2_0.model.choreography.ChoreographyActivity;
 import de.hpi.bpmn2_0.model.choreography.ChoreographyLoopType;
 import de.hpi.bpmn2_0.model.choreography.ChoreographyTask;
 import de.hpi.bpmn2_0.model.choreography.SubChoreography;
+import de.hpi.bpmn2_0.model.extension.signavio.SignavioMetaData;
 
 /**
  * Factory that creates elements of a choreography diagram.
@@ -47,6 +56,14 @@ import de.hpi.bpmn2_0.model.choreography.SubChoreography;
 })
 public class ChoreographyActivityFactory extends AbstractShapeFactory {
 
+	public BPMNElement createBpmnElement(Shape shape, Configuration configuration) throws BpmnConverterException {
+		BPMNElement bpmnElement = super.createBpmnElement(shape, configuration);
+		
+		handleLinkedDiagrams(bpmnElement.getNode(), shape, configuration);
+		
+		return bpmnElement;
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.hpi.bpmn2_0.factory.AbstractBpmnFactory#createProcessElement(org.oryxeditor.server.diagram.Shape)
 	 */
@@ -58,19 +75,25 @@ public class ChoreographyActivityFactory extends AbstractShapeFactory {
 			activity.setId(shape.getResourceId());
 			activity.setName(shape.getProperty("name"));
 			
+			/* Call choreography */
+			String isCallActivity = shape.getProperty("callacitivity");
+			if(isCallActivity != null && isCallActivity.equals("true")) {
+				activity = new CallChoreography(activity);
+			}
+			
 			/* Loop type */
 			String loopType = shape.getProperty("looptype");
 			if(loopType != null) {
-				if(loopType.equals("none")) {
+				if(loopType.equalsIgnoreCase("None")) {
 					activity.setLoopType(ChoreographyLoopType.NONE);
 				}
-				else if(loopType.equals("standard")) {
+				else if(loopType.equalsIgnoreCase("Standard")) {
 					activity.setLoopType(ChoreographyLoopType.STANDARD);
 				}
-				else if(loopType.equals("parallel")) {
+				else if(loopType.equalsIgnoreCase("MultiInstance")) {
 					activity.setLoopType(ChoreographyLoopType.MULTI_INSTANCE_PARALLEL);
 				} 
-				else if(loopType.equals("sequential")) {
+				else if(loopType.equalsIgnoreCase("Sequential")) {
 					activity.setLoopType(ChoreographyLoopType.MULTI_INSTANCE_SEQUENTIAL);
 				}
 			}
@@ -127,5 +150,72 @@ public class ChoreographyActivityFactory extends AbstractShapeFactory {
 		}
 		
 		return diagramElement;
+	}
+	
+	/**
+	 * Transforms linked diagrams of collapsed subprocess and event subprocess.
+	 * 
+	 * @param baseElement
+	 * @param shape
+	 * @param config
+	 */
+	private void handleLinkedDiagrams(BaseElement baseElement, Shape shape, Configuration config) {
+		if(baseElement == null || !(baseElement instanceof SubChoreography) || !shape.getStencilId().matches(".*Collapsed.*")) {
+			return;
+		}
+		
+		/*
+		 * Diagram Link
+		 */
+		String entry = shape.getProperty("entry");
+		if(entry == null || entry.length() == 0) {
+			return;
+		}
+		
+		SignavioMetaData metaData = new SignavioMetaData("entry", entry);
+		baseElement.getOrCreateExtensionElements().add(metaData);
+		
+		Definitions linkedDiagram = SubprocessFactory.retrieveDefinitionsOfLinkedDiagram(entry, config);
+		
+		if(linkedDiagram == null || linkedDiagram.getRootElement().size() == 0) {
+			return;
+		}
+		
+		for(BaseElement rootEl : linkedDiagram.getRootElement()) {
+			if(rootEl instanceof Choreography) {
+				Choreography linkedChoreo = (Choreography) rootEl;
+				
+				/* Sub choreography */
+				if(baseElement instanceof SubChoreography) {
+					SubChoreography subChoreography = (SubChoreography) baseElement;
+					
+					/* 
+					 * Add flow elements and artifacts including their diagram
+					 * elements
+					 */
+					for(FlowElement flowEl : linkedChoreo.getFlowElement()) {
+						subChoreography.getFlowElement().add(flowEl);
+						subChoreography._diagramElements.add(flowEl._diagramElement);
+					}
+					
+					for(Artifact artifact : linkedChoreo.getArtifact()) {
+						subChoreography.getArtifact().add(artifact);
+						subChoreography._diagramElements.add(artifact._diagramElement);
+					}
+					
+				}
+				
+				/* Call choreography */
+				else if(baseElement instanceof CallChoreography) {
+					CallChoreography callChoreography = (CallChoreography) baseElement;
+					callChoreography.setCalledChoreographyRef(linkedChoreo);
+					
+					for(BaseElement baseEl : linkedChoreo.getChilds()) {
+						callChoreography._diagramElements.add(baseEl._diagramElement);
+					}
+					
+				}
+			} 
+		}
 	}
 }

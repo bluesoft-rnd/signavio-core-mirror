@@ -33,12 +33,12 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
-import org.oryxeditor.server.diagram.Shape;
-import org.oryxeditor.server.diagram.StencilType;
-
+import de.hpi.bpmn2_0.annotations.CallingElement;
 import de.hpi.bpmn2_0.annotations.ChildElements;
+import de.hpi.bpmn2_0.annotations.ContainerElement;
 import de.hpi.bpmn2_0.model.BaseElement;
 import de.hpi.bpmn2_0.model.FlowElement;
 import de.hpi.bpmn2_0.model.activity.type.BusinessRuleTask;
@@ -50,22 +50,13 @@ import de.hpi.bpmn2_0.model.activity.type.ServiceTask;
 import de.hpi.bpmn2_0.model.activity.type.UserTask;
 import de.hpi.bpmn2_0.model.artifacts.Artifact;
 import de.hpi.bpmn2_0.model.artifacts.TextAnnotation;
+import de.hpi.bpmn2_0.model.bpmndi.di.DiagramElement;
 import de.hpi.bpmn2_0.model.choreography.ChoreographyTask;
 import de.hpi.bpmn2_0.model.connector.Association;
 import de.hpi.bpmn2_0.model.data_object.DataObject;
 import de.hpi.bpmn2_0.model.data_object.DataStore;
-import de.hpi.bpmn2_0.model.event.CompensateEventDefinition;
-import de.hpi.bpmn2_0.model.event.ConditionalEventDefinition;
-import de.hpi.bpmn2_0.model.event.ErrorEventDefinition;
-import de.hpi.bpmn2_0.model.event.EscalationEventDefinition;
-import de.hpi.bpmn2_0.model.event.EventDefinition;
-import de.hpi.bpmn2_0.model.event.MessageEventDefinition;
-import de.hpi.bpmn2_0.model.event.SignalEventDefinition;
-import de.hpi.bpmn2_0.model.event.StartEvent;
-import de.hpi.bpmn2_0.model.event.TimerEventDefinition;
 import de.hpi.bpmn2_0.model.gateway.ParallelGateway;
-
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 /**
  * <p>
@@ -95,7 +86,8 @@ import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tSubProcess", propOrder = { "flowElement", "artifact" })
 @XmlSeeAlso( { AdHocSubProcess.class, Transaction.class })
-public class SubProcess extends Activity {
+public class SubProcess extends Activity implements ContainerElement,
+		CallingElement {
 
 	@XmlElementRef(type = FlowElement.class)
 	protected List<FlowElement> flowElement;
@@ -106,15 +98,18 @@ public class SubProcess extends Activity {
 	@XmlAttribute
 	protected Boolean triggeredByEvent;
 
+	@XmlTransient
+	public List<DiagramElement> _diagramElements = new ArrayList<DiagramElement>();
+
 	/**
 	 * Adds the child to the list of {@link FlowElement} of the subprocess.
 	 */
 	public void addChild(BaseElement child) {
 		/* Set sub process reference */
-		if(child instanceof FlowElement) {
+		if (child instanceof FlowElement) {
 			this.setSubProcess(this);
 		}
-		
+
 		/* Insert into appropriate list */
 		if (child instanceof Artifact) {
 			this.getArtifact().add((Artifact) child);
@@ -155,85 +150,9 @@ public class SubProcess extends Activity {
 
 		return subprocesses;
 	}
-	
-	/**
-	 * 
-	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
-	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
-	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
-	 * 
-	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
-	 */
-	public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
-		Shape shape = super.toShape(converterForShapeCoordinateLookup);
-		shape.putProperty("callacitivity", "false");
-		shape.putProperty("activitytype", "Sub-Process");
-		shape.putProperty("isclosed", "true");
-		shape.putProperty("isadhoc", "false");
-		shape.putProperty("isatransaction", "false");
-		
-		if(this.isTriggeredByEvent()){
-			if(shape.getProperty("isExpanded") != null && shape.getProperty("isExpanded").equals("true")){
-				shape.setStencil(new StencilType("EventSubprocess"));
-			}else{
-				shape.setStencil(new StencilType("CollapsedEventSubprocess"));
-				
-				List<StartEvent> startevents = new ArrayList<StartEvent>();
-				for(FlowElement fe : this.getFlowElement())
-					if(fe instanceof StartEvent){
-						startevents.add(((StartEvent) fe));
-						//CONVENTION: as the standard leaves me clueless of what will 
-						//happen in case of multiple StartEvents in the collapsed SubProcess,
-						//I just take the first one
-						break;
-					}
-					
-					if(startevents.size() == 1){
-						StartEvent startevent = startevents.get(0);
-						if(startevent.isIsInterrupting()){
-							shape.putProperty("isinterrupting", "true");
-						}
-						else{
-							shape.putProperty("isinterrupting", "false");
-						}
-						
-						if(startevent.getEventDefinition().size() == 1){
-							EventDefinition e = startevent.getEventDefinition().get(0);
-							
-							if (e instanceof CompensateEventDefinition){ shape.putProperty("startevent", "Compensation");
-					   		} else if (e instanceof ConditionalEventDefinition){ shape.putProperty("startevent", "Conditional");
-					   		} else if (e instanceof ErrorEventDefinition){ shape.putProperty("startevent", "Error");
-					   		} else if (e instanceof EscalationEventDefinition){ shape.putProperty("startevent", "Escalation");
-					   		} else if (e instanceof EscalationEventDefinition){ shape.putProperty("startevent", "Escalation");
-					   		} else if (e instanceof MessageEventDefinition){ shape.putProperty("startevent", "Message");
-					   		} else if (e instanceof SignalEventDefinition){ shape.putProperty("startevent", "Signal");
-					   		} else if (e instanceof TimerEventDefinition){ shape.putProperty("startevent", "Timer");
-					   		}	   		
-						}
-						else if(startevent.getEventDefinition().size() > 1){
-							if(startevent.isParallelMultiple()){
-								shape.putProperty("startevent", "MultipleParallel");
-							}
-							else{
-								shape.putProperty("startevent", "Multiple");
-							}
-						}
-						
-						
-					}
-			
-				
-			}
-					
-		}
-		else{
-			if(shape.getProperty("isExpanded") != null && shape.getProperty("isExpanded").equals("true"))
-				shape.setStencil(new StencilType("Subprocess"));
-			else
-				shape.setStencil(new StencilType("CollapsedSubprocess"));
-		}
-		
-		return shape;
+
+	public void acceptVisitor(Visitor v) {
+		v.visitSubProcess(this);
 	}
 
 	/* Getter & Setter */
@@ -355,5 +274,22 @@ public class SubProcess extends Activity {
 	 */
 	public void setTriggeredByEvent(Boolean value) {
 		this.triggeredByEvent = value;
+	}
+
+	public List<DiagramElement> _getDiagramElements() {
+		return _diagramElements;
+	}
+
+	public List<BaseElement> getCalledElements() {
+		List<BaseElement> calledElements = new ArrayList<BaseElement>();
+
+		for (FlowElement flowEl : getFlowElement()) {
+			if (flowEl instanceof CallingElement) {
+				calledElements.addAll(((CallingElement) flowEl)
+						.getCalledElements());
+			}
+		}
+
+		return calledElements;
 	}
 }

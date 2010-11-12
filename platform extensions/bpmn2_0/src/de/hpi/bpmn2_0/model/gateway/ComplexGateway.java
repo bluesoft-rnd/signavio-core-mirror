@@ -29,13 +29,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
-import org.oryxeditor.server.diagram.Shape;
-import org.oryxeditor.server.diagram.StencilType;
-
 import de.hpi.bpmn2_0.annotations.StencilId;
 import de.hpi.bpmn2_0.model.Expression;
-
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 /**
  * <p>
@@ -83,33 +79,8 @@ public class ComplexGateway extends GatewayWithDefaultFlow {
 	private boolean waitingForStart;
 
 	
-	/**
-	 * 
-	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
-	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
-	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
-	 * 
-	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
-	 */
-    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup)  {
-		Shape shape = super.toShape(converterForShapeCoordinateLookup);
-
-		shape.setStencil(new StencilType("ComplexGateway"));
-        
-		if(this.getActivationCondition() != null){
-			if(this.getActivationCondition().toExportString() != null)
-				shape.putProperty("activationcondition", this.getActivationCondition().toExportString());
-		}
-		
-//		if(this.isWaitingForStart() != null){
-//			
-//		}
-		
-		//these are instance attributes! will not be set here
-//		shape.putProperty("waitingforstart", Boolean.toString(this.isWaitingForStart()));
-//		shape.putProperty("activationcount", Integer.toString(this.getActivationCount()));
-		
-		return shape;
+	public void acceptVisitor(Visitor v){
+		v.visitComplexGateway(this);
 	}
     
 	/* Getter & Setter */

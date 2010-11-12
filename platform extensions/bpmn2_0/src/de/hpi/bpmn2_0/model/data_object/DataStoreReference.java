@@ -24,7 +24,6 @@
 package de.hpi.bpmn2_0.model.data_object;
 
 import javax.xml.bind.annotation.XmlAccessType;
-
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlIDREF;
@@ -32,12 +31,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
-import org.oryxeditor.server.diagram.Shape;
-import org.oryxeditor.server.diagram.StencilType;
-
 import de.hpi.bpmn2_0.model.Process;
-
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 /**
  * A DataStoreReference provides a reference to a globally defined
@@ -77,30 +72,11 @@ public class DataStoreReference extends AbstractDataObject {
     public double getStandardHeight(){
     	return 61.173;
     }
-	
-	/**
-	 * 
-	 * Basic method for the conversion of BPMN2.0 to the editor's internal
-	 * format. {@see BaseElement#toShape(BPMN2DiagramConverter)}
-	 * 
-	 * @param converterForShapeCoordinateLookup
-	 *            an instance of {@link BPMN2DiagramConverter}, offering several
-	 *            lookup methods needed for the conversion.
-	 * 
-	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be
-	 *         used for the output. Its bounds and stencil are set.
-	 */
-	public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup)  {
-		Shape shape = super.toShape(converterForShapeCoordinateLookup);
-
-		shape.setBounds(getMiddleBounds(this.getStandardWidth(), this.getStandardHeight(), shape.getBounds()));
-				
-		shape.setStencil(new StencilType("DataStore"));
-        
-        //shape.putProperty("", );
-        
-		return shape;
+    
+    public void acceptVisitor(Visitor v){
+		v.visitDataStoreReference(this);
 	}
+    
 	public void setProcess(Process process) {
 		super.setProcess(process);
 		if (this.dataStoreRef != null)

@@ -28,6 +28,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import de.hpi.bpmn2_0.transformation.Visitor;
+
 /**
  * <p>
  * Java class for tImplicitThrowEvent complex type.
@@ -69,6 +71,9 @@ public class ImplicitThrowEvent extends ThrowEvent {
 				EventDefinition.createEventDefinition(eventIdentifier));
 	}
 	
-	//DO NOT ADD a separate toShape method here - it is a non-graphical element! (Standard BPMN 2.0, 10.4.1 very last part)
+	public void acceptVisitor(Visitor v){
+		v.visitImplicitThrowEvent(this);
+	}
+	
 
 }

@@ -189,6 +189,10 @@ public class Process
     	else if(child instanceof FlowElement) {
     		this.getFlowElement().add((FlowElement) child);
     	}
+    	
+    	if(child instanceof FlowElement) {
+    		((FlowElement) child).setProcess(this);
+    	}
     }
     
     /**
@@ -201,7 +205,21 @@ public class Process
     	this.getArtifact().remove(child);
     	
     	this.getFlowElement().remove(child);
+    	
+    	removeFromLaneSet(child);
     }
+    
+    /**
+     * Remove the element recursively from the lane set.
+     */
+    private void removeFromLaneSet(BaseElement child) {
+    	if(this.laneSet != null) {
+    		for(LaneSet laneSet : this.getLaneSet()) {
+    			laneSet.removeChild(child);
+    		}
+    	}
+    }
+    
     
     /**
      * Determines whether the process contains choreograhy elements.

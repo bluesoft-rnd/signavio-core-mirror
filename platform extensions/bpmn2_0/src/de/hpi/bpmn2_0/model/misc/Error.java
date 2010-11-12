@@ -32,6 +32,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.hpi.bpmn2_0.model.RootElement;
 import de.hpi.bpmn2_0.util.EscapingStringAdapter;
+import de.hpi.diagram.SignavioUUID;
 
 
 /**
@@ -65,6 +66,14 @@ public class Error
     @XmlAttribute
     @XmlJavaTypeAdapter(EscapingStringAdapter.class)
     protected String errorCode;
+    
+    /* Constructor */
+    public Error() {
+    	super();
+    	setId(SignavioUUID.generate());
+    }
+    
+    /* Getter & Setter */
 
     /**
      * Gets the value of the structureRef property.

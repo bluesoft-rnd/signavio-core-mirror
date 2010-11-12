@@ -23,14 +23,14 @@
 
 package de.hpi.bpmn2_0.model.event;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import de.hpi.bpmn2_0.util.EscapingStringAdapter;
 
 
 /**
@@ -52,14 +52,73 @@ import de.hpi.bpmn2_0.util.EscapingStringAdapter;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "tLinkEventDefinition")
+@XmlType(name = "tLinkEventDefinition", propOrder = {
+    "source",
+    "target"
+})
 public class LinkEventDefinition
     extends EventDefinition
 {
-
-    @XmlAttribute(required = true)
-    @XmlJavaTypeAdapter(EscapingStringAdapter.class)
+	
+    protected List<String> source;
+    protected String target;
+    @XmlAttribute(name = "name", required = true)
     protected String name;
+    
+    /* Getter & Setter */
+
+    /**
+     * Gets the value of the source property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the source property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getSource().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link String }
+     * 
+     * 
+     */
+    public List<String> getSource() {
+        if (source == null) {
+            source = new ArrayList<String>();
+        }
+        return this.source;
+    }
+
+    /**
+     * Gets the value of the target property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getTarget() {
+        return target;
+    }
+
+    /**
+     * Sets the value of the target property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setTarget(String value) {
+        this.target = value;
+    }
 
     /**
      * Gets the value of the name property.

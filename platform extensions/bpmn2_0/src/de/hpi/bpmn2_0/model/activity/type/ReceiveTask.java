@@ -30,11 +30,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
-import org.oryxeditor.server.diagram.Shape;
-
 import de.hpi.bpmn2_0.model.activity.Task;
 import de.hpi.bpmn2_0.model.activity.misc.ServiceImplementation;
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 
 /**
@@ -72,20 +70,11 @@ public class ReceiveTask
     @XmlAttribute
     protected ServiceImplementation implementation;
     
-    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup)  {
-		Shape shape = super.toShape(converterForShapeCoordinateLookup);
-
-        shape.putProperty("tasktype", "Receive");
-        
-        if(this.isInstantiate()){
-        	shape.putProperty("instantiate", "true");
-        }
-        else{
-        	shape.putProperty("instantiate", "false");
-        }
-        
-		return shape;
+	public void acceptVisitor(Visitor v){
+		v.visitReceiveTask(this);
 	}
+	
+	
     
     /**
      * Gets the value of the instantiate property.

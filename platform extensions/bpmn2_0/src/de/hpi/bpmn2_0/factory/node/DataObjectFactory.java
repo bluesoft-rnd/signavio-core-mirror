@@ -56,7 +56,7 @@ public class DataObjectFactory extends AbstractShapeFactory {
 		
 		BaseElement dataObject = null;
 		
-		if(prop.equals("None")) {
+		if(prop == null || prop.equals("None")) {
 			dataObject = new DataObject();
 			this.setDataObjectAttributes((DataObject) dataObject, shape);
 			

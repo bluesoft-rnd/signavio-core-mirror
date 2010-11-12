@@ -31,13 +31,11 @@ import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.oryxeditor.server.diagram.Shape;
-
 import de.hpi.bpmn2_0.model.BaseElement;
 import de.hpi.bpmn2_0.model.bpmndi.di.DiagramElement;
 import de.hpi.bpmn2_0.model.bpmndi.di.LabeledEdge;
 import de.hpi.bpmn2_0.model.bpmndi.di.MessageVisibleKind;
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 /**
  * <p>
@@ -89,7 +87,9 @@ public class BPMNEdge extends LabeledEdge {
 	@XmlAttribute(name = "messageVisibleKind")
 	protected MessageVisibleKind messageVisibleKind;
 
-	
+	public void acceptVisitor(Visitor v){
+		v.visitBpmnEdge(this);
+	}
 
 	/* Getter & Setter */
 
@@ -196,12 +196,5 @@ public class BPMNEdge extends LabeledEdge {
 	 */
 	public void setMessageVisibleKind(MessageVisibleKind value) {
 		this.messageVisibleKind = value;
-	}
-
-	@Override
-	public Shape toShape(
-			BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

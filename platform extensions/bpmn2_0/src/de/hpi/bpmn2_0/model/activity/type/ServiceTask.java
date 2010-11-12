@@ -30,11 +30,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
-import org.oryxeditor.server.diagram.Shape;
-
 import de.hpi.bpmn2_0.model.activity.Task;
 import de.hpi.bpmn2_0.model.activity.misc.ServiceImplementation;
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 
 /**
@@ -83,15 +81,11 @@ public class ServiceTask
 	
     @XmlAttribute
     protected QName operationRef;
-
-    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup)  {
-		Shape shape = super.toShape(converterForShapeCoordinateLookup);
-
-        shape.putProperty("tasktype", "Service");
-        
-		return shape;
-	}
     
+	public void acceptVisitor(Visitor v){
+		v.visitServiceTask(this);
+	}
+	
 	/* Getter & Setter */
 	
 	/**

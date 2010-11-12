@@ -10,6 +10,7 @@ package de.hpi.bpmn2_0.model;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -18,6 +19,10 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 
+import de.hpi.bpmn2_0.model.callable.GlobalChoreographyTask;
+import de.hpi.bpmn2_0.model.callable.GlobalTask;
+import de.hpi.bpmn2_0.model.choreography.Choreography;
+import de.hpi.bpmn2_0.model.conversation.GlobalCommunication;
 import de.hpi.bpmn2_0.model.data_object.InputOutputBinding;
 import de.hpi.bpmn2_0.model.data_object.InputOutputSpecification;
 import de.hpi.bpmn2_0.util.EscapingStringAdapter;
@@ -52,12 +57,11 @@ import de.hpi.bpmn2_0.util.EscapingStringAdapter;
     "ioBinding"
 })
 @XmlSeeAlso({
-//    Conversation.class,
-    Process.class//,
-//    Choreography.class,
-//    TGlobalChoreographyTask.class,
-//    GlobalCommunication.class,
-//    TGlobalTask.class
+    Process.class,
+    Choreography.class,
+    GlobalChoreographyTask.class,
+    GlobalCommunication.class,
+    GlobalTask.class
 })
 public class CallableElement
     extends RootElement
@@ -104,7 +108,7 @@ public class CallableElement
      * 
      * @return
      *     possible object is
-     *     {@link TInputOutputSpecification }
+     *     {@link InputOutputSpecification }
      *     
      */
     public InputOutputSpecification getIoSpecification() {

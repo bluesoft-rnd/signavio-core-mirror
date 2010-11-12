@@ -32,8 +32,10 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 
+import de.hpi.bpmn2_0.model.BaseElement;
 import de.hpi.bpmn2_0.model.Collaboration;
 import de.hpi.bpmn2_0.model.FlowElement;
 import de.hpi.bpmn2_0.model.activity.AdHocSubProcess;
@@ -46,6 +48,7 @@ import de.hpi.bpmn2_0.model.activity.type.ScriptTask;
 import de.hpi.bpmn2_0.model.activity.type.SendTask;
 import de.hpi.bpmn2_0.model.activity.type.ServiceTask;
 import de.hpi.bpmn2_0.model.activity.type.UserTask;
+import de.hpi.bpmn2_0.model.callable.GlobalChoreographyTask;
 import de.hpi.bpmn2_0.model.connector.SequenceFlow;
 
 
@@ -55,6 +58,9 @@ import de.hpi.bpmn2_0.model.connector.SequenceFlow;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlSeeAlso({
+	GlobalChoreographyTask.class
+})
 @XmlType(name = "tChoreography", propOrder = {
 		"flowElement"
 })
@@ -84,6 +90,17 @@ public class Choreography
     	@XmlElementRef(type = SequenceFlow.class)
     })
     protected List<FlowElement> flowElement;
+    
+    public List<BaseElement> getChilds() {
+    	List<BaseElement> childs = super.getChilds();
+    	
+    	childs.addAll(this.getFlowElement());
+    	
+    	return childs;
+    }
+    
+    /* Getter & Setter */
+    
 
     /**
      * Gets the value of the flowElement property.

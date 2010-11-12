@@ -23,12 +23,19 @@
 
 package de.hpi.bpmn2_0.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAnyElement;
+import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import de.hpi.bpmn2_0.util.EscapingStringAdapter;
 import de.hpi.diagram.SignavioUUID;
 
 
@@ -53,7 +60,9 @@ import de.hpi.diagram.SignavioUUID;
 	FormalExpression.class
 })
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "tExpression")
+@XmlType(name = "tExpression", propOrder = {
+    "content"
+})
 public class Expression
     extends BaseElement
 {	
@@ -61,21 +70,34 @@ public class Expression
 	 * Default no-arg constructor
 	 */
 	public Expression() {
-		
+		super();
 	}
 	
 	public Expression(String text) {
-		this.getDocumentation().add(new Documentation(text));
+		super();
 		this.setId(SignavioUUID.generate());
+		this.getContent().add(text);
 	}
+	
+	@XmlMixed
+    @XmlAnyElement(lax = true)
+    @XmlJavaTypeAdapter(EscapingStringAdapter.class)
+    protected List<String> content;
 	
 	/**
 	 * Is used for exporting the expression.
 	 * 
 	 * @return Returns a string, or null if there is no expression.
 	 */
-	public String toExportString(){
-		return this.getDocumentation().size() == 0? null : this.getDocumentation().get(0).getText();
-	}
+    public String toExportString(){
+    	return this.getContent().size() == 0? null : this.getContent().get(0);
+    }
+	
+	public List<String> getContent() {
+        if (content == null) {
+            content = new ArrayList<String>();
+        }
+        return this.content;
+    }
 
 }

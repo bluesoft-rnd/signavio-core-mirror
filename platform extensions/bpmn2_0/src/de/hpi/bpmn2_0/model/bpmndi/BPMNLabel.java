@@ -32,7 +32,7 @@ import javax.xml.namespace.QName;
 import org.oryxeditor.server.diagram.Shape;
 
 import de.hpi.bpmn2_0.model.bpmndi.di.Label;
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverter;
 
 
 /**
@@ -87,7 +87,7 @@ public class BPMNLabel
     }
 
 	// @Override
-	public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
+	public Shape toShape(BPMN2DiagramConverter converterForShapeCoordinateLookup) {
 		// TODO Auto-generated method stub
 		return null;
 	}

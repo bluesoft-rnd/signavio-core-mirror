@@ -8,6 +8,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 
+import de.hpi.bpmn2_0.model.data_object.Message;
+import de.hpi.bpmn2_0.model.misc.Signal;
+
 
 /**
  * <p>Java class for tRootElement complex type.
@@ -35,13 +38,13 @@ import javax.xml.bind.annotation.XmlType;
 //    TEndPoint.class,
 //    TPartnerRole.class,
 //    TPartnerEntity.class,
-//    TSignal.class,
+    Signal.class,
 //    EventDefinition.class,
 //    TError.class,
 //    TResource.class,
 //    TInterface.class,
 //    TCorrelationProperty.class,
-//    Message.class,
+    Message.class,
 
     CallableElement.class//,
 

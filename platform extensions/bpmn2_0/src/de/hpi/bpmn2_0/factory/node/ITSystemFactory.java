@@ -28,7 +28,9 @@ import de.hpi.bpmn2_0.annotations.StencilId;
 import de.hpi.bpmn2_0.exceptions.BpmnConverterException;
 import de.hpi.bpmn2_0.factory.AbstractShapeFactory;
 import de.hpi.bpmn2_0.model.BaseElement;
-import de.hpi.bpmn2_0.model.data_object.ITSystem;
+import de.hpi.bpmn2_0.model.data_object.DataObject;
+import de.hpi.bpmn2_0.model.extension.signavio.SignavioDataObjectType;
+import de.hpi.bpmn2_0.model.extension.signavio.SignavioType;
 
 /**
  * @author Philipp Giese
@@ -44,13 +46,16 @@ public class ITSystemFactory extends AbstractShapeFactory {
 	// @Override
 	protected BaseElement createProcessElement(Shape shape)
 			throws BpmnConverterException {
-		ITSystem system = new ITSystem();
-		this.setCommonAttributes(system, shape);
+		DataObject itsystem = new DataObject();
+		this.setCommonAttributes(itsystem, shape);
 		
-		system.setName(shape.getProperty("name"));
-		system.setId(shape.getResourceId());
+		/* Set IT-System flag */
+		itsystem.getOrCreateExtensionElements().getAny().add(new SignavioType(SignavioDataObjectType.ITSYSTEM));
 		
-		return system;
+		itsystem.setName(shape.getProperty("name"));
+		itsystem.setId(shape.getResourceId());
+		
+		return itsystem;
 	}
 
 }

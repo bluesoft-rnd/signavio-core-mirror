@@ -43,7 +43,7 @@ import de.hpi.diagram.SignavioUUID;
  * @author Sven Wagner-Boysen
  * 
  */
-@StencilId( { "CollapsedPool", "Pool", "Lane" })
+@StencilId( { "CollapsedPool", "VerticalPool", "Pool", "Lane" })
 public class LaneFactory extends AbstractShapeFactory {
 
 	/*
@@ -56,7 +56,9 @@ public class LaneFactory extends AbstractShapeFactory {
 	protected BaseElement createProcessElement(Shape shape)
 			throws BpmnConverterException {
 
-		if (shape.getStencilId().equals("CollapsedPool") || shape.getStencilId().equals("Pool")) {
+		if (shape.getStencilId().equals("CollapsedPool") 
+				|| shape.getStencilId().equals("Pool")
+				|| shape.getStencilId().equals("VerticalPool")) {
 			Participant participant = new Participant();
 			
 			/* Set name attribute */
@@ -70,6 +72,19 @@ public class LaneFactory extends AbstractShapeFactory {
 			String isMultipleParticipant = shape.getProperty("multiinstance");
 			if(isMultipleParticipant != null && isMultipleParticipant.equals("true")) {
 				ParticipantMultiplicity multiplicit = new ParticipantMultiplicity();
+				
+				/* Maximum */
+				String maximum = shape.getProperty("maximum");
+				if(maximum != null) {
+					multiplicit.setMaximum(Integer.valueOf(maximum));
+				}
+				
+				/* Minimum */
+				String minimum = shape.getProperty("minimum");
+				if(minimum != null) {
+					multiplicit.setMinimum(Integer.valueOf(minimum));
+				}
+				
 				participant.setParticipantMultiplicity(multiplicit);
 			}
 			
@@ -151,7 +166,12 @@ public class LaneFactory extends AbstractShapeFactory {
 	// @Override
 	protected BPMNShape createDiagramElement(Shape shape) {
 		BPMNShape swimLaneShape = super.createDiagramElement(shape);
-		swimLaneShape.setIsHorizontal(true);
+		if(shape.getStencil().equals("Pool")
+			|| shape.getStencilId().equals("Lane")) {
+			swimLaneShape.setIsHorizontal(true);
+		} else {
+			swimLaneShape.setIsHorizontal(false);
+		}
 				
 		return swimLaneShape;
 	}

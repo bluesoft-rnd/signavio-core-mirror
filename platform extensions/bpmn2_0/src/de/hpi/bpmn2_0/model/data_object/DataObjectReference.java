@@ -31,12 +31,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
-import org.oryxeditor.server.diagram.Shape;
-import org.oryxeditor.server.diagram.StencilType;
-
 import de.hpi.bpmn2_0.model.Process;
-
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 /**
  * A DataObjectReference provides a reference to a globally defined {@link DataObject}.
@@ -62,29 +58,8 @@ public class DataObjectReference extends AbstractDataObject {
 		
 	}
 	
-    /**
-	 * 
-	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
-	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
-	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
-	 * 
-	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
-	 */
-    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup)  {
-		Shape shape = super.toShape(converterForShapeCoordinateLookup);
-
-		shape.setStencil(new StencilType("DataObject"));
-        
-		if(this.isIsCollection()){
-    		shape.putProperty("iscollection", "true");
-    	}
-    	else{
-    		shape.putProperty("iscollection", "false");
-    	}
-		
-        //shape.putProperty("", );
-        
-		return shape;
+	public void acceptVisitor(Visitor v){
+		v.visitDataObjectReference(this);
 	}
     
 	/* Getter & Setter */

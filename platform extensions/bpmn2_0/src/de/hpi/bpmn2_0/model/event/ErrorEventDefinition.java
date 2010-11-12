@@ -25,7 +25,8 @@ package de.hpi.bpmn2_0.model.event;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -57,8 +58,9 @@ public class ErrorEventDefinition
     extends EventDefinition
 {
 
-    @XmlElement
-    protected Error error;
+    @XmlAttribute
+    @XmlIDREF
+    protected Error errorRef;
 
 
     /* Getter & Setter */
@@ -71,8 +73,8 @@ public class ErrorEventDefinition
      *     {@link Error }
      *     
      */
-    public Error getError() {
-        return error;
+    public Error getErrorRef() {
+        return errorRef;
     }
 
     /**
@@ -83,8 +85,8 @@ public class ErrorEventDefinition
      *     {@link Error }
      *     
      */
-    public void setError(Error value) {
-        this.error = value;
+    public void setErrorRef(Error value) {
+        this.errorRef = value;
     }
 
 }

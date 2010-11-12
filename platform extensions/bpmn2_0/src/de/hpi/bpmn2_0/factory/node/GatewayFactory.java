@@ -32,7 +32,7 @@ import de.hpi.bpmn2_0.exceptions.BpmnConverterException;
 import de.hpi.bpmn2_0.factory.AbstractShapeFactory;
 import de.hpi.bpmn2_0.factory.BPMNElement;
 import de.hpi.bpmn2_0.model.BaseElement;
-import de.hpi.bpmn2_0.model.Expression;
+import de.hpi.bpmn2_0.model.FormalExpression;
 import de.hpi.bpmn2_0.model.bpmndi.BPMNShape;
 import de.hpi.bpmn2_0.model.gateway.ComplexGateway;
 import de.hpi.bpmn2_0.model.gateway.EventBasedGateway;
@@ -174,7 +174,7 @@ public class GatewayFactory extends AbstractShapeFactory {
 		
 		String activationCondition = shape.getProperty("activationcondition");
 		if(activationCondition != null && !activationCondition.equals("")) {
-			gateway.setActivationCondition(new Expression(activationCondition));
+			gateway.setActivationCondition(new FormalExpression(activationCondition));
 		}
 		
 		return gateway;

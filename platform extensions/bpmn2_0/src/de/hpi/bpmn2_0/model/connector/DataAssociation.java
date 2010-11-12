@@ -37,14 +37,10 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
-import org.oryxeditor.server.diagram.Shape;
-import org.oryxeditor.server.diagram.StencilType;
-
 import de.hpi.bpmn2_0.model.FlowElement;
 import de.hpi.bpmn2_0.model.FormalExpression;
 import de.hpi.bpmn2_0.model.misc.Assignment;
-
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 /**
  * <p>
@@ -125,89 +121,11 @@ public class DataAssociation extends Edge {
 			targetRefList.add(firstEle);
 		}
 	}
-
-	/**
-	 * 
-	 * Basic method for the conversion of BPMN2.0 to the editor's internal
-	 * format. {@see BaseElement#toShape(BPMN2DiagramConverter)}
-	 * 
-	 * @param converterForShapeCoordinateLookup
-	 *            an instance of {@link BPMN2DiagramConverter}, offering several
-	 *            lookup methods needed for the conversion.
-	 * 
-	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be
-	 *         used for the output.
-	 */
-	public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
-		Shape shape = super.toShape(converterForShapeCoordinateLookup);
-
-		shape.setStencil(new StencilType("Association_Undirected"));
-
-		String sourceObject = this.getSourceRef().getId();
-		String targetObject = this.getTargetRef().getId();
-
-		// add to source as outgoing
-		Shape s = converterForShapeCoordinateLookup
-				.getEditorShapeByID(sourceObject);
-		if (s == null) {
-			s = converterForShapeCoordinateLookup.newShape(sourceObject);
-		}
-		s.addOutgoing(new Shape(this.getId()));
-
-		// ..or, as ingoing :)
-		Shape s2 = converterForShapeCoordinateLookup
-				.getEditorShapeByID(targetObject);
-		if (s2 == null) {
-			s2 = converterForShapeCoordinateLookup.newShape(targetObject);
-		}
-		s2.addIncoming(new Shape(this.getId()));
-
-		// shape.putProperty("", );
-
-		/*
-		 * "properties" : { "assignments" : { "totalCount" : 3, "items" : [ {
-		 * "to" : "10", "from" : "", "language" : "en" }, { "to" : "", "from" :
-		 * "5", "language" : "de" }, { "to" : "1", "from" : "2", "language" :
-		 * "fr" } ] }, "transformation" : "oaeioaieoai", "text" : "einname\n"
-		 * },...
-		 */
-		
-		if(this.getAssignment().size() != 0){
-			shape.putProperty("assignments", this.getAssignmentString());
-			System.out.println("assignments : " + shape.getProperty("assignments"));
-		}
-		
-		if(this.getTransformation() != null)
-			shape.putProperty("transformation", this.getTransformation().toExportString());
-		
-		//DataAssociation does not have a name property, it seems. Importing this as the "text" property
-		if(this.getName() != null)
-			shape.putProperty("text", this.getName());
-		
-		return shape;
-	}
-
-	private String getAssignmentString() {
-		
-		int count = this.getAssignment().size();
-//		if (count == 0)
-//			return "";
-		String answerstring = "{ \"totalCount\" : "
-				+ Integer.toString(count) + ", \"items\" : [";
-		for (Assignment a : this.getAssignment()) {
-			answerstring += "{ \"to\" : \""
-					+ (a.getTo() == null ? "" : a.getTo())
-					+ "\", \"from\" : \""
-					+ (a.getFrom() == null ? "" : a.getFrom())
-					+ "\", \"language\" : \""
-					+ (a.getLanguage() == null ? "" : a.getLanguage())
-					+ "\"},";
-		}
-		answerstring = answerstring.substring(0, answerstring.length() - 1);
-		answerstring += "]}";
 	
-		return answerstring;
+	public void acceptVisitor(Visitor v){
+		v.visitDataAssociation(this);
 	}
+
 
 	/* Getter & Setter */
 

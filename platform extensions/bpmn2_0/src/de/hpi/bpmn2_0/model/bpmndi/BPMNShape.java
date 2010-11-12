@@ -31,13 +31,10 @@ import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.oryxeditor.server.diagram.Point;
-import org.oryxeditor.server.diagram.Shape;
-
 import de.hpi.bpmn2_0.model.BaseElement;
 import de.hpi.bpmn2_0.model.bpmndi.di.LabeledShape;
 import de.hpi.bpmn2_0.model.bpmndi.di.ParticipantBandKind;
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 /**
  * <p>
@@ -100,25 +97,8 @@ public class BPMNShape extends LabeledShape {
 	@XmlAttribute(name = "choreographyActivityShape")
 	protected BPMNShape choreographyActivityShape;
 
-//	private static Point pointSubstraction(Point childPoint, Point parentPoint){
-//		return new Point(childPoint.getX() - parentPoint.getX(), childPoint.getY() - parentPoint.getY());
-//	}
-	
-	/**
-	 * Convenience method for adjusting bounds (from global coordinates to parent-relative coordinates).
-	 */
-	@SuppressWarnings("unused")
-	private static org.oryxeditor.server.diagram.Bounds boundsAdjustment(org.oryxeditor.server.diagram.Bounds childBounds, org.oryxeditor.server.diagram.Bounds parentBounds){
-		return new org.oryxeditor.server.diagram.Bounds(
-				new Point(
-						childBounds.getLowerRight().getX() - (parentBounds.getLowerRight().getX()), 
-						childBounds.getLowerRight().getY() - (parentBounds.getLowerRight().getY())
-						),
-				new Point(
-						childBounds.getUpperLeft().getX() - (parentBounds.getLowerRight().getX()), 
-						childBounds.getUpperLeft().getY() - (parentBounds.getLowerRight().getY())
-						)
-				);
+	public void acceptVisitor(Visitor v){
+		v.visitBpmnShape(this);
 	}
 	
 	/**
@@ -287,13 +267,6 @@ public class BPMNShape extends LabeledShape {
 	 */
 	public void setChoreographyActivityShape(BPMNShape value) {
 		this.choreographyActivityShape = value;
-	}
-
-	@Override
-	public Shape toShape(
-			BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

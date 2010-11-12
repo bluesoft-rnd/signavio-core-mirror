@@ -45,9 +45,9 @@ import javax.xml.bind.annotation.XmlEnumValue;
 @XmlEnum
 public enum AdHocOrdering {
 
-    @XmlEnumValue("parallel")
+    @XmlEnumValue("Parallel")
     PARALLEL("parallel"),
-    @XmlEnumValue("sequential")
+    @XmlEnumValue("Sequential")
     SEQUENTIAL("sequential");
     private final String value;
 

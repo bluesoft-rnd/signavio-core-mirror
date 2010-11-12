@@ -32,20 +32,26 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
-import org.oryxeditor.server.diagram.Shape;
-import org.oryxeditor.server.diagram.StencilType;
-
+import de.hpi.bpmn2_0.annotations.CallingElement;
+import de.hpi.bpmn2_0.annotations.ContainerElement;
+import de.hpi.bpmn2_0.model.BaseElement;
+import de.hpi.bpmn2_0.model.FlowElement;
 import de.hpi.bpmn2_0.model.artifacts.Artifact;
-
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
-
+import de.hpi.bpmn2_0.model.bpmndi.di.DiagramElement;
+import de.hpi.bpmn2_0.model.connector.Association;
+import de.hpi.bpmn2_0.model.connector.MessageFlow;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 /**
- * <p>Java class for tSubConversation complex type.
+ * <p>
+ * Java class for tSubConversation complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within
+ * this class.
  * 
  * <pre>
  * &lt;complexType name="tSubConversation">
@@ -65,131 +71,190 @@ import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "tSubConversation", propOrder = {
-    "conversationNode",
-    "artifact",
-    "correlationKeyRef"
-})
-public class SubConversation
-    extends ConversationNode
-{
+@XmlType(name = "tSubConversation", propOrder = { 
+		"conversationNode",
+		"artifact", 
+		"correlationKeyRef",
+		"messageFlow",
+		"association",
+		"conversationLink"})
+public class SubConversation extends ConversationNode implements ContainerElement, CallingElement{
 
-	@XmlElementRefs({
-    	@XmlElementRef(type = CallConversation.class),
-    	@XmlElementRef(type = Conversation.class),
-    	@XmlElementRef(type = SubConversation.class)
-    })
-    protected List<ConversationNode> conversationNode;
-    
-    @XmlElementRef()
-    protected List<Artifact> artifact;
-    
-//    @XmlAttribute
-    protected CorrelationKey correlationKeyRef;
+	@XmlElementRefs( { @XmlElementRef(type = CallConversation.class),
+			@XmlElementRef(type = Conversation.class),
+			@XmlElementRef(type = SubConversation.class) })
+	protected List<ConversationNode> conversationNode;
 
-	/**
-	 * 
-	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
-	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
-	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
-	 * 
-	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
-	 */
-    // @Override    
-    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
-		Shape shape = super.toShape(converterForShapeCoordinateLookup);
+	@XmlElementRef()
+	protected List<Artifact> artifact;
 
-		shape.setStencil(new StencilType("SubConversation"));
-		
-		return shape;
+	protected List<MessageFlow> messageFlow;
+	@XmlElementRef
+	protected List<Association> association;
+
+	protected List<ConversationLink> conversationLink;
+
+	@XmlTransient
+	public List<DiagramElement> _diagramElements = new ArrayList<DiagramElement>();
+
+	// @XmlAttribute
+	protected CorrelationKey correlationKeyRef;
+
+	public void acceptVisitor(Visitor v) {
+		v.visitSubConversation(this);
 	}
 
-    /**
-     * Gets the value of the conversationNode property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the conversationNode property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getConversationNode().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link JAXBElement }{@code <}{@link SubConversation }{@code >}
-     * {@link JAXBElement }{@code <}{@link CallConversation }{@code >}
-     * {@link JAXBElement }{@code <}{@link Communication }{@code >}
-     * {@link JAXBElement }{@code <}{@link ConversationNode }{@code >}
-     * 
-     * 
-     */
-    public List<ConversationNode> getConversationNode() {
-        if (conversationNode == null) {
-            conversationNode = new ArrayList<ConversationNode>();
-        }
-        return this.conversationNode;
-    }
+	public List<BaseElement> getChilds() {
+		List<BaseElement> childs = super.getChilds();
 
-    /**
-     * Gets the value of the artifact property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the artifact property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getArtifact().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link JAXBElement }{@code <}{@link TArtifact }{@code >}
-     * {@link JAXBElement }{@code <}{@link TAssociation }{@code >}
-     * {@link JAXBElement }{@code <}{@link TGroup }{@code >}
-     * {@link JAXBElement }{@code <}{@link TTextAnnotation }{@code >}
-     * 
-     * 
-     */
-    public List<Artifact> getArtifact() {
-        if (artifact == null) {
-            artifact = new ArrayList<Artifact>();
-        }
-        return this.artifact;
-    }
+		childs.addAll(this.getParticipantRef());
+		childs.addAll(this.getMessageFlow());
+		childs.addAll(this.getArtifact());
+		childs.addAll(this.getConversationNode());
+		childs.addAll(this.getConversationLink());
+		childs.addAll(this.getAssociation());
 
-    /**
-     * Gets the value of the correlationKeyRef property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link CorrelationKey }
-     *     
-     */
-    public CorrelationKey getCorrelationKeyRef() {
-        return correlationKeyRef;
-    }
+		return childs;
+	}
 
-    /**
-     * Sets the value of the correlationKeyRef property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link CorrelationKey }
-     *     
-     */
-    public void setCorrelationKeyRef(CorrelationKey value) {
-        this.correlationKeyRef = value;
-    }
+	/* Getter & Setter */
+
+	/**
+	 * Gets the value of the conversationNode property.
+	 * 
+	 * <p>
+	 * This accessor method returns a reference to the live list, not a
+	 * snapshot. Therefore any modification you make to the returned list will
+	 * be present inside the JAXB object. This is why there is not a
+	 * <CODE>set</CODE> method for the conversationNode property.
+	 * 
+	 * <p>
+	 * For example, to add a new item, do as follows:
+	 * 
+	 * <pre>
+	 * getConversationNode().add(newItem);
+	 * </pre>
+	 * 
+	 * 
+	 * <p>
+	 * Objects of the following type(s) are allowed in the list
+	 * {@link JAXBElement }{@code <}{@link SubConversation }{@code >}
+	 * {@link JAXBElement }{@code <}{@link CallConversation }{@code >}
+	 * {@link JAXBElement }{@code <}{@link Communication }{@code >}
+	 * {@link JAXBElement }{@code <}{@link ConversationNode }{@code >}
+	 * 
+	 * 
+	 */
+	public List<ConversationNode> getConversationNode() {
+		if (conversationNode == null) {
+			conversationNode = new ArrayList<ConversationNode>();
+		}
+		return this.conversationNode;
+	}
+
+	/**
+	 * Gets the value of the artifact property.
+	 * 
+	 * <p>
+	 * This accessor method returns a reference to the live list, not a
+	 * snapshot. Therefore any modification you make to the returned list will
+	 * be present inside the JAXB object. This is why there is not a
+	 * <CODE>set</CODE> method for the artifact property.
+	 * 
+	 * <p>
+	 * For example, to add a new item, do as follows:
+	 * 
+	 * <pre>
+	 * getArtifact().add(newItem);
+	 * </pre>
+	 * 
+	 * 
+	 * <p>
+	 * Objects of the following type(s) are allowed in the list
+	 * {@link JAXBElement }{@code <}{@link TArtifact }{@code >}
+	 * {@link JAXBElement }{@code <}{@link TAssociation }{@code >}
+	 * {@link JAXBElement }{@code <}{@link TGroup }{@code >} {@link JAXBElement }
+	 * {@code <}{@link TTextAnnotation }{@code >}
+	 * 
+	 * 
+	 */
+	public List<Artifact> getArtifact() {
+		if (artifact == null) {
+			artifact = new ArrayList<Artifact>();
+		}
+		return this.artifact;
+	}
+
+	public List<MessageFlow> getMessageFlow() {
+		if (messageFlow == null) {
+			messageFlow = new ArrayList<MessageFlow>();
+		}
+		return messageFlow;
+	}
+
+	public List<Association> getAssociation() {
+		if (association == null) {
+			association = new ArrayList<Association>();
+		}
+
+		return association;
+	}
+
+	public List<ConversationLink> getConversationLink() {
+		if (conversationLink == null) {
+			conversationLink = new ArrayList<ConversationLink>();
+		}
+		return conversationLink;
+	}
+
+	/**
+	 * Gets the value of the correlationKeyRef property.
+	 * 
+	 * @return possible object is {@link CorrelationKey }
+	 * 
+	 */
+	public CorrelationKey getCorrelationKeyRef() {
+		return correlationKeyRef;
+	}
+
+	/**
+	 * Sets the value of the correlationKeyRef property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link CorrelationKey }
+	 * 
+	 */
+	public void setCorrelationKeyRef(CorrelationKey value) {
+		this.correlationKeyRef = value;
+	}
+
+	public List<DiagramElement> _getDiagramElements() {
+		return _diagramElements;
+	}
+
+	public List<FlowElement> getFlowElement() {
+		List<FlowElement> flowElements = new ArrayList<FlowElement>();
+		
+		flowElements.addAll(getConversationNode());
+		flowElements.addAll(getParticipantRef());
+		flowElements.addAll(getArtifact());
+		flowElements.addAll(getConversationLink());
+		flowElements.addAll(getMessageFlow());
+		flowElements.addAll(getAssociation());
+		
+		return flowElements;
+	}
+
+	public List<BaseElement> getCalledElements() {
+		List<BaseElement> calledElements = new ArrayList<BaseElement>();
+		
+		for(ConversationNode node : getConversationNode()) {
+			if(node instanceof CallingElement) {
+				calledElements.addAll(((CallingElement) node).getCalledElements());
+			}
+		}
+		
+		return calledElements;
+	}
 
 }

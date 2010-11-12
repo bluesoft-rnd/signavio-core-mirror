@@ -32,6 +32,7 @@ import de.hpi.bpmn2_0.model.FormalExpression;
 import de.hpi.bpmn2_0.model.activity.Task;
 import de.hpi.bpmn2_0.model.activity.misc.Operation;
 import de.hpi.bpmn2_0.model.data_object.Message;
+import de.hpi.bpmn2_0.model.event.CancelEventDefinition;
 import de.hpi.bpmn2_0.model.event.CompensateEventDefinition;
 import de.hpi.bpmn2_0.model.event.ConditionalEventDefinition;
 import de.hpi.bpmn2_0.model.event.ErrorEventDefinition;
@@ -40,6 +41,7 @@ import de.hpi.bpmn2_0.model.event.EscalationEventDefinition;
 import de.hpi.bpmn2_0.model.event.MessageEventDefinition;
 import de.hpi.bpmn2_0.model.event.SignalEventDefinition;
 import de.hpi.bpmn2_0.model.event.StartEvent;
+import de.hpi.bpmn2_0.model.event.TerminateEventDefinition;
 import de.hpi.bpmn2_0.model.event.TimerEventDefinition;
 import de.hpi.bpmn2_0.model.misc.Error;
 import de.hpi.bpmn2_0.model.misc.Signal;
@@ -216,7 +218,7 @@ public class StartEventFactory extends AbstractShapeFactory {
 			error.setErrorCode(errorCode);
 		}
 		
-		evDef.setError(error);
+		evDef.setErrorRef(error);
 		event.getEventDefinition().add(evDef);
 		
 		return event;
@@ -274,12 +276,19 @@ public class StartEventFactory extends AbstractShapeFactory {
 	public StartEvent createStartMultipleEvent(Shape shape) {
 		StartEvent event = new StartEvent();
 		
+		event.getEventDefinition().add(new CancelEventDefinition());
+		event.getEventDefinition().add(new TerminateEventDefinition());
+		
 		return event;
 	}
 	
 	@StencilId("StartParallelMultipleEvent")
 	public StartEvent createStartParallelMultipleEvent(Shape shape) {
 		StartEvent event = new StartEvent();
+		
+		event.getEventDefinition().add(new CancelEventDefinition());
+		event.getEventDefinition().add(new TerminateEventDefinition());
+		
 		event.setParallelMultiple(true);
 		
 		return event;

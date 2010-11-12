@@ -24,22 +24,17 @@
 package de.hpi.bpmn2_0.model.choreography;
 
 import java.util.ArrayList;
-
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.oryxeditor.server.diagram.Shape;
-import org.oryxeditor.server.diagram.StencilType;
-
 import de.hpi.bpmn2_0.model.connector.MessageFlow;
-
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
-
-import javax.xml.bind.annotation.XmlIDREF;
+import de.hpi.bpmn2_0.transformation.Visitor;
 import de.hpi.diagram.SignavioUUID;
 
 /**
@@ -95,27 +90,9 @@ public class ChoreographyTask
 		}
 	}
 	
-	/**
-	 * 
-	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
-	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
-	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
-	 * 
-	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
-	 */
-    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
-    	Shape shape = super.toShape(converterForShapeCoordinateLookup);
-    	
-    	shape.setStencil(new StencilType("ChoreographyTask"));	 
-    	
-    	if(this.getMessageFlows() != null){
-    		if(this.getMessageFlows().size() != 0){
-    			shape.putProperty("messageFlow", this.getMessageFlows().get(0).getId());
-    		}
-    	}
-    	
-    	return shape;
-    }
+	public void acceptVisitor(Visitor v){
+		v.visitChoreographyTask(this);
+	}
     
     /**
      * Gets the value of the messageFlowRef property.

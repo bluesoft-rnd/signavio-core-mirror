@@ -25,7 +25,8 @@ package de.hpi.bpmn2_0.model.event;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -57,7 +58,8 @@ public class EscalationEventDefinition
 
 	/* Attributes */
     
-    @XmlElementRef(type = Escalation.class)
+    @XmlAttribute
+    @XmlIDREF
     protected Escalation escalationRef;
     
     /* Constructors */

@@ -23,8 +23,6 @@
 
 package de.hpi.bpmn2_0.model.event;
 
-import java.util.ArrayList;
-
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -34,13 +32,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
-import org.oryxeditor.server.diagram.Point;
-import org.oryxeditor.server.diagram.Shape;
-
 import de.hpi.bpmn2_0.model.activity.Activity;
-import de.hpi.bpmn2_0.model.bpmndi.dc.Bounds;
-
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 /**
  * <p>
@@ -81,55 +74,11 @@ public class BoundaryEvent extends IntermediateCatchEvent {
 		 }
 	 }
 	 
-	 /**
-		 * 
-		 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
-		 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
-		 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
-		 * 
-		 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
-		 */
-	public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
-
-		Shape shape = super.toShape(converterForShapeCoordinateLookup);
-
-		String attachedToObject = this.attachedToRef.getId();
-		
-		//[BPMN2.0] TODO which one is right?
-		//shape.addOutgoing(new Shape(attachedToObject));
-		shape.addIncoming(new Shape(attachedToObject));
-		
-		//add to attachedTo event as outgoing
-		Shape s = converterForShapeCoordinateLookup.getEditorShapeByID(attachedToObject);
-		if(s == null){
-			s = converterForShapeCoordinateLookup.newShape(attachedToObject);
-		}
-		s.addOutgoing(new Shape(this.getId()));
-		
-		
-		// add central docker; event size is fixed at 30 x 30
-		Bounds bounds = converterForShapeCoordinateLookup
-				.getBpmnShapeByID(this.attachedToRef.getId()).getBounds();
-		
-		Bounds thisBpmnShapeBounds = converterForShapeCoordinateLookup
-		.getBpmnShapeByID(this.getId()).getBounds();
-			
-		ArrayList<Point> dockers = shape.getDockers();
-				
-		dockers.add(new Point(thisBpmnShapeBounds.getX()
-				- bounds.getX() + 15, 
-				thisBpmnShapeBounds.getY() - bounds.getY() + 15));
-		
-				
-		shape.putProperty("boundarycancelactivity", Boolean.toString(this.isCancelActivity()));
-		
-		
-		
-		//unnecessary
-		//shape.setDockers(dockers);
-	
-		return shape;
+	public void acceptVisitor(Visitor v){
+		v.visitBoundaryEvent(this);
 	}
+	 
+
 	
 	/* Getter & Setter */
 	

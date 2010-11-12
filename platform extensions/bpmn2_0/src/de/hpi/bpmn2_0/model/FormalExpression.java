@@ -23,22 +23,14 @@
 
 package de.hpi.bpmn2_0.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
-
-import org.w3c.dom.Element;
 
 import de.hpi.bpmn2_0.util.EscapingStringAdapter;
 
@@ -64,24 +56,18 @@ import de.hpi.bpmn2_0.util.EscapingStringAdapter;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tFormalExpression", propOrder = {
-    "content",
     "language",
     "evaluatesToTypeRef"
 })
 public class FormalExpression extends Expression {
 
     public FormalExpression() {
-    	
+    	super();
     }
     
     public FormalExpression(String expressionString) {
-    	this.getContent().add(expressionString);
+    	super(expressionString);
     }
-    
-	@XmlMixed
-    @XmlAnyElement(lax = true)
-    @XmlJavaTypeAdapter(EscapingStringAdapter.class)
-    protected List<String> content;
     
     @XmlAttribute
     @XmlSchemaType(name = "anyURI")
@@ -94,39 +80,6 @@ public class FormalExpression extends Expression {
 
     /* Getter & Setter */
     
-    /**
-     * Gets the value of the content property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the content property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getContent().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Object }
-     * {@link String }
-     * {@link JAXBElement }{@code <}{@link TCategory }{@code >}
-     * {@link JAXBElement }{@code <}{@link TDocumentation }{@code >}
-     * {@link Element }
-     * 
-     * 
-     */
-    public List<String> getContent() {
-        if (content == null) {
-            content = new ArrayList<String>();
-        }
-        return this.content;
-    }
-
     /**
      * Gets the value of the language property.
      * 
@@ -174,13 +127,4 @@ public class FormalExpression extends Expression {
     public void setEvaluatesToTypeRef(String value) {
         this.evaluatesToTypeRef = value;
     }
-    
-    /**
-     * See {@link Expression#toExportString()}.
-     */
-    // @Override
-    public String toExportString(){
-    	return this.getContent().get(0);
-    }
-
 }

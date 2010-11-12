@@ -31,13 +31,12 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
-import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
-import org.oryxeditor.server.diagram.Shape;
-import org.oryxeditor.server.diagram.StencilType;
-
+import de.hpi.bpmn2_0.annotations.CallingElement;
+import de.hpi.bpmn2_0.annotations.ContainerElement;
 import de.hpi.bpmn2_0.factory.BPMNElement;
 import de.hpi.bpmn2_0.model.BaseElement;
 import de.hpi.bpmn2_0.model.FlowElement;
@@ -52,14 +51,13 @@ import de.hpi.bpmn2_0.model.activity.type.SendTask;
 import de.hpi.bpmn2_0.model.activity.type.ServiceTask;
 import de.hpi.bpmn2_0.model.activity.type.UserTask;
 import de.hpi.bpmn2_0.model.artifacts.Artifact;
-import de.hpi.bpmn2_0.model.bpmndi.BPMNShape;
+import de.hpi.bpmn2_0.model.bpmndi.di.DiagramElement;
 import de.hpi.bpmn2_0.model.connector.Association;
 import de.hpi.bpmn2_0.model.connector.Edge;
 import de.hpi.bpmn2_0.model.data_object.Message;
 import de.hpi.bpmn2_0.model.participant.Participant;
-
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
 import de.hpi.bpmn2_0.transformation.Diagram2BpmnConverter;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 
 /**
@@ -89,16 +87,17 @@ import de.hpi.bpmn2_0.transformation.Diagram2BpmnConverter;
     "artifact"
 })
 public class SubChoreography
-    extends ChoreographyActivity
+    extends ChoreographyActivity implements ContainerElement, CallingElement
 {
 
-    @XmlElementRefs({
-    	@XmlElementRef(type = ChoreographyTask.class)
-    })
+    @XmlElementRef(type = FlowElement.class)
     protected List<FlowElement> flowElement;
     
     @XmlElementRef(type = Artifact.class)
     protected List<Artifact> artifact;
+    
+    @XmlTransient
+    public List<DiagramElement> _diagramElements = new ArrayList<DiagramElement>();
     
     public void addChild(BaseElement child) {
     	if(child instanceof Participant) {
@@ -112,34 +111,14 @@ public class SubChoreography
     	} else if(child instanceof FlowElement) {
     		this.getFlowElement().add((FlowElement) child);
     	}
+    	
+    	/* Set parent relation */
+    	if(child instanceof FlowElement) {
+    		((FlowElement) child).setSubChoreography(this);
+    	}
     }
     
-	/**
-	 * 
-	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
-	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
-	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
-	 * 
-	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
-	 */
-    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
-    	Shape shape = super.toShape(converterForShapeCoordinateLookup);
-    	
-    	BPMNShape s = converterForShapeCoordinateLookup.getBpmnShapeByID(this.getId());
-    	if(s != null){
-    		if(s.isIsExpanded()!= null && s.isIsExpanded()){
-    			shape.setStencil(new StencilType("ChoreographySubprocessExpanded"));	   
-    		}
-    		else{
-    			shape.setStencil(new StencilType("ChoreographySubprocessCollapsed"));
-    		}
-    	}
-    	else{
-    		shape.setStencil(new StencilType("ChoreographySubprocessExpanded"));
-    	}
-    	
-    	return shape;
-    }
+	
     
     /**
      * Copies all participant references of sub-choreographies recursively to
@@ -248,6 +227,9 @@ public class SubChoreography
     	return subchoreographies;
     }
     
+	public void acceptVisitor(Visitor v){
+		v.visitSubChoreography(this);
+	}
     
     /* Getter & Setter */
     
@@ -341,5 +323,25 @@ public class SubChoreography
         }
         return this.artifact;
     }
+
+
+
+	public List<DiagramElement> _getDiagramElements() {
+		return _diagramElements;
+	}
+
+
+
+	public List<BaseElement> getCalledElements() {
+		List<BaseElement> calledElements = new ArrayList<BaseElement>();
+		
+		for(FlowElement flowEl : getFlowElement()) {
+			if(flowEl instanceof CallingElement) {
+				calledElements.addAll(((CallingElement) flowEl).getCalledElements());
+			}
+		}
+		
+		return calledElements;
+	}
 
 }

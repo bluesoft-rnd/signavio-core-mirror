@@ -51,8 +51,10 @@ public class Bpmn2XmlConverter {
 //		Class[] classes = { Definitions.class };
 
 		/* Perform XML creation */
+//		JAXBContext context = JAXBContext.newInstance(classes, properties);
 		JAXBContext context = JAXBContext.newInstance(Definitions.class);
 		Marshaller marshaller = context.createMarshaller();
+		marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd");
 //		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
 		NamespacePrefixMapper nsp = new BPMNPrefixMapper();
@@ -98,7 +100,8 @@ public class Bpmn2XmlConverter {
 //		properties.put(JAXBRIContext.ANNOTATION_READER, annotationReader);
 //
 //		Class[] classes = { Definitions.class };
-		
+//		
+//		JAXBContext context = JAXBContext.newInstance(classes, properties);
 		JAXBContext context = JAXBContext.newInstance(Definitions.class);
 		Marshaller marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);

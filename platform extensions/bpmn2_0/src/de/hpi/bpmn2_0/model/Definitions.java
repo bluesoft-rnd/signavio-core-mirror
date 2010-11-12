@@ -60,6 +60,7 @@ import de.hpi.bpmn2_0.model.event.ErrorEventDefinition;
 import de.hpi.bpmn2_0.model.event.EventDefinition;
 import de.hpi.bpmn2_0.model.event.LinkEventDefinition;
 import de.hpi.bpmn2_0.model.event.SignalEventDefinition;
+import de.hpi.bpmn2_0.model.extension.Extension;
 import de.hpi.bpmn2_0.model.misc.Signal;
 import de.hpi.bpmn2_0.validation.BPMN2SyntaxChecker;
 import de.hpi.diagram.SignavioUUID;
@@ -97,6 +98,7 @@ import de.hpi.diagram.SignavioUUID;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "definitions")
 @XmlType(name = "tDefinitions", propOrder = {
+		"extension",
 		"targetNamespace",
 		"expressionLanguage",
 		"typeLanguage",
@@ -107,14 +109,15 @@ public class Definitions {
 
 	// @XmlElement(name = "import")
 	// protected List<TImport> _import;
-	// protected List<TExtension> extension;
+	 protected List<Extension> extension;
 	
 	@XmlElementRefs( { @XmlElementRef(type = Process.class),
 			@XmlElementRef(type = Choreography.class),
 			@XmlElementRef(type = Collaboration.class),
 			@XmlElementRef(type = Conversation.class),
-			@XmlElementRef(type = Signal.class)})
-	protected List<RootElement> rootElement;
+			@XmlElementRef(type = Signal.class),
+			@XmlElementRef(type = Message.class)})
+	protected List<BaseElement> rootElement;
 	
 	@XmlElementRef
 	protected List<BPMNDiagram> diagram;
@@ -230,12 +233,12 @@ public class Definitions {
 	 * 
 	 * 
 	 */
-	// public List<TExtension> getExtension() {
-	// if (extension == null) {
-	// extension = new ArrayList<TExtension>();
-	// }
-	// return this.extension;
-	// }
+	 public List<Extension> getExtension() {
+	 if (extension == null) {
+	 extension = new ArrayList<Extension>();
+	 }
+	 return this.extension;
+	 }
 
 	/**
 	 * Gets the value of the rootElement property.
@@ -294,9 +297,9 @@ public class Definitions {
 	 * 
 	 * 
 	 */
-	public List<RootElement> getRootElement() {
+	public List<BaseElement> getRootElement() {
 		if (rootElement == null) {
-			rootElement = new ArrayList<RootElement>();
+			rootElement = new ArrayList<BaseElement>();
 		}
 		return this.rootElement;
 	}
@@ -313,7 +316,7 @@ public class Definitions {
 
 		ArrayList<Edge> edges = new ArrayList<Edge>();
 
-		for (RootElement rootElement : this.rootElement) {
+		for (BaseElement rootElement : this.rootElement) {
 
 			if (rootElement instanceof Process) {
 

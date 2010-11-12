@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAnyAttribute;
@@ -41,7 +42,7 @@ import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 
 
@@ -221,11 +222,8 @@ public abstract class DiagramElement {
 
     }
     
-    /**
-     * Added method for creating a shape for the diagram element.
-     * @param converterForShapeCooordinateLookup converter instance that can offer a lookup of shapes by id 
-     * @return a shape representing the diagram element 
-     */
-    public abstract org.oryxeditor.server.diagram.Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup);
+	public void acceptVisitor(Visitor v){
+		v.visitDiagramElement(this);
+	}
 
 }

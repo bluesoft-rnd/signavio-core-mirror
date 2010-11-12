@@ -30,11 +30,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
-import org.oryxeditor.server.diagram.Shape;
-import org.oryxeditor.server.diagram.StencilType;
-
-
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 
 /**
@@ -67,41 +63,29 @@ public class Association
     
     @XmlTransient
     public boolean _containedInProcess;
-
-	/**
-	 * 
-	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
-	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
-	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
-	 * 
-	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
-	 */
-    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup)  {
-		Shape shape = super.toShape(converterForShapeCoordinateLookup);
-
-		if(this.getAssociationDirection().equals(AssociationDirection.BOTH)){
-			shape.setStencil(new StencilType("Association_Bidirectional"));
-		}else if(this.getAssociationDirection().equals(AssociationDirection.ONE)){
-			shape.setStencil(new StencilType("Association_Unidirectional"));
-		}else { //if(this.getAssociationDirection().equals(AssociationDirection.NONE)){
-			shape.setStencil(new StencilType("Association_Undirected"));
-		}
-		
-		String sourceObject = this.sourceRef.getId();
-		
-		//add to source as outgoing
-		Shape s = converterForShapeCoordinateLookup.getEditorShapeByID(sourceObject);
-		if(s == null){
-			s = converterForShapeCoordinateLookup.newShape(sourceObject);
-		}
-		s.addOutgoing(new Shape(this.getId()));
-		
-        //shape.putProperty("", );
-        
-		return shape;
-	}
-
     
+    public Association() {
+    	super();
+    }
+    
+    public Association(DataAssociation dataAssociation) {
+    	super(dataAssociation);
+    	
+    	/*
+    	 * Determine association direction
+    	 */
+    	if(dataAssociation instanceof DataInputAssociation || dataAssociation instanceof DataOutputAssociation) {
+    		this.setAssociationDirection(AssociationDirection.ONE);
+    	}
+    }
+    
+	public void acceptVisitor(Visitor v){
+		v.visitAssociation(this);
+	}
+    
+	
+	/* Getter & Setter */
+	
     /**
      * Gets the value of the associationDirection property.
      * 

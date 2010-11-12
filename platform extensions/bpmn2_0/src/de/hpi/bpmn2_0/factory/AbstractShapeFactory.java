@@ -28,6 +28,8 @@ import org.oryxeditor.server.diagram.Shape;
 import de.hpi.bpmn2_0.exceptions.BpmnConverterException;
 import de.hpi.bpmn2_0.model.BaseElement;
 import de.hpi.bpmn2_0.model.bpmndi.BPMNShape;
+import de.hpi.bpmn2_0.model.extension.ExtensionElements;
+import de.hpi.bpmn2_0.model.extension.signavio.SignavioMetaData;
 import de.hpi.bpmn2_0.util.DiagramHelper;
 
 /**
@@ -48,6 +50,9 @@ public abstract class AbstractShapeFactory extends AbstractBpmnFactory {
 		BPMNShape diaElement = this.createDiagramElement(shape);
 		BaseElement processElement = this.createProcessElement(shape);
 		diaElement.setBpmnElement(processElement);
+		
+		super.setLabelPositionInfo(shape, processElement);
+		setBgColor(shape, processElement);
 		
 		BPMNElement bpmnElement = new BPMNElement(diaElement, processElement, shape.getResourceId());
 		return bpmnElement;
@@ -82,6 +87,21 @@ public abstract class AbstractShapeFactory extends AbstractBpmnFactory {
 		bpmnBounds.setWidth(shape.getWidth());
 		
 		return bpmnBounds;
+	}
+	
+	/**
+	 * Sets the bgcolor property as a {@link SignavioMetaData} extension
+	 * element.
+	 * 
+	 * @param node
+	 * @param element
+	 */
+	private void setBgColor(Shape node, BaseElement element) {
+		String bgColor = node.getProperty("bgcolor");
+		if(bgColor != null) {
+			ExtensionElements extElements = element.getOrCreateExtensionElements();
+			extElements.add(new SignavioMetaData("bgcolor", bgColor));
+		}
 	}
 	
 

@@ -30,7 +30,7 @@ import de.hpi.bpmn2_0.factory.AbstractShapeFactory;
 import de.hpi.bpmn2_0.model.data_object.Message;
 
 /**
- * Factory to create {@link Mes}
+ * Factory to create {@link Message}
  * 
  * @author Sven
  *

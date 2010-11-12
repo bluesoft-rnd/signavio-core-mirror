@@ -52,10 +52,23 @@ public class ConversationParticipantFactory extends AbstractShapeFactory {
 		participant.setName(shape.getProperty("name"));
 		
 		/* Participant Multiplicity */
-		String multiInstance = shape.getProperty("multiinstance");
-		if(multiInstance != null && multiInstance.equals("true")) {
-			ParticipantMultiplicity mi = new ParticipantMultiplicity();
-			participant.setParticipantMultiplicity(mi);
+		String isMultipleParticipant = shape.getProperty("multiinstance");
+		if(isMultipleParticipant != null && isMultipleParticipant.equals("true")) {
+			ParticipantMultiplicity multiplicit = new ParticipantMultiplicity();
+			
+			/* Maximum */
+			String maximum = shape.getProperty("maximum");
+			if(maximum != null) {
+				multiplicit.setMaximum(Integer.valueOf(maximum));
+			}
+			
+			/* Minimum */
+			String minimum = shape.getProperty("minimum");
+			if(minimum != null) {
+				multiplicit.setMinimum(Integer.valueOf(minimum));
+			}
+			
+			participant.setParticipantMultiplicity(multiplicit);
 		}
 		
 		return participant;

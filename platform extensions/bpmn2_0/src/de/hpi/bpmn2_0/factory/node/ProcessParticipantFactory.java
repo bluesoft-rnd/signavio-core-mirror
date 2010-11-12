@@ -28,7 +28,9 @@ import de.hpi.bpmn2_0.annotations.StencilId;
 import de.hpi.bpmn2_0.exceptions.BpmnConverterException;
 import de.hpi.bpmn2_0.factory.AbstractShapeFactory;
 import de.hpi.bpmn2_0.model.BaseElement;
-import de.hpi.bpmn2_0.model.artifacts.ProcessParticipant;
+import de.hpi.bpmn2_0.model.data_object.DataObject;
+import de.hpi.bpmn2_0.model.extension.signavio.SignavioDataObjectType;
+import de.hpi.bpmn2_0.model.extension.signavio.SignavioType;
 
 /**
  * @author Philipp Giese
@@ -44,13 +46,16 @@ public class ProcessParticipantFactory extends AbstractShapeFactory {
 	// @Override
 	protected BaseElement createProcessElement(Shape shape)
 			throws BpmnConverterException {
-		ProcessParticipant system = new ProcessParticipant();
-		this.setCommonAttributes(system, shape);
+		DataObject processParticipant = new DataObject();
+		this.setCommonAttributes(processParticipant, shape);
 		
-		system.setName(shape.getProperty("name"));
-		system.setId(shape.getResourceId());
+		/* Set Process Participant flag */
+		processParticipant.getOrCreateExtensionElements().getAny().add(new SignavioType(SignavioDataObjectType.PROCESSPARTICIPANT));
 		
-		return system;
+		processParticipant.setName(shape.getProperty("name"));
+		processParticipant.setId(shape.getResourceId());
+		
+		return processParticipant;
 	}
 
 }

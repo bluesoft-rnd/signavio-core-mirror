@@ -24,18 +24,12 @@
 
 package de.hpi.bpmn2_0.model.event;
 
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.oryxeditor.server.diagram.Shape;
-import org.oryxeditor.server.diagram.StencilType;
-
-
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 
 /**
@@ -60,68 +54,11 @@ import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
 public class IntermediateThrowEvent
     extends ThrowEvent
 {
-	/**
-	 * 
-	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
-	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
-	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
-	 * 
-	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
-	 */
-	public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
-		Shape shape = super.toShape(converterForShapeCoordinateLookup);
-
-		shape.setStencil(new StencilType("IntermediateEvent"));
-		
-		List<EventDefinition> eventdef = this.getEventDefinition();
-    	
-    	if(eventdef.size() == 0){
-	   		 shape.setStencil(new StencilType("IntermediateEvent"));
-	   	}
-	   	else if (eventdef.size() == 1){
-	   		EventDefinition e = eventdef.get(0);
-            
-	        //if(e instanceof CancelEventDefinition){shape.setStencil(new StencilType(""));} else 
-	   		if (e instanceof CompensateEventDefinition){
-	   			shape.setStencil(new StencilType("IntermediateCompensationEventThrowing"));
-	   			putShapeCompensateEventProperties(shape, e);
-	   		//} else if (e instanceof ConditionalEventDefinition){ shape.setStencil(new StencilType(""));
-	   		//} else if (e instanceof ErrorEventDefinition){ shape.setStencil(new StencilType(""));
-	   		} else if (e instanceof EscalationEventDefinition){ 
-	   			shape.setStencil(new StencilType("IntermediateEscalationEventThrowing"));
-	   			putShapeEscalationEventProperties(shape, e);
-	   		//} else if (e instanceof SaperionEscalationEventDefinition){ shape.setStencil(new StencilType(""));
-	   		} else if (e instanceof LinkEventDefinition){ 
-	   			shape.setStencil(new StencilType("IntermediateLinkEventThrowing"));
-	   			putShapeLinkEventProperties(shape, e);
-	   		} else if (e instanceof MessageEventDefinition){ 
-	   			shape.setStencil(new StencilType("IntermediateMessageEventThrowing"));
-	   			putShapeMessageEventProperties(shape, e);
-	   		} else if (e instanceof SignalEventDefinition){ 
-	   			shape.setStencil(new StencilType("IntermediateSignalEventThrowing"));
-	   			putShapeSignalEventProperties(shape, e);
-	   		//} else if (e instanceof TerminateEventDefinition){ shape.setStencil(new StencilType(""));
-	   		//} else if (e instanceof TimerEventDefinition){ shape.setStencil(new StencilType(""));
-	   		}
-	   	}
-	   	else{
-		  shape.setStencil(new StencilType("IntermediateMultipleEventThrowing"));
-		  
-		  for(EventDefinition e : eventdef){
-			  if (e instanceof CompensateEventDefinition){
-		   			putShapeCompensateEventProperties(shape, e);
-		   		} else if (e instanceof EscalationEventDefinition){ 
-		   			putShapeEscalationEventProperties(shape, e);
-		   		} else if (e instanceof LinkEventDefinition){ 
-		   			putShapeLinkEventProperties(shape, e);
-		   		} else if (e instanceof MessageEventDefinition){ 
-		   			putShapeMessageEventProperties(shape, e);
-		   		} else if (e instanceof SignalEventDefinition){ 
-		   			putShapeSignalEventProperties(shape, e);
-		   		}
-		  }
-	   	}
-		return shape;
+	
+	public void acceptVisitor(Visitor v){
+		v.visitIntermediateThrowEvent(this);
 	}
+	
+	
 
 }

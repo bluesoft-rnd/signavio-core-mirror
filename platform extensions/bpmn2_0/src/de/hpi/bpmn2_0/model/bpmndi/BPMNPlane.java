@@ -33,7 +33,8 @@ import org.oryxeditor.server.diagram.Shape;
 
 import de.hpi.bpmn2_0.model.BaseElement;
 import de.hpi.bpmn2_0.model.bpmndi.di.Plane;
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverter;
+import de.hpi.diagram.SignavioUUID;
 
 
 /**
@@ -62,6 +63,14 @@ public class BPMNPlane extends Plane
     @XmlAttribute(name = "bpmnElement")
     @XmlIDREF
     protected BaseElement bpmnElement;
+    
+    /* Constructor */
+    public BPMNPlane() {
+    	super();
+    	id = SignavioUUID.generate();
+    }
+    
+    /* Getter & Setter */
 
     /**
      * Gets the value of the bpmnElement property.
@@ -88,7 +97,7 @@ public class BPMNPlane extends Plane
     }
 
 	// @Override
-	public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
+	public Shape toShape(BPMN2DiagramConverter converterForShapeCoordinateLookup) {
 		// TODO Auto-generated method stub
 		return null;
 	}

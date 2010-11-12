@@ -40,8 +40,6 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
-import org.oryxeditor.server.diagram.Shape;
-
 import de.hpi.bpmn2_0.model.FlowNode;
 import de.hpi.bpmn2_0.model.activity.loop.LoopCharacteristics;
 import de.hpi.bpmn2_0.model.activity.loop.MultiInstanceLoopCharacteristics;
@@ -58,9 +56,10 @@ import de.hpi.bpmn2_0.model.data_object.InputOutputSpecification;
 import de.hpi.bpmn2_0.model.data_object.InputSet;
 import de.hpi.bpmn2_0.model.data_object.OutputSet;
 import de.hpi.bpmn2_0.model.event.BoundaryEvent;
+import de.hpi.bpmn2_0.model.extension.PropertyListItem;
 import de.hpi.bpmn2_0.model.misc.IoOption;
 import de.hpi.bpmn2_0.model.misc.Property;
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.Visitor;
 import de.hpi.diagram.SignavioUUID;
 
 
@@ -96,11 +95,11 @@ import de.hpi.diagram.SignavioUUID;
 @XmlType(name = "tActivity", propOrder = {
     "ioSpecification",
     "property",
-	"boundaryEventRefs",
     "dataInputAssociation",
     "dataOutputAssociation",
     "activityResource",
-    "loopCharacteristics"
+    "loopCharacteristics",
+    "additionalProperties"
 })
 @XmlSeeAlso({
     SubProcess.class,
@@ -135,8 +134,9 @@ public abstract class Activity
     })
     protected LoopCharacteristics loopCharacteristics;
     
-	@XmlIDREF
-	@XmlElement(name = "boundaryEventRef", type = BoundaryEvent.class)
+//	@XmlIDREF
+//	@XmlElement(name = "boundaryEventRef", type = BoundaryEvent.class)
+    @XmlTransient
 	protected List<BoundaryEvent> boundaryEventRefs;
 	
 	@XmlAttribute
@@ -152,6 +152,9 @@ public abstract class Activity
     @XmlIDREF
     @XmlSchemaType(name = "IDREF")
     protected Object _default;
+	
+	@XmlElementRef
+	protected List<PropertyListItem> additionalProperties;
 	
 	@XmlTransient
 	private List<HashMap<String, IoOption>> inputSetInfo;
@@ -199,6 +202,9 @@ public abstract class Activity
 		if(act.getOutputSetInfo().size() > 0)
 			this.getOutputSetInfo().addAll(act.getOutputSetInfo());
 		
+		if(act.getAdditionalProperties().size() > 0) {
+			this.getAdditionalProperties().addAll(act.getAdditionalProperties());
+		}
 		
 		this.setIoSpecification(act.getIoSpecification());
 		this.setLoopCharacteristics(act.getLoopCharacteristics());
@@ -289,6 +295,13 @@ public abstract class Activity
 	
 	
 	/* Getter & Setter */
+	
+	public List<PropertyListItem> getAdditionalProperties() {
+		if(additionalProperties == null) {
+			additionalProperties = new ArrayList<PropertyListItem>();
+		}
+		return additionalProperties;
+	}
 	
 	/**
 	 * @return The list of boundary event references
@@ -607,59 +620,8 @@ public abstract class Activity
     	return attachedBoundaryEvents;
 	}
 
-	public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup)  {
-
-    /*
-    	return this.toShape(converterForShapeCoordinateLookup, true);
-    }
-    	
-    //needed for CallActivity, as several properties are null...
-	public Shape toShape(BPMN2DiagramConverter converterForShapeCoordinateLookup, boolean setProperties)  {
-	*/
-		Shape shape = super.toShape(converterForShapeCoordinateLookup);
-
-		shape.putProperty("isforcompensation", Boolean.toString(this.isForCompensation()));
-		
-		shape.putProperty("startquantity", this.getStartQuantity().toString());
-		shape.putProperty("completionquantity", this.getCompletionQuantity().toString());
-		
-		if(this.getLoopCharacteristics() != null){
-			if(this.getLoopCharacteristics() instanceof MultiInstanceLoopCharacteristics){
-				if(((MultiInstanceLoopCharacteristics)this.getLoopCharacteristics()).isIsSequential())
-					shape.putProperty("looptype", "Sequential");
-				else
-					shape.putProperty("looptype", "Parallel");
-			} else if (this.getLoopCharacteristics() instanceof StandardLoopCharacteristics){
-				shape.putProperty("looptype", "Standard");
-			}
-					
-		}
-		else{
-			shape.putProperty("looptype", "None");
-		}
-		
-		//unnecessary: SequenceFlow has a isDefaultSequenceFlow method
-		/*
-		//todo check if default is instance of SequenceFlow (as in the standard...)
-		if(this.getDefault() != null && this.getDefault() instanceof SequenceFlow){
-    		SequenceFlow defaultSeqFlow = (SequenceFlow) this.getDefault();
-    		Shape defaultFlowShape = converterForShapeCoordinateLookup.getEditorShapeByID(defaultSeqFlow.getId());
-    		if(defaultFlowShape == null){
-    			defaultFlowShape = converterForShapeCoordinateLookup.newShape(defaultSeqFlow.getId());
-    		}
-    		
-    		defaultFlowShape.putProperty("ConditionType", "Default");
-    	}
-    	*/
-		
-		//shape.putProperty(..., ...);
-		
-		//assignments property not added - what is it for anyway? :D
-		
-		
-		
-		
-		return shape;
+	public void acceptVisitor(Visitor v){
+		v.visitActivity(this);
 	}
 
 }

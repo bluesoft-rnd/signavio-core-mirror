@@ -28,15 +28,10 @@ import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
-import org.oryxeditor.server.diagram.Shape;
-
 import de.hpi.bpmn2_0.model.FlowElement;
 import de.hpi.bpmn2_0.model.FlowNode;
-
-
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
-
 import de.hpi.bpmn2_0.model.conversation.ConversationLink;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 
 /**
@@ -90,6 +85,9 @@ public abstract class Edge extends FlowElement {
 	    		((FlowNode)this.getTargetRef()).getPool() != ((FlowNode)this.getSourceRef()).getPool());
 	}
 	
+	public void acceptVisitor(Visitor v){
+		v.visitEdge(this);
+	}
 	
 	/* Getters */
 	
@@ -121,27 +119,4 @@ public abstract class Edge extends FlowElement {
 	public void setTargetRef(FlowElement targetRef) {
 		this.targetRef = targetRef;
 	}
-	
-	/**
-	 * 
-	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
-	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
-	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
-	 * 
-	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. TargetRef, incomings and outgoings (from source and target) are set. 
-	 */
-	public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
-    	Shape shape = super.toShape(converterForShapeCoordinateLookup);
-    	
-    	//check for null pointers: edges may be unconnected!
-    	if(this.getTargetRef() != null){
-    		shape.setTarget(new Shape(this.getTargetRef().getId()));
-    		shape.getOutgoings().add(new Shape(this.getTargetRef().getId()));
-		}
-    	if(this.getSourceRef() != null){
-    		shape.getIncomings().add(new Shape(this.getSourceRef().getId()));
-    	}
-    	
-    	return shape;
-    }
 }

@@ -48,6 +48,7 @@ import de.hpi.bpmn2_0.model.event.IntermediateCatchEvent;
 import de.hpi.bpmn2_0.model.event.LinkEventDefinition;
 import de.hpi.bpmn2_0.model.event.MessageEventDefinition;
 import de.hpi.bpmn2_0.model.event.SignalEventDefinition;
+import de.hpi.bpmn2_0.model.event.TerminateEventDefinition;
 import de.hpi.bpmn2_0.model.event.TimerEventDefinition;
 import de.hpi.bpmn2_0.model.misc.Error;
 import de.hpi.bpmn2_0.model.misc.Signal;
@@ -236,7 +237,14 @@ public class IntermediateCatchEventFactory extends AbstractShapeFactory {
 		String name = shape.getProperty("name");
 		if (name != null && !(name.length() == 0))
 			linkDef.setName(name);
-
+		
+		/* Set source reference */
+		String sourceEntry = shape.getProperty("entry");
+		if(sourceEntry != null && sourceEntry.length() != 0) {
+			linkDef.getSource().add(sourceEntry);
+		}
+		
+		
 		icEvent.getEventDefinition().add(linkDef);
 
 		return icEvent;
@@ -262,7 +270,7 @@ public class IntermediateCatchEventFactory extends AbstractShapeFactory {
 			error.setErrorCode(errorCode);
 		}
 		
-		errorDef.setError(error);
+		errorDef.setErrorRef(error);
 		
 		icEvent.getEventDefinition().add(errorDef);
 
@@ -305,6 +313,10 @@ public class IntermediateCatchEventFactory extends AbstractShapeFactory {
 	@StencilId("IntermediateMultipleEventCatching")
 	public IntermediateCatchEvent createMultipleEvent(Shape shape) {
 		IntermediateCatchEvent icEvent = new IntermediateCatchEvent();
+		
+		icEvent.getEventDefinition().add(new CancelEventDefinition());
+		icEvent.getEventDefinition().add(new TerminateEventDefinition());
+		
 		icEvent.setParallelMultiple(false);
 
 		return icEvent;
@@ -313,6 +325,10 @@ public class IntermediateCatchEventFactory extends AbstractShapeFactory {
 	@StencilId("IntermediateParallelMultipleEventCatching")
 	public IntermediateCatchEvent createParallelMultipleEvent(Shape shape) {
 		IntermediateCatchEvent icEvent = new IntermediateCatchEvent();
+		
+		icEvent.getEventDefinition().add(new CancelEventDefinition());
+		icEvent.getEventDefinition().add(new TerminateEventDefinition());
+		
 		icEvent.setParallelMultiple(true);
 
 		return icEvent;

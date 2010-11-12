@@ -24,17 +24,13 @@
 package de.hpi.bpmn2_0.model.gateway;
 
 import javax.xml.bind.annotation.XmlAccessType;
-
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 
-import org.oryxeditor.server.diagram.Shape;
-
 import de.hpi.bpmn2_0.model.FlowNode;
-
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 
 /**
@@ -92,31 +88,9 @@ public class Gateway
     	return 40.0;
     }
     
-    
-    /**
-	 * 
-	 * Basic method for the conversion of BPMN2.0 to the editor's internal
-	 * format. {@see BaseElement#toShape(BPMN2DiagramConverter)}
-	 * 
-	 * @param converterForShapeCoordinateLookup
-	 *            an instance of {@link BPMN2DiagramConverter}, offering several
-	 *            lookup methods needed for the conversion.
-	 * 
-	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be
-	 *         used for the output. The name property is set, and a parent is
-	 *         added (the flow element is added as a child as well).
-	 */
-    public Shape toShape(BPMN2DiagramConverterI converterForShapeLookup) {
-    	Shape shape = super.toShape(converterForShapeLookup);
-    	
-    	//not relevant for the editor
-    	//this.getGatewayDirection()
-    	
-    	shape.setBounds(getMiddleBounds(this.getStandardWidth(), this.getStandardHeight(), shape.getBounds()));
-    	
-   		return shape;    
-    }
-    
+	public void acceptVisitor(Visitor v){
+		v.visitGateway(this);
+	}
     
     
     /* Getter & Setter */

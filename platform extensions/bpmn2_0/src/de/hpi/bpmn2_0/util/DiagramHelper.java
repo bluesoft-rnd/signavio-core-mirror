@@ -28,38 +28,59 @@ import org.oryxeditor.server.diagram.Shape;
 
 /**
  * @author Sven Wagner-Boysen
- *
+ * 
  */
 public class DiagramHelper {
-	
+
 	public static Bounds getAbsoluteBounds(Shape shape) {
 		/* Handle invalid diagram and prevent from crashing the transformation */
-		if(shape.getBounds() == null) {
+		if (shape.getBounds() == null) {
 			Bounds bounds = new Bounds(new Point(0.0, 0.0), new Point(0.0, 0.0));
 			return bounds;
 		}
-		//clone bounds
+		// clone bounds
 		Bounds bounds = cloneBounds(shape.getBounds());
-		
+
 		Shape parent = shape.getParent();
-		
-		if(parent != null) {
+
+		if (parent != null) {
 			Bounds parentBounds = getAbsoluteBounds(parent);
-			setBounds(bounds, parentBounds.getUpperLeft().getX().doubleValue(), parentBounds.getUpperLeft().getY().doubleValue());
+			setBounds(bounds, parentBounds.getUpperLeft().getX().doubleValue(),
+					parentBounds.getUpperLeft().getY().doubleValue());
 		}
-		
+
 		return bounds;
 	}
-	
+
+	public static double calculateCenterDistance(
+			de.hpi.bpmn2_0.model.bpmndi.dc.Bounds b1,
+			de.hpi.bpmn2_0.model.bpmndi.dc.Bounds b2) {
+
+		de.hpi.bpmn2_0.model.bpmndi.dc.Point b1Center = new de.hpi.bpmn2_0.model.bpmndi.dc.Point();
+		b1Center.setX(b1.getX() + b1.getWidth() / 2.0);
+		b1Center.setY(b1.getY() + b1.getHeight() / 2.0);
+
+		de.hpi.bpmn2_0.model.bpmndi.dc.Point b2Center = new de.hpi.bpmn2_0.model.bpmndi.dc.Point();
+		b2Center.setX(b2.getX() + b2.getWidth() / 2.0);
+		b2Center.setY(b2.getY() + b2.getHeight() / 2.0);
+
+		return Math.sqrt(Math.pow(b1Center.getX() - b2Center.getX(), 2.0)
+				+ Math.pow(b1Center.getY() - b2Center.getY(), 2.0));
+	}
+
 	private static Bounds cloneBounds(Bounds bounds) {
-		double lrx = (bounds.getLowerRight().getX() != null ? bounds.getLowerRight().getX() : 0.0);
-		double lry = (bounds.getLowerRight().getY() != null ? bounds.getLowerRight().getY() : 0.0);
-		double ulx = (bounds.getUpperLeft().getX() != null ? bounds.getUpperLeft().getX() : 0.0);
-		double uly = (bounds.getUpperLeft().getY() != null ? bounds.getUpperLeft().getY() : 0.0);
-		
+		double lrx = (bounds.getLowerRight().getX() != null ? bounds
+				.getLowerRight().getX() : 0.0);
+		double lry = (bounds.getLowerRight().getY() != null ? bounds
+				.getLowerRight().getY() : 0.0);
+		double ulx = (bounds.getUpperLeft().getX() != null ? bounds
+				.getUpperLeft().getX() : 0.0);
+		double uly = (bounds.getUpperLeft().getY() != null ? bounds
+				.getUpperLeft().getY() : 0.0);
+
 		return new Bounds(new Point(lrx, lry), new Point(ulx, uly));
 	}
-	
+
 	private static void setBounds(Bounds bounds, double offsetX, double offsetY) {
 		Point ul = bounds.getUpperLeft();
 		ul.setX(ul.getX() + offsetX);
@@ -68,5 +89,5 @@ public class DiagramHelper {
 		lr.setX(lr.getX() + offsetX);
 		lr.setY(lr.getY() + offsetY);
 	}
-	
+
 }

@@ -28,6 +28,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 
+import de.hpi.bpmn2_0.transformation.Visitor;
+
 
 /**
  * <p>Java class for tThrowEvent complex type.
@@ -84,6 +86,10 @@ public abstract class ThrowEvent
 //    protected List<JAXBElement<? extends EventDefinition>> eventDefinition;
 //    protected List<QName> eventDefinitionRef;
 
+	public void acceptVisitor(Visitor v){
+		v.visitThrowEvent(this);
+	}
+	
     /**
      * Gets the value of the dataInput property.
      * 

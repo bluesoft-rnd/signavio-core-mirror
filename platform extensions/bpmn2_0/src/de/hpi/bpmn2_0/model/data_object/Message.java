@@ -33,6 +33,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 import de.hpi.bpmn2_0.model.FlowElement;
@@ -41,6 +42,7 @@ import de.hpi.bpmn2_0.model.choreography.ChoreographyActivity;
 import de.hpi.bpmn2_0.model.connector.Association;
 import de.hpi.bpmn2_0.model.misc.ItemDefinition;
 import de.hpi.bpmn2_0.model.participant.Participant;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 
 /**
@@ -72,30 +74,12 @@ public class Message
     @XmlIDREF
     protected ItemDefinition structureRef;
     
-    @XmlAttribute
+    @XmlTransient
     private boolean isInitiating;
     
-    
-	/**
-	 * 
-	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
-	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
-	 * 
-	 * Actually, it is useless here, as the message shape is not an element referenced by a BPMNShape... it has to be put manually.
-	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
-	 * 
-	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
-	 */
-//    
-//    public Shape toShape(BPMN2DiagramConverter converterForShapeCoordinateLookup)  {
-//		Shape shape = super.toShape(converterForShapeCoordinateLookup);
-//
-//		shape.setStencil(new StencilType("Message"));
-//        
-//        //shape.putProperty("", );
-//        
-//		return shape;
-//	}
+    public void acceptVisitor(Visitor v) {
+    	v.visitMessage(this);
+    }
     
     /**
      * Retrieves the association edge connecting the message object with an 

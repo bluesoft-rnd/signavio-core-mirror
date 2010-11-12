@@ -35,20 +35,18 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 
-import org.oryxeditor.server.diagram.Shape;
-
 import de.hpi.bpmn2_0.model.activity.Activity;
 import de.hpi.bpmn2_0.model.connector.Association;
 import de.hpi.bpmn2_0.model.connector.AssociationDirection;
 import de.hpi.bpmn2_0.model.connector.Edge;
 import de.hpi.bpmn2_0.model.connector.SequenceFlow;
 import de.hpi.bpmn2_0.model.data_object.AbstractDataObject;
+import de.hpi.bpmn2_0.model.data_object.Message;
 import de.hpi.bpmn2_0.model.event.BoundaryEvent;
 import de.hpi.bpmn2_0.model.event.CompensateEventDefinition;
 import de.hpi.bpmn2_0.model.event.Event;
 import de.hpi.bpmn2_0.model.gateway.Gateway;
-
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 /**
  * <p>
@@ -76,6 +74,7 @@ import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tFlowNode")
 @XmlSeeAlso( { Event.class,
+	Message.class,
 // ChoreographyActivity.class,
 		Gateway.class, Activity.class, AbstractDataObject.class })
 public abstract class FlowNode extends FlowElement {
@@ -109,28 +108,9 @@ public abstract class FlowNode extends FlowElement {
 		super(flowNode);
 	}
 	
-	/**
-	 * 
-	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
-	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
-	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
-	 * 
-	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
-	 */
-    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
-    	Shape shape = super.toShape(converterForShapeCoordinateLookup);
-    	
-    	//more needed here??
-    	for(Edge edge : this.get_outgoingSequenceFlows()) {
-    		shape.getOutgoings().add(new Shape(edge.getId()));
-    	}
-    	
-    	for(Edge edge : this.getOutgoingCompensationFlows()) {
-    		shape.getOutgoings().add(new Shape(edge.getId()));
-    	}
-    	
-    	return shape;
-    }
+	public void acceptVisitor(Visitor v){
+		v.visitBaseElement(this);
+	}
 
 	/**
 	 * Convenience method to retrieve all incoming {@link SequenceFlow}

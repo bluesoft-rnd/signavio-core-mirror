@@ -47,14 +47,14 @@ import javax.xml.bind.annotation.XmlEnumValue;
 @XmlEnum
 public enum MultiInstanceFlowCondition {
 
-    @XmlEnumValue("none")
-    NONE("none"),
-    @XmlEnumValue("one")
-    ONE("one"),
-    @XmlEnumValue("all")
-    ALL("all"),
-    @XmlEnumValue("complex")
-    COMPLEX("complex");
+    @XmlEnumValue("None")
+    NONE("None"),
+    @XmlEnumValue("One")
+    ONE("One"),
+    @XmlEnumValue("All")
+    ALL("All"),
+    @XmlEnumValue("Complex")
+    COMPLEX("Complex");
     private final String value;
 
     MultiInstanceFlowCondition(String v) {

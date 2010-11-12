@@ -31,20 +31,40 @@ import org.oryxeditor.server.diagram.Shape;
 import de.hpi.bpmn2_0.annotations.StencilId;
 import de.hpi.bpmn2_0.exceptions.BpmnConverterException;
 import de.hpi.bpmn2_0.factory.AbstractShapeFactory;
+import de.hpi.bpmn2_0.factory.BPMNElement;
 import de.hpi.bpmn2_0.model.bpmndi.BPMNShape;
+import de.hpi.bpmn2_0.model.extension.signavio.SignavioMessageName;
 import de.hpi.bpmn2_0.model.participant.Participant;
+import de.hpi.bpmn2_0.model.participant.ParticipantMultiplicity;
 
 /**
  * Factory to create participants
  * 
  * @author Sven Wagner-Boysen
- *
+ * 
  */
 @StencilId("ChoreographyParticipant")
 public class ParticipantFactory extends AbstractShapeFactory {
 
-	/* (non-Javadoc)
-	 * @see de.hpi.bpmn2_0.factory.AbstractBpmnFactory#createProcessElement(org.oryxeditor.server.diagram.Shape)
+	
+	@Override
+	public BPMNElement createBpmnElement(Shape shape, BPMNElement parent)
+			throws BpmnConverterException {
+		BPMNElement bpmnElement = super.createBpmnElement(shape, parent);
+		
+		/*
+		 * Check on associated messages
+		 */
+		setMessageVisibility(shape, bpmnElement);
+		
+		return bpmnElement;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seede.hpi.bpmn2_0.factory.AbstractBpmnFactory#createProcessElement(org.
+	 * oryxeditor.server.diagram.Shape)
 	 */
 	// @Override
 	protected Participant createProcessElement(Shape shape)
@@ -54,47 +74,88 @@ public class ParticipantFactory extends AbstractShapeFactory {
 		this.setCommonAttributes(p, shape);
 		p.setId(shape.getResourceId());
 		p.setName(shape.getProperty("name"));
-		
+
 		/* Handle initiating property */
 		String initiating = shape.getProperty("initiating");
-		if(initiating != null)
+		if (initiating != null)
 			p.setInitiating(initiating.equalsIgnoreCase("true"));
-		else 
+		else
 			p.setInitiating(false);
+
+		/* Participant Multiplicity */
+		String isMultipleParticipant = shape.getProperty("multiple_instance");
+		if (isMultipleParticipant != null
+				&& isMultipleParticipant.equals("true")) {
+			ParticipantMultiplicity multiplicit = new ParticipantMultiplicity();
+
+			/* Maximum */
+			String maximum = shape.getProperty("maximum");
+			if (maximum != null) {
+				multiplicit.setMaximum(Integer.valueOf(maximum));
+			}
+
+			/* Minimum */
+			String minimum = shape.getProperty("minimum");
+			if (minimum != null) {
+				multiplicit.setMinimum(Integer.valueOf(minimum));
+			}
+
+			p.setParticipantMultiplicity(multiplicit);
+		}
+
 		return p;
 	}
-	
+
 	// @Override
 	protected BPMNShape createDiagramElement(Shape shape) {
 		BPMNShape bpmnShape = super.createDiagramElement(shape);
-		bpmnShape.setIsMessageVisible(Boolean.valueOf(isMessageVisible(shape)));
 		return bpmnShape;
 	}
-	
+
 	/**
-	 *  Checks whether the message of an participant is visible 
+	 * Checks whether the message of an participant is visible and assigns the
+	 * name tag as a {@link SignavioMessageName} to the {@link Participant}.
 	 */
-	private boolean isMessageVisible(Shape shape) {
+	private Shape getTheVisibleMessage(Shape shape) {
 		/* Navigate in both directions because of undirected association */
 		List<Shape> connectedElements = new ArrayList<Shape>();
 		connectedElements.addAll(shape.getOutgoings());
 		connectedElements.addAll(shape.getIncomings());
-		
-		for(Shape conShape : connectedElements) {
-			if(conShape.getStencilId().equals("Association_Undirected")) {
+
+		for (Shape conShape : connectedElements) {
+			if (conShape.getStencilId().equals("Association_Undirected")) {
 				List<Shape> shapeList = new ArrayList<Shape>();
 				shapeList.addAll(conShape.getIncomings());
 				shapeList.addAll(conShape.getOutgoings());
-				
-				for(Shape msgShape : shapeList) {
-					if(msgShape.getStencilId().equals("Message"))
-						return true;
+
+				for (Shape msgShape : shapeList) {
+					if (msgShape.getStencilId().equals("Message")) {
+
+						return msgShape;
+					}
 				}
 			}
 		}
-		
-		return false;
+
+		return null;
 	}
-	
+
+	private void setMessageVisibility(Shape shape, BPMNElement bpmnElement) {
+		Shape visibleMessage = getTheVisibleMessage(shape);
+		if (visibleMessage != null) {
+			((BPMNShape) bpmnElement.getShape()).setIsMessageVisible(true);
+
+			/*
+			 * Set the message name tag as extension element of the participant
+			 */
+			String name = visibleMessage.getProperty("name");
+			if (name != null && name.length() > 0) {
+				bpmnElement.getNode().getOrCreateExtensionElements().add(
+						new SignavioMessageName(name));
+			}
+		} else {
+			((BPMNShape) bpmnElement.getShape()).setIsMessageVisible(false);
+		}
+	}
 
 }

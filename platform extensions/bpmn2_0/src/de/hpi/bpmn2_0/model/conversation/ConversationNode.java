@@ -1,4 +1,5 @@
 /**
+
  * Copyright (c) 2009
  * Philipp Giese, Sven Wagner-Boysen
  * 
@@ -24,7 +25,6 @@
 package de.hpi.bpmn2_0.model.conversation;
 
 import java.util.ArrayList;
-
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -34,13 +34,10 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
-import org.oryxeditor.server.diagram.Shape;
-
 import de.hpi.bpmn2_0.model.FlowNode;
 import de.hpi.bpmn2_0.model.connector.MessageFlow;
 import de.hpi.bpmn2_0.model.participant.Participant;
-
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 /**
  * <p>
@@ -81,6 +78,19 @@ public abstract class ConversationNode extends FlowNode implements
 
 	@XmlTransient
 	public List<String> participantsIds;
+	
+	/*
+	 * Constructors
+	 */
+
+	public ConversationNode() {
+		super();
+	}
+	
+	public ConversationNode(ConversationNode node) {
+		super(node);
+		
+	}
 
 	/**
 	 * Helper for the import, see {@link FlowElement#isElementWithFixedSize().
@@ -104,38 +114,8 @@ public abstract class ConversationNode extends FlowNode implements
     	return 29.0;
     }
     
-	/**
-	 * 
-	 * Basic method for the conversion of BPMN2.0 to the editor's internal
-	 * format. {@see BaseElement#toShape(BPMN2DiagramConverter)}
-	 * 
-	 * @param converterForShapeCoordinateLookup
-	 *            an instance of {@link BPMN2DiagramConverter}, offering several
-	 *            lookup methods needed for the conversion.
-	 * 
-	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be
-	 *         used for the output. Its bounds are set, as they are fixed in the
-	 *         editor, but not necessarily in external ones.
-	 */
-	public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
-		Shape shape = super.toShape(converterForShapeCoordinateLookup);
-
-		converterForShapeCoordinateLookup.setIsConversation(true);
-
-		// also a fixed size!
-		// width="33.5"
-		// height="29"
-		// > but, gets cut if there is a white rim, so:
-		// y : 0.5 - 28.43 > 27.93
-		// x : 0.578 - 32.828 > 32.250
-		// >> looks better with the SUM of both...
-		// Point upperLeft = shape.getBounds().getUpperLeft();
-
-		// new Bounds(new Point(upperLeft.getX() + 33.5, upperLeft.getY() + 29),
-		// upperLeft)
-		shape.setBounds(getMiddleBounds(this.getStandardWidth(), this.getStandardHeight(), shape.getBounds()));
-
-		return shape;
+	public void acceptVisitor(Visitor v){
+		v.visitConversationNode(this);
 	}
 
 	/**

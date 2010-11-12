@@ -24,18 +24,12 @@
 
 package de.hpi.bpmn2_0.model.event;
 
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.oryxeditor.server.diagram.Shape;
-import org.oryxeditor.server.diagram.StencilType;
-
-
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 /**
  * <p>
@@ -71,70 +65,10 @@ public class EndEvent extends ThrowEvent {
 
 	/* Transformation Methods */
 	
-	/**
-	 * 
-	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
-	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
-	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
-	 * 
-	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
-	 */
-	public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
-		Shape shape = super.toShape(converterForShapeCoordinateLookup);
-
-		List<EventDefinition> eventdef = this.getEventDefinition();
-    	
-    	if(eventdef.size() == 0){
-	   		 shape.setStencil(new StencilType("EndNoneEvent"));
-	   	}
-	   	else if (eventdef.size() == 1){
-	   		EventDefinition e = eventdef.get(0);
-	   		
-			if(e instanceof CancelEventDefinition){shape.setStencil(new StencilType("EndCancelEvent"));
-	   		} else if (e instanceof CompensateEventDefinition){
-	   			shape.setStencil(new StencilType("EndCompensationEvent"));
-	   			putShapeCompensateEventProperties(shape, e);
-	   		//} else if (e instanceof ConditionalEventDefinition){ shape.setStencil(new StencilType(""));
-	   		} else if (e instanceof ErrorEventDefinition){ 
-	   			shape.setStencil(new StencilType("EndErrorEvent"));
-	   			putShapeErrorEventProperties(shape, e);
-	   		} else if (e instanceof EscalationEventDefinition){ 
-	   			shape.setStencil(new StencilType("EndEscalationEvent"));
-	   			putShapeEscalationEventProperties(shape, e);
-	   		} else if (e instanceof EscalationEventDefinition){ 
-	   			shape.setStencil(new StencilType("EndEscalationEvent"));
-	   			putShapeEscalationEventProperties(shape, e);
-	   		//} else if (e instanceof LinkEventDefinition){ shape.setStencil(new StencilType(""));
-	   		} else if (e instanceof MessageEventDefinition){ 
-	   			shape.setStencil(new StencilType("EndMessageEvent"));
-	   			putShapeMessageEventProperties(shape, e);
-	   		} else if (e instanceof SignalEventDefinition){ 
-	   			shape.setStencil(new StencilType("EndSignalEvent"));
-	   			putShapeSignalEventProperties(shape, e);
-	   		} else if (e instanceof TerminateEventDefinition){ shape.setStencil(new StencilType("EndTerminateEvent"));
-	   		//} else if (e instanceof TimerEventDefinition){ shape.setStencil(new StencilType(""));
-	   		}	   
-		}
-	   	else{
-			  shape.setStencil(new StencilType("EndMultipleEvent"));
-			  for(EventDefinition e : eventdef){
-				  if(e instanceof ErrorEventDefinition){
-					putShapeErrorEventProperties(shape, e);
-				  } else if (e instanceof EscalationEventDefinition){ 
-		   			putShapeEscalationEventProperties(shape, e);
-				  } else if (e instanceof EscalationEventDefinition){ 
-			   		putShapeEscalationEventProperties(shape, e);
-				  } else if (e instanceof SignalEventDefinition){ 
-		   			putShapeSignalEventProperties(shape, e);
-		   		  }else if (e instanceof MessageEventDefinition){ 
-		   			putShapeMessageEventProperties(shape, e);
-		   		  } else if (e instanceof CompensateEventDefinition){
-		   			putShapeCompensateEventProperties(shape, e);
-		   		  }
-			  }
-	   	}
-				
-		return shape;
+	public void acceptVisitor(Visitor v){
+		v.visitEndEvent(this);
 	}
+	
+	
 
 }

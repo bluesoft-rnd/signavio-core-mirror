@@ -24,8 +24,6 @@
 package de.hpi.bpmn2_0.model.event;
 
 import java.util.ArrayList;
-
-
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -38,12 +36,8 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.oryxeditor.server.diagram.Shape;
-
-import de.hpi.bpmn2_0.model.Expression;
 import de.hpi.bpmn2_0.model.FlowNode;
-
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 
 
@@ -100,132 +94,10 @@ public abstract class Event
 		this.setEventDefinitionRef(endEvent.getEventDefinitionRef());
 	}
 	
-	/* Transformation Methods */
-
-	/**
-	 * Convenience method for putting shape properties.
-	 * @param shape The editor shape whose properties shall be set.
-	 * @param e An event definition that provides the information for the properties.
-	 */
-	public static void putShapeEscalationEventProperties(Shape shape, EventDefinition e){
-		if(((EscalationEventDefinition) e).getEscalationRef() != null){
-				if(((EscalationEventDefinition) e).getEscalationRef().getName() != null){
-					shape.putProperty("escalationname", ((EscalationEventDefinition) e).getEscalationRef().getName());
-				}
-				if(((EscalationEventDefinition) e).getEscalationRef().getEscalationCode() != null){
-					shape.putProperty("escalationcode", ((EscalationEventDefinition) e).getEscalationRef().getEscalationCode());
-				}
-			}
+	public void acceptVisitor(Visitor v){
+		v.visitEvent(this);
 	}
 	
-	/**
-	 * Convenience method for putting shape properties.
-	 * @param shape The editor shape whose properties shall be set.
-	 * @param e An event definition that provides the information for the properties.
-	 */
-	public static void putShapeErrorEventProperties(Shape shape, EventDefinition e){
-		if(((ErrorEventDefinition) e).getError() != null){
-			if(((ErrorEventDefinition) e).getError().getName() != null)
-				shape.putProperty("errorname", ((ErrorEventDefinition) e).getError().getName());
-			if(((ErrorEventDefinition) e).getError().getErrorCode() != null)
-   				shape.putProperty("errorcode", ((ErrorEventDefinition) e).getError().getErrorCode());
-		}
-	}
-	
-	/**
-	 * Convenience method for putting shape properties.
-	 * @param shape The editor shape whose properties shall be set.
-	 * @param e An event definition that provides the information for the properties.
-	 */
-	public static void putShapeSignalEventProperties(Shape shape, EventDefinition e){
-		if(((SignalEventDefinition) e).getSignalRef() != null)
-			if(((SignalEventDefinition) e).getSignalRef().getName() != null)
-				shape.putProperty("signalname", ((SignalEventDefinition) e).getSignalRef().getName());
-	}
-	
-	/**
-	 * Convenience method for putting shape properties.
-	 * @param shape The editor shape whose properties shall be set.
-	 * @param e An event definition that provides the information for the properties.
-	 */
-	public static void putShapeTimerEventProperties(Shape shape, EventDefinition e){
-		if(((TimerEventDefinition) e).getTimeCycle() != null){
-			Expression timecycle = ((TimerEventDefinition) e).getTimeCycle();
-			if(timecycle.toExportString() != null){
-				shape.putProperty("timecycle", timecycle.toExportString());
-			}
-		}
-		
-		if(((TimerEventDefinition) e).getTimeDuration() != null){
-			Expression timeduration = ((TimerEventDefinition) e).getTimeDuration();
-			if(timeduration.toExportString() != null){
-				shape.putProperty("timeduration", timeduration.toExportString());
-			}
-		}
-		
-		if(((TimerEventDefinition) e).getTimeDate() != null){
-			Expression timedate = ((TimerEventDefinition) e).getTimeDate();
-			if(timedate.toExportString() != null){
-				shape.putProperty("timedate", timedate.toExportString());
-			}
-		}
-	}
-	
-	/**
-	 * Convenience method for putting shape properties.
-	 * @param shape The editor shape whose properties shall be set.
-	 * @param e An event definition that provides the information for the properties.
-	 */
-	public static void putShapeMessageEventProperties(Shape shape, EventDefinition e){
-		if(((MessageEventDefinition) e).getOperationRef() != null){
-			if(((MessageEventDefinition) e).getOperationRef().getName() != null)
-				shape.putProperty("operationname", ((MessageEventDefinition) e).getOperationRef().getName());
-		}
-		
-		if(((MessageEventDefinition) e).getMessageRef() != null){
-			if(((MessageEventDefinition) e).getMessageRef().getName() != null)
-				shape.putProperty("messagename", ((MessageEventDefinition) e).getMessageRef().getName());
-		}
-	}
-	
-	/**
-	 * Convenience method for putting shape properties.
-	 * @param shape The editor shape whose properties shall be set.
-	 * @param e An event definition that provides the information for the properties.
-	 */
-	public static void putShapeConditionalEventProperties(Shape shape, EventDefinition e){
-		if(((ConditionalEventDefinition) e).getCondition() != null){
-			if(((ConditionalEventDefinition) e).getCondition().toExportString() != null)
-				shape.putProperty("condition", ((ConditionalEventDefinition) e).getCondition().toExportString());
-		}
-	}
-	
-	/**
-	 * Convenience method for putting shape properties.
-	 * @param shape The editor shape whose properties shall be set.
-	 * @param e An event definition that provides the information for the properties.
-	 */
-	public static void putShapeLinkEventProperties(Shape shape, EventDefinition e){
-		//((LinkEventDefinition) e).getName();
-		//There is no consensus on how to do this; we just set the name, which has already been done.
-		//TODO: update if the standard changes...
-	}
-	
-	/**
-	 * Convenience method for putting shape properties.
-	 * @param shape The editor shape whose properties shall be set.
-	 * @param e An event definition that provides the information for the properties.
-	 */
-	public static void putShapeCompensateEventProperties(Shape shape, EventDefinition e){
-		if(((CompensateEventDefinition)e).isWaitForCompletion() != null){
-			shape.putProperty("waitforcompletion", ((CompensateEventDefinition)e).isWaitForCompletion().toString());
-		}
-		
-		if(((CompensateEventDefinition)e).getActivityRef() != null){
-			if(((CompensateEventDefinition)e).getActivityRef().getId() != null)
-				shape.putProperty("activityref", ((CompensateEventDefinition)e).getActivityRef().getId());
-		}		
-	}
 	
 	/**
 	 * Helper for the import, see {@link FlowElement#isElementWithFixedSize().
@@ -247,30 +119,6 @@ public abstract class Event
      */
     public double getStandardHeight(){
     	return 28.0;
-    }
-	
-	/**
-	 * 
-	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
-	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
-	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
-	 * 
-	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
-	 */
-	public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
-    	Shape shape = super.toShape(converterForShapeCoordinateLookup);
-    	
-    	//has been moved to BPMNShape
-    	
-//    	if(!(this instanceof BoundaryEvent) && !(this instanceof IntermediateCatchEvent) && !(this instanceof IntermediateThrowEvent)){
-//	    	Bounds thisBpmnShapeBounds = converterForShapeCoordinateLookup.getBpmnShapeByID(this.getId()).getBounds();
-//	    	shape.getDockers().add(new Point(thisBpmnShapeBounds.getX() + 15, 
-//	    			thisBpmnShapeBounds.getY() + 15));
-//    	}
-    	
-    	shape.setBounds(getMiddleBounds(this.getStandardWidth(), this.getStandardHeight(), shape.getBounds()));
-    	
-    	return shape;
     }
 	
 	/**

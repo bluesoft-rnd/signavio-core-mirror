@@ -164,6 +164,19 @@ public class LaneSet
 		return laneList;
 	}
 	
+	/**
+	 * Removes the child element from the underling lanes and child lane sets.
+	 * @param child
+	 */
+	public void removeChild(BaseElement child) {
+		for(Lane lane : this.getLanes()) {
+			lane.getFlowNodeRef().remove(child);
+			if(lane.childLaneSet != null) {
+				lane.getChildLaneSet(false).removeChild(child);
+			}
+		}
+	}
+	
 //	/**
 //	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
 //	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}

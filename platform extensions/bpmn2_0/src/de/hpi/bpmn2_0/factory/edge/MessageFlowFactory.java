@@ -28,7 +28,11 @@ import org.oryxeditor.server.diagram.Shape;
 import de.hpi.bpmn2_0.annotations.StencilId;
 import de.hpi.bpmn2_0.exceptions.BpmnConverterException;
 import de.hpi.bpmn2_0.factory.AbstractEdgesFactory;
+import de.hpi.bpmn2_0.factory.BPMNElement;
+import de.hpi.bpmn2_0.model.bpmndi.BPMNEdge;
+import de.hpi.bpmn2_0.model.bpmndi.di.MessageVisibleKind;
 import de.hpi.bpmn2_0.model.connector.MessageFlow;
+import de.hpi.bpmn2_0.model.data_object.Message;
 
 /**
  * Factory that creates {@link MessageFlow}
@@ -40,6 +44,36 @@ import de.hpi.bpmn2_0.model.connector.MessageFlow;
 @StencilId("MessageFlow")
 public class MessageFlowFactory extends AbstractEdgesFactory {
 
+	@Override
+	public BPMNElement createBpmnElement(Shape shape, BPMNElement parent)
+			throws BpmnConverterException {
+		BPMNElement element = super.createBpmnElement(shape, parent);
+		
+		for(Shape child : shape.getChildShapes()) {
+			if(child.getStencilId().equals("Message")) {
+				Message m = new Message();
+				
+				/* Name value */
+				String name = child.getProperty("name");
+				if(name != null && name.length() > 0) {
+					m.setName(name);
+				}
+				
+				((MessageFlow) element.getNode()).setMessageRef(m);
+				
+				/* Initiating */
+				String initiating = shape.getProperty("initiating");
+				if(initiating != null && initiating.equals("false")) {
+					((BPMNEdge) element.getShape()).setMessageVisibleKind(MessageVisibleKind.NON_INITIATING);
+				} else {
+					((BPMNEdge) element.getShape()).setMessageVisibleKind(MessageVisibleKind.INITIATING);
+				}
+			}
+		}
+		
+		return element;
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.hpi.bpmn2_0.factory.AbstractBpmnFactory#createProcessElement(org.oryxeditor.server.diagram.Shape)
 	 */

@@ -27,13 +27,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.oryxeditor.server.diagram.Shape;
 
 import de.hpi.bpmn2_0.annotations.Property;
 import de.hpi.bpmn2_0.annotations.StencilId;
 import de.hpi.bpmn2_0.exceptions.BpmnConverterException;
+import de.hpi.bpmn2_0.factory.configuration.Configuration;
 import de.hpi.bpmn2_0.factory.edge.AssociationFactory;
 import de.hpi.bpmn2_0.factory.edge.ConversationLinkFactory;
 import de.hpi.bpmn2_0.factory.edge.MessageFlowFactory;
@@ -62,6 +66,9 @@ import de.hpi.bpmn2_0.model.BaseElement;
 import de.hpi.bpmn2_0.model.Documentation;
 import de.hpi.bpmn2_0.model.FlowElement;
 import de.hpi.bpmn2_0.model.bpmndi.di.DiagramElement;
+import de.hpi.bpmn2_0.model.extension.ExtensionElements;
+import de.hpi.bpmn2_0.model.extension.signavio.SignavioLabel;
+import de.hpi.bpmn2_0.model.extension.signavio.SignavioMetaData;
 import de.hpi.bpmn2_0.model.misc.Auditing;
 import de.hpi.bpmn2_0.model.misc.Monitoring;
 
@@ -242,4 +249,50 @@ public abstract class AbstractBpmnFactory {
 		throw new BpmnConverterException("Creator method for shape with id "
 				+ shape.getStencilId() + " not found");
 	}
+	
+	
+	public BPMNElement createBpmnElement(Shape shape, Configuration configuration) throws BpmnConverterException {
+		BPMNElement bpmnElement = createBpmnElement(shape, new BPMNElement(null, null, null));
+		bpmnElement.getNode()._diagramElement = bpmnElement.getShape();
+		
+		setCustomAttributes(shape, bpmnElement.getNode(), configuration.getMetaData());
+		
+		return bpmnElement;
+	}
+	
+	private void setCustomAttributes(Shape shape, BaseElement node, Map<String, Set<String>> metaData) {
+		if(shape == null || node == null || metaData == null) 
+			return;
+		
+		Set<String> attributeNames = metaData.get(shape.getStencilId());
+		if(attributeNames == null) {
+			return;
+		}
+		
+		ExtensionElements extElements = node.getOrCreateExtensionElements();
+		
+		Iterator<String> iterator = attributeNames.iterator();
+		while(iterator.hasNext()) {
+			String attributeKey = iterator.next();
+			String attributeValue = shape.getProperty(attributeKey);
+			
+			SignavioMetaData sigMetaData = new SignavioMetaData(attributeKey, attributeValue);
+			
+			extElements.getAny().add(sigMetaData);
+		}
+	}
+	
+	protected void setLabelPositionInfo(Shape shape, BaseElement node) {
+		if(shape == null || node == null || shape.getLabels().isEmpty()) {
+			return;
+		}
+		
+		ExtensionElements extElements = node.getOrCreateExtensionElements();
+		
+		for(Map<String, String> labelPosition : shape.getLabels()) {
+			SignavioLabel label = new SignavioLabel(labelPosition);
+			extElements.getAny().add(label);
+		}
+	}
+	
 }

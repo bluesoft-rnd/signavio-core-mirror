@@ -37,6 +37,7 @@ import de.hpi.bpmn2_0.model.FlowNode;
 import de.hpi.bpmn2_0.model.Process;
 import de.hpi.bpmn2_0.model.connector.Edge;
 import de.hpi.bpmn2_0.model.conversation.ConversationElement;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 
 /**
@@ -153,6 +154,10 @@ public abstract class Artifact
 		}
 
 		return null;
+	}
+	
+	public void acceptVisitor(Visitor v){
+		v.visitArtifact(this);
 	}
 	
 	/**

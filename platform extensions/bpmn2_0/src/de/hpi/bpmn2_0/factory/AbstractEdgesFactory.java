@@ -59,6 +59,8 @@ public abstract class AbstractEdgesFactory extends AbstractBpmnFactory {
 		BPMNEdge diaElement = this.createDiagramElement(shape);
 		BaseElement processElement = this.createProcessElement(shape);
 		diaElement.setBpmnElement(processElement);
+		
+		super.setLabelPositionInfo(shape, processElement);
 
 		BPMNElement bpmnElement = new BPMNElement(diaElement, processElement,
 				shape.getResourceId());
@@ -186,12 +188,18 @@ public abstract class AbstractEdgesFactory extends AbstractBpmnFactory {
 		if (edge.getIncomings() == null) {
 			return null;
 		}
-
+		
+		/* Prefer shape instead of edges */
 		for (Shape incoming : edge.getIncomings()) {
 			if (!Diagram2BpmnConverter.edgeIds
 					.contains(incoming.getStencilId())) {
 				return incoming;
 			}
+		}
+		
+		/* Select the first incoming as source shape otherwise */
+		if(!edge.getIncomings().isEmpty()) {
+			return edge.getIncomings().get(0);
 		}
 
 		return null;

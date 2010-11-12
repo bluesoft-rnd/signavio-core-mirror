@@ -31,6 +31,7 @@ import de.hpi.bpmn2_0.factory.AbstractShapeFactory;
 import de.hpi.bpmn2_0.model.activity.Task;
 import de.hpi.bpmn2_0.model.activity.misc.Operation;
 import de.hpi.bpmn2_0.model.data_object.Message;
+import de.hpi.bpmn2_0.model.event.CancelEventDefinition;
 import de.hpi.bpmn2_0.model.event.CompensateEventDefinition;
 import de.hpi.bpmn2_0.model.event.Escalation;
 import de.hpi.bpmn2_0.model.event.EscalationEventDefinition;
@@ -38,6 +39,7 @@ import de.hpi.bpmn2_0.model.event.IntermediateThrowEvent;
 import de.hpi.bpmn2_0.model.event.LinkEventDefinition;
 import de.hpi.bpmn2_0.model.event.MessageEventDefinition;
 import de.hpi.bpmn2_0.model.event.SignalEventDefinition;
+import de.hpi.bpmn2_0.model.event.TerminateEventDefinition;
 import de.hpi.bpmn2_0.model.misc.Signal;
 import de.hpi.diagram.SignavioUUID;
 
@@ -87,7 +89,8 @@ public class IntermediateThrowEventFactory extends AbstractShapeFactory {
 	}
 	
 	@StencilId("IntermediateMessageEventThrowing")
-	public IntermediateThrowEvent createIntermediateMessageEvent(Shape shape) {
+	public IntermediateThrowEvent createIntermediateMessageEvent(Shape shape) 
+		throws BpmnConverterException {
 		IntermediateThrowEvent itEvent = new IntermediateThrowEvent();
 
 		MessageEventDefinition msgDef = new MessageEventDefinition();
@@ -151,6 +154,12 @@ public class IntermediateThrowEventFactory extends AbstractShapeFactory {
 		if(name != null && !(name.length() == 0))
 			linkDef.setName(name);
 		
+		/* Set target reference */
+		String targetEntry = shape.getProperty("entry");
+		if(targetEntry != null && targetEntry.length() != 0) {
+			linkDef.setTarget(targetEntry);
+		}
+		
 		itEvent.getEventDefinition().add(linkDef);
 		
 		return itEvent;
@@ -210,6 +219,9 @@ public class IntermediateThrowEventFactory extends AbstractShapeFactory {
 	@StencilId("IntermediateMultipleEventThrowing")
 	public IntermediateThrowEvent createIntermediateMultipleEvent(Shape shape) {
 		IntermediateThrowEvent itEvent = new IntermediateThrowEvent();
+		
+		itEvent.getEventDefinition().add(new CancelEventDefinition());
+		itEvent.getEventDefinition().add(new TerminateEventDefinition());
 		
 		return itEvent;
 	}

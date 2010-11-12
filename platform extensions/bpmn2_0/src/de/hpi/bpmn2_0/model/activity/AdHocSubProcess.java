@@ -24,17 +24,14 @@
 package de.hpi.bpmn2_0.model.activity;
 
 import javax.xml.bind.annotation.XmlAccessType;
-
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.oryxeditor.server.diagram.Shape;
-
 import de.hpi.bpmn2_0.model.AdHocOrdering;
 import de.hpi.bpmn2_0.model.FormalExpression;
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 
 /**
@@ -73,22 +70,8 @@ public class AdHocSubProcess
     @XmlAttribute
     protected AdHocOrdering ordering;
     
-    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
-		Shape shape = super.toShape(converterForShapeCoordinateLookup);
-		
-		shape.putProperty("isadhoc", "true");
-		if(this.getOrdering() != null){
-			if(this.getOrdering().equals(AdHocOrdering.PARALLEL)){
-				shape.putProperty("adhocordering", "parallel");
-			} else if(this.getOrdering().equals(AdHocOrdering.SEQUENTIAL)){
-				shape.putProperty("adhocordering", "sequential");
-			} 
-		}
-		if(this.isCancelRemainingInstances()){
-			shape.putProperty("adhoccancelremaininginstances", "true");
-		}
-		
-		return shape;
+	public void acceptVisitor(Visitor v){
+		v.visitAdHocSubProcess(this);
 	}
 
     /**

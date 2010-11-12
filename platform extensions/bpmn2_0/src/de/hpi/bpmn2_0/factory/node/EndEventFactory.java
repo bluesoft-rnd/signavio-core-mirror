@@ -165,7 +165,7 @@ public class EndEventFactory extends AbstractShapeFactory {
 			error.setErrorCode(errorCode);
 		}
 		
-		errorEventDef.setError(error);
+		errorEventDef.setErrorRef(error);
 		
 		endEvent.getEventDefinition().add(errorEventDef);
 		
@@ -235,6 +235,9 @@ public class EndEventFactory extends AbstractShapeFactory {
 	@StencilId("EndMultipleEvent")
 	public EndEvent createEndMultipleEvent(Shape shape) {
 		EndEvent endEvent = new EndEvent();
+		
+		endEvent.getEventDefinition().add(new CancelEventDefinition());
+		endEvent.getEventDefinition().add(new TerminateEventDefinition());
 		
 		return endEvent;
 	}

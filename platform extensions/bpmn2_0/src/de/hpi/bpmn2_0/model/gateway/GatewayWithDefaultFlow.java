@@ -27,10 +27,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlSchemaType;
 
-import org.oryxeditor.server.diagram.Shape;
-
 import de.hpi.bpmn2_0.model.connector.SequenceFlow;
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 /**
  * This class summarizes {@link Gateway} that associate a default
@@ -63,22 +61,8 @@ public abstract class GatewayWithDefaultFlow extends Gateway {
 		return null;
 	}
     
-    /**
-	 * 
-	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
-	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
-	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
-	 * 
-	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
-	 */
-    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup)  {
-		Shape shape = super.toShape(converterForShapeCoordinateLookup);
-
-		if(this.getDefault() != null){
-			shape.putProperty("defaultgate", this.getDefault().getId());
-		}
-       
-		return shape;
+	public void acceptVisitor(Visitor v){
+		v.visitGatewayWithDefaultFlow(this);
 	}
     
     /* Getter & Setter */

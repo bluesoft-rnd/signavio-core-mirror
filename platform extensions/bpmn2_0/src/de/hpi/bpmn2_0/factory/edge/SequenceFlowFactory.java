@@ -65,16 +65,17 @@ public class SequenceFlowFactory extends AbstractEdgesFactory {
 			seqFlow.setDefaultSequenceFlow(true);
 		}
 		
-		/*
-		 * Copy condition expression to name attribute, because many tools only
-		 * display the name property
-		 */
-		if((seqFlow.getName() == null || seqFlow.getName().length() == 0)
-				&& seqFlow.getConditionExpression() != null) {
-			String condition = seqFlow.getConditionExpression().toExportString();
-			if(condition != null)
-				seqFlow.setName(condition);
-		}
+		/* Unnecessary since migration is doing the same */
+//		/*
+//		 * Copy condition expression to name attribute, because many tools only
+//		 * display the name property
+//		 */
+//		if((seqFlow.getName() == null || seqFlow.getName().length() == 0)
+//				&& seqFlow.getConditionExpression() != null) {
+//			String condition = seqFlow.getConditionExpression().toExportString();
+//			if(condition != null)
+//				seqFlow.setName(condition);
+//		}
 		
 		/* IsImmediate Property */
 		String isImmediate = shape.getProperty("isimmediate");

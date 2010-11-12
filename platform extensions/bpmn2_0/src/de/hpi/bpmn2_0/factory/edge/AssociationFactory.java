@@ -70,7 +70,7 @@ public class AssociationFactory extends AbstractEdgesFactory {
 		if (associationType.equals(AssociationType.ASSOCIATION)) {
 			Association association = new Association();
 			association.setId(shape.getResourceId());
-			association.setName(shape.getProperty("name"));
+			association.setName(shape.getProperty("text"));
 			association.setAssociationDirection(this
 					.getAssociationDirectionFromShape(shape));
 			return association;
@@ -143,7 +143,8 @@ public class AssociationFactory extends AbstractEdgesFactory {
 
 		/* Determine the appropriate association type */
 		if (stencilId.equals("Association_Bidirectional"))
-			return AssociationType.DATA;
+//			return AssociationType.DATA;
+			return AssociationType.ASSOCIATION;
 		else if (stencilId.equals("Association_Unidirectional")
 				&& (targetId.equals("DataObject") || targetId
 						.equals("DataStore")))
@@ -153,12 +154,13 @@ public class AssociationFactory extends AbstractEdgesFactory {
 						.contains("DataStore")))
 			return AssociationType.DATA_INPUT;
 		else if (stencilId.equals("Association_Undirectional")
-				&& ((sourceIds.contains("DataObject") || sourceIds
+				/*&& ((sourceIds.contains("DataObject") || sourceIds
 						.contains("DataStore")) && targetId
 						.equals("SequenceFlow"))
 				|| (sourceIds.contains("SequenceFlow") && (targetId
-						.equals("DataStore") || targetId.equals("DataObject"))))
-			return AssociationType.DATA;
+						.equals("DataStore") || targetId.equals("DataObject")))*/)
+//			return AssociationType.DATA;
+			return AssociationType.ASSOCIATION;
 		else
 			return AssociationType.ASSOCIATION;
 	}

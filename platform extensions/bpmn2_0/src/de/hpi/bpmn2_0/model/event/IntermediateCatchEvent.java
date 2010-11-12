@@ -23,8 +23,6 @@
 
 package de.hpi.bpmn2_0.model.event;
 
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -32,11 +30,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
-import org.oryxeditor.server.diagram.Shape;
-import org.oryxeditor.server.diagram.StencilType;
-
-
-import de.hpi.bpmn2_0.transformation.BPMN2DiagramConverterI;
+import de.hpi.bpmn2_0.transformation.Visitor;
 
 
 /**
@@ -65,90 +59,10 @@ public class IntermediateCatchEvent
 	@XmlTransient
 	protected String cancelActivity;
 	
-	/**
-	 * 
-	 * Basic method for the conversion of BPMN2.0 to the editor's internal format. 
-	 * {@see BaseElement#toShape(BPMN2DiagramConverter)}
-	 * @param converterForShapeCoordinateLookup an instance of {@link BPMN2DiagramConverter}, offering several lookup methods needed for the conversion.
-	 * 
-	 * @return Instance of org.oryxeditor.server.diagram.Shape, that will be used for the output. 
-	 */
-    public Shape toShape(BPMN2DiagramConverterI converterForShapeCoordinateLookup) {
-    	Shape shape = super.toShape(converterForShapeCoordinateLookup);
-
-    	List<EventDefinition> eventdef = this.getEventDefinition();
-    	
-    	
-    	if(eventdef.size() == 0){
-	   		 shape.setStencil(new StencilType("StartNoneEvent"));
-	   	}
-	   	else if (eventdef.size() == 1){
-	   		EventDefinition e = eventdef.get(0);
-            
-	   		if(e instanceof CancelEventDefinition){ shape.setStencil(new StencilType("IntermediateCancelEvent"));
-	   		} else if (e instanceof CompensateEventDefinition){ 
-	   			shape.setStencil(new StencilType("IntermediateCompensationEventCatching"));
-	   			putShapeCompensateEventProperties(shape, e);
-	   		} else if (e instanceof ConditionalEventDefinition){ 
-	   			shape.setStencil(new StencilType("IntermediateConditionalEvent"));
-	   			putShapeConditionalEventProperties(shape, e);
-	   		} else if (e instanceof ErrorEventDefinition){ 
-	   			shape.setStencil(new StencilType("IntermediateErrorEvent"));
-	   			putShapeErrorEventProperties(shape, e);
-	   		} else if (e instanceof EscalationEventDefinition){ 
-	   			shape.setStencil(new StencilType("IntermediateEscalationEvent"));
-	   			putShapeEscalationEventProperties(shape, e);
-	   		} else if (e instanceof EscalationEventDefinition){ 
-	   			shape.setStencil(new StencilType("IntermediateEscalationEvent"));
-	   			putShapeEscalationEventProperties(shape, e);
-	   		} else if (e instanceof LinkEventDefinition){ 
-	   			shape.setStencil(new StencilType("IntermediateLinkEventCatching"));
-	   			putShapeLinkEventProperties(shape, e);
-	   		} else if (e instanceof MessageEventDefinition){ 
-	   			shape.setStencil(new StencilType("IntermediateMessageEventCatching"));
-	   			putShapeMessageEventProperties(shape, e);
-	   		} else if (e instanceof SignalEventDefinition){ 
-	   			shape.setStencil(new StencilType("IntermediateSignalEventCatching"));
-	   			putShapeSignalEventProperties(shape, e);
-	   		//} else if (e instanceof TerminateEventDefinition){ shape.setStencil(new StencilType(""));
-	   		} else if (e instanceof TimerEventDefinition){ 
-	   			shape.setStencil(new StencilType("IntermediateTimerEvent"));
-	   			putShapeTimerEventProperties(shape, e);
-	   		}
-	   	}
-	   	else{
-	   		
-	   	 	if(this.isParallelMultiple()){
-   	 		  shape.setStencil(new StencilType("IntermediateParallelMultipleEventCatching"));
-	   	 	}	   	 	  
-	   	 	else{
-   			  shape.setStencil(new StencilType("IntermediateMultipleEventCatching"));
-	   		}
-	   	 	
-	   	 for(EventDefinition e : eventdef){
-	   		if (e instanceof CompensateEventDefinition){ 
-	   			putShapeCompensateEventProperties(shape, e);
-	   		} else if (e instanceof ConditionalEventDefinition){ 
-	   			putShapeConditionalEventProperties(shape, e);
-	   		} else if (e instanceof ErrorEventDefinition){ 
-	   			putShapeErrorEventProperties(shape, e);
-	   		} else if (e instanceof EscalationEventDefinition){ 
-	   			putShapeEscalationEventProperties(shape, e);
-	   		} else if (e instanceof EscalationEventDefinition){ 
-	   			putShapeEscalationEventProperties(shape, e);
-	   		} else if (e instanceof LinkEventDefinition){ 
-	   			putShapeLinkEventProperties(shape, e);
-	   		} else if (e instanceof MessageEventDefinition){ 
-	   			putShapeMessageEventProperties(shape, e);
-	   		} else if (e instanceof SignalEventDefinition){ 
-	   			putShapeSignalEventProperties(shape, e);
-	   		} else if (e instanceof TimerEventDefinition){ 
-	   			putShapeTimerEventProperties(shape, e);
-	   		}
-		  }
-	   	}
-    	return shape;
-    }
+	
+	public void acceptVisitor(Visitor v){
+		v.visitIntermediateCatchEvent(this);
+	}
     
 	/**
 	 * Avoid null values.
