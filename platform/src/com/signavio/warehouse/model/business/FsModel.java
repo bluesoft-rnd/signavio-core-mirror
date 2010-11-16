@@ -22,6 +22,7 @@
 package com.signavio.warehouse.model.business;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -152,8 +153,14 @@ public class FsModel extends FsSecureBusinessObject {
 	}
 
 	public FsDirectory getParentDirectory() {
-		if (FsRootDirectory.getSingleton().getPath().replaceAll("[\\\\/]", "/").equals(pathPrefix.replaceAll("[\\\\/]", "/"))){
-			return FsRootDirectory.getSingleton();
+		File rootDir = new File(FsRootDirectory.getSingleton().getPath());
+		File parentDir = new File(pathPrefix);
+		try {
+			if (rootDir.getCanonicalPath().equals(parentDir.getCanonicalPath())){
+				return FsRootDirectory.getSingleton();
+			}
+		} catch (IOException e) {
+			throw new IllegalArgumentException("Cannot determine canonical path.", e);
 		}
 		return new FsDirectory(pathPrefix);
 	}

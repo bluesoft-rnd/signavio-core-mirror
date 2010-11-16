@@ -23,6 +23,7 @@ package com.signavio.warehouse.directory.business;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -140,8 +141,14 @@ public class FsDirectory extends FsSecureBusinessObject {
 	}
 
 	public FsDirectory getParentDirectory() {
-		if (FsRootDirectory.getSingleton().getPath().replaceAll("[\\\\/]", "/").equals(getPathPrefix().replaceAll("[\\\\/]", "/"))){
-			return FsRootDirectory.getSingleton();
+		File rootDir = new File(FsRootDirectory.getSingleton().getPath());
+		File parentDir = new File(getPathPrefix());
+		try {
+			if (rootDir.getCanonicalPath().equals(parentDir.getCanonicalPath())){
+				return FsRootDirectory.getSingleton();
+			}
+		} catch (IOException e) {
+			throw new IllegalArgumentException("Cannot determine canonical path.", e);
 		}
 		return new FsDirectory(getPathPrefix());
 	}
