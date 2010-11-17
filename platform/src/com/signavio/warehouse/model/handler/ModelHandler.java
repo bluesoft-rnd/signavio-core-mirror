@@ -193,8 +193,8 @@ public class ModelHandler extends BasisHandler {
 				description = model.getDescription();
 				type = model.getType();
 				comment = "";
-				jsonRep = new String(model.getHeadRevision().getRepresentation(RepresentationType.JSON).getContent());
-				svgRep = new String(model.getHeadRevision().getRepresentation(RepresentationType.SVG).getContent());
+				jsonRep = new String(model.getHeadRevision().getRepresentation(RepresentationType.JSON).getContent(), "utf-8");
+				svgRep = new String(model.getHeadRevision().getRepresentation(RepresentationType.SVG).getContent(), "utf-8");
 			} else {
 				name = jsonParams.getString("name");
 				description = jsonParams.getString("description");
@@ -211,6 +211,8 @@ public class ModelHandler extends BasisHandler {
 			
 		} catch (JSONException e) {
 			throw new RequestException("invalid_request_missing_parameter ", e);
+		} catch (UnsupportedEncodingException e) {
+			throw new RequestException("unsupported_encoding ", e);
 		}
 		
 		FsModel model;

@@ -22,6 +22,7 @@
 package com.signavio.warehouse.model.business.modeltype;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 
 import com.signavio.platform.util.fsbackend.FileSystemUtil;
 import com.signavio.warehouse.model.business.FsModel;
@@ -66,35 +67,47 @@ public class SignavioModelType implements ModelType {
 	}
 
 	public byte[] getRepresentationInfoFromModelFile(RepresentationType type, String path) {
-		switch (type) {
-		case JSON :
-			String json = FileSystemUtil.readXmlNodeChildFromFile(XPATH_PREFIX + JSON_ElEMENT_NAME, path, null);
-			if (json != null) {
-				return json.getBytes();
+		try {
+			switch (type) {
+			case JSON :
+				String json = FileSystemUtil.readXmlNodeChildFromFile(XPATH_PREFIX + JSON_ElEMENT_NAME, path, null);
+				if (json != null) {
+					return json.getBytes("utf-8");
+				}
+				break;
+			case SVG :
+				String svg = FileSystemUtil.readXmlNodeChildFromFile(XPATH_PREFIX + SVG_ElEMENT_NAME, path, null);
+				if (svg != null) {
+					
+						return svg.getBytes("utf-8");
+					
+				}
+				break;
 			}
-			break;
-		case SVG :
-			String svg = FileSystemUtil.readXmlNodeChildFromFile(XPATH_PREFIX + SVG_ElEMENT_NAME, path, null);
-			if (svg != null) {
-				return svg.getBytes();
-			}
-			break;
+		} catch (UnsupportedEncodingException e) {
+			throw new IllegalStateException("Could not read data from file", e);
 		}
 		System.out.println("Failed to return reprensentation of type " + type);
 		return null;
 	}
 	
 	public void storeRepresentationInfoToModelFile(RepresentationType type, byte[] content, String path) {
-		if (RepresentationType.JSON == type){
-			if (!FileSystemUtil.writeXmlNodeChildToFile(JSON_ElEMENT_NAME, new String(content), false, path)) {
-				throw new IllegalStateException("Could not write new revision data to file");
+		try {
+			if (RepresentationType.JSON == type){
+				if (!FileSystemUtil.writeXmlNodeChildToFile(JSON_ElEMENT_NAME, new String(content, "utf-8"), false, path)) {
+					throw new IllegalStateException("Could not write new revision data to file");
+				}
+			} else if (RepresentationType.SVG == type) {
+				
+					if (!FileSystemUtil.writeXmlNodeChildToFile(SVG_ElEMENT_NAME, new String(content, "utf-8"), true, path)) {
+						throw new IllegalStateException("Could not write new revision data to file");
+					}
+				
+			} else  {
+				System.out.println("Imitated creation of reprensentation of type " + type);
 			}
-		} else if (RepresentationType.SVG == type) {
-			if (!FileSystemUtil.writeXmlNodeChildToFile(SVG_ElEMENT_NAME, new String(content), true, path)) {
-				throw new IllegalStateException("Could not write new revision data to file");
-			}
-		} else  {
-			System.out.println("Imitated creation of reprensentation of type " + type);
+		} catch (UnsupportedEncodingException e) {
+			throw new IllegalStateException("Could not write new revision data to file", e);
 		}
 	}
 

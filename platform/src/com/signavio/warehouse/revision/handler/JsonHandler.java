@@ -21,6 +21,8 @@
  */
 package com.signavio.warehouse.revision.handler;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.servlet.ServletContext;
 
 import org.json.JSONException;
@@ -59,7 +61,7 @@ public class JsonHandler extends AbstractRevisionExportHandler {
  				JSONObject p = (JSONObject) params;
  				if (p.has("jsonp")){
  					String prepend = (String) p.get("jsonp");
- 					return  (prepend + "(" + new String(rep.getContent()) + ")").getBytes();
+ 					return  (prepend + "(" + new String(rep.getContent(), "utf-8") + ")").getBytes("utf-8");
  				} else {
  					return rep.getContent();
  				}
@@ -67,6 +69,8 @@ public class JsonHandler extends AbstractRevisionExportHandler {
 				
 			} catch (JSONException e) {
 				return rep.getContent();
+			} catch (UnsupportedEncodingException e) {
+				throw new IllegalStateException("Could not read data", e);
 			}
   			
 

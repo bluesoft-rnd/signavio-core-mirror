@@ -24,6 +24,7 @@ package com.signavio.warehouse.model.business.modeltype;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -82,7 +83,7 @@ public class JpdlModelType implements ModelType {
 				DocumentBuilder builder = factory.newDocumentBuilder();
 				Document jpdlDoc = builder.parse(new File(path));	
 				String result = JpdlToJson.transform(jpdlDoc);
-				return result.getBytes();
+				return result.getBytes("utf-8");
 			} catch (ParserConfigurationException e) {
 				e.printStackTrace();
 			} catch (SAXException e) {
@@ -105,8 +106,9 @@ public class JpdlModelType implements ModelType {
 			File f = new File(path);
 			String name = f.getName();
 			name = name.substring(0, name.length() - this.getClass().getAnnotation(ModelTypeFileExtension.class).fileExtension().length());
-			String result = getNewModelString(new String(content), name, getDescriptionFromModelFile(path));
-  			try {
+			try {
+				String result = getNewModelString(new String(content, "utf-8"), name, getDescriptionFromModelFile(path));
+  			
   				// Write to file
   				FileWriter fw = new FileWriter(f);
   				fw.write(result);
@@ -127,7 +129,11 @@ public class JpdlModelType implements ModelType {
 	}
 
 	public void storeRevisionToModelFile(String jsonRep, String svgRep,String path) {
-		storeRepresentationInfoToModelFile(RepresentationType.JSON, jsonRep.getBytes(), path);
+		try {
+			storeRepresentationInfoToModelFile(RepresentationType.JSON, jsonRep.getBytes("utf-8"), path);
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException("Could not store data in file", e);
+		}
 		//System.out.println("Could not store SVG data");
 	}
 
