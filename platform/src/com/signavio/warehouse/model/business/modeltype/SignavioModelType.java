@@ -54,7 +54,7 @@ public class SignavioModelType implements ModelType {
 
 	public boolean storeDescriptionToModelFile(String description, String path) {
 		if (!FileSystemUtil.writeXmlNodeChildToFile(DESCRIPTION_ElEMENT_NAME, description, false, path)){
-			throw new IllegalStateException("Could not write new decription to file");
+			throw new IllegalStateException("Could not write new description to file");
 		}
 		return true;
 	}

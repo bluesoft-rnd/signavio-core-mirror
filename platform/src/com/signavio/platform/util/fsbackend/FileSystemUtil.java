@@ -212,7 +212,8 @@ public class FileSystemUtil {
 			docFactory.setNamespaceAware(true);
 			try {
 				DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-				Document doc = docBuilder.parse(path);
+				File file = new File(path);
+				Document doc = docBuilder.parse(file);
 				for (WriteOperation operation : operations) {
 					String nodeName = operation.nodeName;
 					boolean handleAttribute = operation.attributeName != null;
