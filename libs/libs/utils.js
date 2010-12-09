@@ -255,4 +255,56 @@ new function(){
 		return typeof val == "string" ? val.unescapeHTML() : val;
 	}
 	
+
+	/*** SPECIFIC BROWSER FIXES ***/
+
+	// Chrome
+	Ext.isChrome = String(window.navigator.userAgent).include("Chrome/");
+	
+	
+	/**
+	 * Chrome Fixes
+	 */
+	if (Ext.isChrome){
+		(function(){
+			
+			// Fixes for Chrome Bug
+			// http://code.google.com/p/chromium/issues/detail?id=58493
+			
+			// Check if there exists the bug in the current chrome version
+			var parseNode = (new DOMParser()).parseFromString("<div ext:qtip='tooltip'></div>", "text/xml");
+			if (parseNode.getElementsByTagName("parsererror").length == 0){
+				return;
+			}
+			
+			// @overwrite
+			var inHtml = Ext.DomHelper.insertHtml;
+			Ext.DomHelper.insertHtml = function(foo, bar, html){
+				html = html.gsub("ext:qtip=", "title="); 
+				html = html.gsub("ext:tree-node-id=", "tree-node-id=");
+				return inHtml.call(this, foo, bar, html);
+			};
+			
+			// Remove namespace awareness of node ids
+			Ext.tree.TreeEventModel.prototype.getNode = function(e){
+		        var t;
+		        if(t = e.getTarget('.x-tree-node-el', 10)){
+		            var id = Ext.fly(t, '_treeEvents').dom.getAttributeNS(null, 'tree-node-id');
+		            if(id){
+		                return this.tree.getNodeById(id);
+		            }
+		        }
+		        return null;
+		    };
+		    
+		    // Fix use of ext namespaces
+		    Ext.Template.prototype.overwrite = function(el, values, returnElement){
+		        el = Ext.getDom(el);
+		        el.innerHTML = this.applyTemplate(values).gsub(" ext:qtip=", " title=");
+		        return returnElement ? Ext.get(el.firstChild, true) : el.firstChild;
+		    };
+			
+		}());
+	}
+	
 }()
