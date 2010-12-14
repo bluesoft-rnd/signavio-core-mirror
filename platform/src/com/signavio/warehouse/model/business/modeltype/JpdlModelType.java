@@ -37,9 +37,9 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.signavio.platform.util.fsbackend.FileSystemUtil;
-import com.signavio.warehouse.business.jpdl.InvalidModelException;
-import com.signavio.warehouse.business.jpdl.JpdlToJson;
-import com.signavio.warehouse.business.jpdl.JsonToJpdl;
+import com.signavio.warehouse.business.util.jpdl4.InvalidModelException;
+import com.signavio.warehouse.business.util.jpdl4.JpdlToJson;
+import com.signavio.warehouse.business.util.jpdl4.JsonToJpdl;
 import com.signavio.warehouse.model.business.ModelType;
 import com.signavio.warehouse.model.business.ModelTypeFileExtension;
 import com.signavio.warehouse.model.business.ModelTypeRequiredNamespaces;
@@ -152,7 +152,7 @@ public class JpdlModelType implements ModelType {
 				jsonObj.getJSONObject("properties").put("name", processName);
 			}
 			JsonToJpdl transformation = JsonToJpdl.createInstance(jsonObj);
-			return "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + transformation.transform();
+			return transformation.transform();
 		} catch (JSONException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Transformation failed.");
