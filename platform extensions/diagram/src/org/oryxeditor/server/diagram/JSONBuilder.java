@@ -207,10 +207,13 @@ public class JSONBuilder {
 					propertiesObject.put(key, propertyValue.equals("true"));
 
 				} else if(propertyValue.matches("[0-9]+")) {
-					
-					Integer value = Integer.parseInt(propertyValue);
-					propertiesObject.put(key, value);
-				
+					// Handle exception in case an out of integer's range number 
+					try {
+						Integer value = Integer.parseInt(propertyValue);
+						propertiesObject.put(key, value);
+					} catch(NumberFormatException e) {
+						propertiesObject.put(key, propertyValue);
+					}
 				} else if (propertyValue.startsWith("{") && propertyValue.endsWith("}"))
 				{
 					propertiesObject.put(key, new JSONObject(propertyValue));
