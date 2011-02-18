@@ -23,6 +23,9 @@
 
 package de.hpi.bpmn2_0.model.artifacts;
 
+import java.util.ArrayList;
+
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -31,6 +34,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import de.hpi.bpmn2_0.model.FlowElement;
 import de.hpi.bpmn2_0.transformation.Visitor;
 import de.hpi.bpmn2_0.util.EscapingStringAdapter;
 
@@ -73,6 +77,21 @@ public class TextAnnotation
 
 	public void acceptVisitor(Visitor v){
 		v.visitTextAnnotation(this);
+	}
+	
+	/**
+	 * The {@link Marshaller} invokes this method right before marshaling to
+	 * XML. It secures that the name attribute is removed from the text annotation
+	 * element.
+	 * 
+	 * @param marshaller
+	 *            The marshaling context
+	 */
+	public void beforeMarshal(Marshaller marshaller) {
+		/*
+		 * empty the name element
+		 */
+		this.name = null;
 	}
 
     /* Getter & Setter */
