@@ -197,14 +197,22 @@ public abstract class AbstractEdgesFactory extends AbstractBpmnFactory {
 			}
 		}
 		
-		/* Select the first incoming as source shape otherwise */
-		if(!edge.getIncomings().isEmpty()) {
-			return edge.getIncomings().get(0);
+		/* Select the first incoming as source shape otherwise that is
+		 * not has this edge not as target */
+//		if(!edge.getIncomings().isEmpty()) {
+//			return edge.getIncomings().get(0).;
+//		}
+		
+		for(Shape incoming : edge.getIncomings()) {
+			if(incoming.getTarget() == null 
+				|| !incoming.getTarget().equals(edge)) {
+				return incoming;
+			}
 		}
 
 		return null;
 	}
-
+	
 	private class Algorithm {
 
 		private int RIGHT = 2;

@@ -59,7 +59,9 @@ public class ConversationFactory extends AbstractShapeFactory {
 	public BPMNElement createBpmnElement(Shape shape, Configuration configuration) throws BpmnConverterException {
 		BPMNElement bpmnElement = super.createBpmnElement(shape, configuration);
 		
-		handleLinkedDiagrams(bpmnElement.getNode(), shape, configuration);
+		if(bpmnElement != null && bpmnElement.getNode() != null) {
+			handleLinkedDiagrams(bpmnElement.getNode(), shape, configuration);
+		}
 		
 		return bpmnElement;
 	}

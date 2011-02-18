@@ -40,6 +40,7 @@ import de.hpi.bpmn2_0.model.BaseElement;
 import de.hpi.bpmn2_0.model.FlowElement;
 import de.hpi.bpmn2_0.model.bpmndi.di.DiagramElement;
 import de.hpi.bpmn2_0.model.callable.GlobalChoreographyTask;
+import de.hpi.bpmn2_0.model.connector.Edge;
 import de.hpi.bpmn2_0.transformation.Visitor;
 
 
@@ -119,6 +120,20 @@ public class CallChoreography
     	
     	return calledElements;
     }
+    
+    public List<Edge> getChildEdges() {
+		List<Edge> edgeList = new ArrayList<Edge>();
+		
+		for(FlowElement fe : this.getFlowElement()) {
+			if(fe instanceof Edge) {
+				edgeList.add((Edge) fe);
+			} else if(fe instanceof ContainerElement) {
+				edgeList.addAll(((ContainerElement) fe).getChildEdges());
+			}
+		}
+		
+		return edgeList;
+	}
     
     /* Getter & Setter */
     

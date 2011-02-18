@@ -27,6 +27,7 @@ import java.util.List;
 
 import de.hpi.bpmn2_0.model.FlowElement;
 import de.hpi.bpmn2_0.model.bpmndi.di.DiagramElement;
+import de.hpi.bpmn2_0.model.connector.Edge;
 
 /**
  * @author Sven Wagner-Boysen
@@ -40,4 +41,6 @@ public interface ContainerElement {
 	public List<FlowElement> getFlowElement();
 	
 	public List<DiagramElement> _getDiagramElements();
+	
+	public List<Edge> getChildEdges();
 }

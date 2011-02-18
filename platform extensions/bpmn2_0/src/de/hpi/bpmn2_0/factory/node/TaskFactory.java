@@ -35,6 +35,8 @@ import de.hpi.bpmn2_0.annotations.StencilId;
 import de.hpi.bpmn2_0.exceptions.BpmnConverterException;
 import de.hpi.bpmn2_0.factory.AbstractActivityFactory;
 import de.hpi.bpmn2_0.model.FormalExpression;
+import de.hpi.bpmn2_0.model.activity.Activity;
+import de.hpi.bpmn2_0.model.activity.CallActivity;
 import de.hpi.bpmn2_0.model.activity.Task;
 import de.hpi.bpmn2_0.model.activity.misc.BusinessRuleTaskImplementation;
 import de.hpi.bpmn2_0.model.activity.misc.Operation;
@@ -53,6 +55,7 @@ import de.hpi.bpmn2_0.model.activity.type.ScriptTask;
 import de.hpi.bpmn2_0.model.activity.type.SendTask;
 import de.hpi.bpmn2_0.model.activity.type.ServiceTask;
 import de.hpi.bpmn2_0.model.activity.type.UserTask;
+import de.hpi.bpmn2_0.model.callable.GlobalTask;
 import de.hpi.bpmn2_0.model.data_object.Message;
 
 /**
@@ -73,11 +76,17 @@ public class TaskFactory extends AbstractActivityFactory {
 	 * oryxeditor.server.diagram.Shape)
 	 */
 	// @Override
-	protected Task createProcessElement(Shape shape)
+	protected Activity createProcessElement(Shape shape)
 			throws BpmnConverterException {
 		try {
 			Task task = (Task) this.invokeCreatorMethodAfterProperty(shape);
 			this.setStandardAttributes(task, shape);
+			
+			CallActivity ca = this.handleCallActivity(task, shape);
+			if(ca != null) {
+				return ca;
+			}
+			
 			return task;
 		} catch (Exception e) {
 			throw new BpmnConverterException(
@@ -310,7 +319,29 @@ public class TaskFactory extends AbstractActivityFactory {
 		}
 	}
 	
-//	private Operation createOperation(Shape shape) {
+	/**
+	 * In case the "callacitivity" property is set to true, the Task t gets 
+	 * converted to an {@link CallActivity} referencing a {@link GlobalTask} 
+	 * depending on the original task type.
+	 *  
+	 * @param t
+	 * @param s
+	 * @return
+	 */
+	private CallActivity handleCallActivity(Task t, Shape s) {
+		if(s.getProperty("callacitivity") == null || !s.getProperty("callacitivity").equalsIgnoreCase("true")) {
+			return null;
+		}
+		
+		GlobalTask gt = t.getAsGlobalTask();
+		
+		CallActivity ca = new CallActivity(t);
+		ca.setCalledElement(gt);
+		
+		return ca;
+	}
+	
+ //	private Operation createOperation(Shape shape) {
 //		Operation operation = new Operation();
 //		operation.setId(OryxUUID.generate());
 //		operation.setName(shape.getProperty("operationname"));

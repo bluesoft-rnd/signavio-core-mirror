@@ -29,6 +29,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import de.hpi.bpmn2_0.model.activity.Task;
+import de.hpi.bpmn2_0.model.callable.GlobalManualTask;
+import de.hpi.bpmn2_0.model.callable.GlobalTask;
 import de.hpi.bpmn2_0.transformation.Visitor;
 
 
@@ -58,5 +60,11 @@ public class ManualTask
 	public void acceptVisitor(Visitor v){
 		v.visitManualTask(this);
 	}
+	
+	public GlobalTask getAsGlobalTask() {
+		GlobalManualTask gmt = new GlobalManualTask(super.getAsGlobalTask());
+		return gmt;
+	}
+	
 
 }

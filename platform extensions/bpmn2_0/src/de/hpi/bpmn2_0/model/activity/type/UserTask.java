@@ -35,6 +35,8 @@ import javax.xml.bind.annotation.XmlType;
 import de.hpi.bpmn2_0.model.activity.Task;
 import de.hpi.bpmn2_0.model.activity.misc.UserTaskImplementation;
 import de.hpi.bpmn2_0.model.activity.resource.Rendering;
+import de.hpi.bpmn2_0.model.callable.GlobalTask;
+import de.hpi.bpmn2_0.model.callable.GlobalUserTask;
 import de.hpi.bpmn2_0.transformation.Visitor;
 
 
@@ -93,6 +95,15 @@ public class UserTask
 	public void acceptVisitor(Visitor v){
 		v.visitUserTask(this);
 	}
+	
+	public GlobalTask getAsGlobalTask() {
+		GlobalUserTask gut = new GlobalUserTask(super.getAsGlobalTask());
+		gut.getRendering().addAll(this.getRendering());
+		gut.setImplementation(this.getImplementation());
+		return gut;
+	}
+	
+	/* Getter & Setter */
 	
     /**
      * Gets the value of the rendering property.

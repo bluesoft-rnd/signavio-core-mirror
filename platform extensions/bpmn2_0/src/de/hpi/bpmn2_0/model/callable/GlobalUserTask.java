@@ -31,6 +31,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
+import de.hpi.bpmn2_0.model.activity.misc.UserTaskImplementation;
 import de.hpi.bpmn2_0.model.activity.resource.Rendering;
 
 
@@ -62,10 +63,18 @@ import de.hpi.bpmn2_0.model.activity.resource.Rendering;
 public class GlobalUserTask
     extends GlobalTask
 {
-
+	/* Constructors */
+	public GlobalUserTask() {
+		super();
+	}
+	
+	public GlobalUserTask(GlobalTask gt) {
+		super(gt);
+	}
+	
     protected List<Rendering> rendering;
     @XmlAttribute(name = "implementation")
-    protected String implementation;
+    protected UserTaskImplementation implementation;
 
     /**
      * Gets the value of the rendering property.
@@ -101,15 +110,11 @@ public class GlobalUserTask
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link UserTaskImplementation }
      *     
      */
-    public String getImplementation() {
-        if (implementation == null) {
-            return "##unspecified";
-        } else {
+    public UserTaskImplementation getImplementation() {
             return implementation;
-        }
     }
 
     /**
@@ -117,10 +122,10 @@ public class GlobalUserTask
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link UserTaskImplementation }
      *     
      */
-    public void setImplementation(String value) {
+    public void setImplementation(UserTaskImplementation value) {
         this.implementation = value;
     }
 

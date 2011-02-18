@@ -36,6 +36,7 @@ import de.hpi.bpmn2_0.model.activity.type.ScriptTask;
 import de.hpi.bpmn2_0.model.activity.type.SendTask;
 import de.hpi.bpmn2_0.model.activity.type.ServiceTask;
 import de.hpi.bpmn2_0.model.activity.type.UserTask;
+import de.hpi.bpmn2_0.model.callable.GlobalTask;
 import de.hpi.bpmn2_0.transformation.Visitor;
 
 
@@ -92,5 +93,16 @@ public class Task
 	
 	public void acceptVisitor(Visitor v){
 		v.visitTask(this);
+	}
+	
+	public GlobalTask getAsGlobalTask() {
+		GlobalTask gt = new GlobalTask();
+		gt.getDocumentation().addAll(this.getDocumentation());
+		gt.setExtensionElements(this.getExtensionElements());
+		gt.setIoSpecification(this.getIoSpecification());
+		gt.setLane(this.getLane());
+		gt.setName(this.getName());
+		
+		return gt;
 	}
 }

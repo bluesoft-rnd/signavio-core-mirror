@@ -66,7 +66,21 @@ import de.hpi.bpmn2_0.util.EscapingStringAdapter;
 public class CallableElement
     extends RootElement
 {
-
+	
+	/* Constructors */
+	public CallableElement() {
+		super();
+	}
+	
+	public CallableElement(CallableElement ce) {
+		super(ce);
+		
+		this.getSupportedInterfaceRef().addAll(ce.getSupportedInterfaceRef());
+		this.getIoBinding().addAll(ce.getIoBinding());
+		this.setIoSpecification(ce.getIoSpecification());
+		this.setName(ce.getName());
+	}
+	
     protected List<QName> supportedInterfaceRef;
     protected InputOutputSpecification ioSpecification;
     protected List<InputOutputBinding> ioBinding;

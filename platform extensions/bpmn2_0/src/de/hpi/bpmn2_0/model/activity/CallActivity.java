@@ -32,11 +32,14 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 import de.hpi.bpmn2_0.annotations.CallingElement;
 import de.hpi.bpmn2_0.model.BaseElement;
 import de.hpi.bpmn2_0.model.CallableElement;
+import de.hpi.bpmn2_0.model.FlowElement;
+import de.hpi.bpmn2_0.model.bpmndi.BPMNDiagram;
 import de.hpi.bpmn2_0.transformation.Visitor;
 
 
@@ -63,7 +66,24 @@ import de.hpi.bpmn2_0.transformation.Visitor;
 public class CallActivity
     extends Activity implements CallingElement
 {
-
+	/* Constructors */
+	public CallActivity() {
+		super();
+	}
+	
+	public CallActivity(Task t) {
+		super(t);
+	}
+	
+	@XmlTransient
+	private List<FlowElement> processElements;
+	
+	/*
+	 * The diagram and process element of a linked subprocess
+	 */
+	@XmlTransient
+	public BPMNDiagram _diagramElement;
+	
     @XmlAttribute
     @XmlIDREF
     protected CallableElement calledElement;
@@ -95,7 +115,7 @@ public class CallActivity
 	public void acceptVisitor(Visitor v){
 		v.visitCallActivity(this);
 	}
-
+	
 	public List<BaseElement> getCalledElements() {
 		List<BaseElement> calledElements = new ArrayList<BaseElement>();
 		
@@ -105,5 +125,28 @@ public class CallActivity
 		
 		return calledElements;
 	}
+	
+	/**
+	 * Overrides the general addChild method to collect elements of a call 
+	 * activity expanded sub process. 
+	 */
+	public void addChild(BaseElement el) {
+		if(el instanceof FlowElement) {
+			this._getFlowElementsOfTheGlobalProcess().add((FlowElement) el);
+		}
+	}
 
+	/* Getter & Setter */
+	
+	/**
+	 * !!! Only for usages during the BPMN 2.0 Export process.
+	 * Returns the elements the expanded subprocess called be this call activity.
+	 */
+	public List<FlowElement> _getFlowElementsOfTheGlobalProcess() {
+		if(this.processElements == null) {
+			this.processElements = new ArrayList<FlowElement>();
+		}
+		
+		return this.processElements;
+	}
 }

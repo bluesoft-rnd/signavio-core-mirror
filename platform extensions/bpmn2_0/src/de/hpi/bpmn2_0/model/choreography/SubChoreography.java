@@ -227,6 +227,20 @@ public class SubChoreography
     	return subchoreographies;
     }
     
+    public List<Edge> getChildEdges() {
+		List<Edge> edgeList = new ArrayList<Edge>();
+		
+		for(FlowElement fe : this.getFlowElement()) {
+			if(fe instanceof Edge) {
+				edgeList.add((Edge) fe);
+			} else if(fe instanceof ContainerElement) {
+				edgeList.addAll(((ContainerElement) fe).getChildEdges());
+			}
+		}
+		
+		return edgeList;
+	}
+    
 	public void acceptVisitor(Visitor v){
 		v.visitSubChoreography(this);
 	}

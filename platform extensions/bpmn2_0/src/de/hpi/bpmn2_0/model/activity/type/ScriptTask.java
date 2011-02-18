@@ -32,6 +32,8 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
 import de.hpi.bpmn2_0.model.activity.Task;
+import de.hpi.bpmn2_0.model.callable.GlobalScriptTask;
+import de.hpi.bpmn2_0.model.callable.GlobalTask;
 import de.hpi.bpmn2_0.transformation.Visitor;
 
 
@@ -94,6 +96,17 @@ public class ScriptTask
 	public void acceptVisitor(Visitor v){
 		v.visitScriptTask(this);
 	}
+	
+	public GlobalTask getAsGlobalTask() {
+		GlobalScriptTask gst = new GlobalScriptTask(super.getAsGlobalTask());
+		
+		gst.setScript(this.getScript());
+		gst.setScriptLanguage(this.getScriptFormat());
+		
+		return gst;
+	}
+	
+	/* Getter & Setter */
 	
     /**
      * Gets the value of the script property.

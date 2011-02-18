@@ -20,10 +20,12 @@ public class Configuration {
 	private Map<String, Set<String>> metaData;
 	private Map<String, LinkedModel> linkedModels;
 	
+	public static boolean ensureSignavioStyleDefault = true;
+	
 	/*
 	 * Flag to enforce a check on IDs of style 'sid-...'
 	 */
-	public static boolean ensureSignavioStyle = true;
+	public boolean ensureSignavioStyle = ensureSignavioStyleDefault;
 	
 	
 

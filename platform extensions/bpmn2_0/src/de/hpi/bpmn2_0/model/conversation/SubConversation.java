@@ -42,6 +42,7 @@ import de.hpi.bpmn2_0.model.FlowElement;
 import de.hpi.bpmn2_0.model.artifacts.Artifact;
 import de.hpi.bpmn2_0.model.bpmndi.di.DiagramElement;
 import de.hpi.bpmn2_0.model.connector.Association;
+import de.hpi.bpmn2_0.model.connector.Edge;
 import de.hpi.bpmn2_0.model.connector.MessageFlow;
 import de.hpi.bpmn2_0.transformation.Visitor;
 
@@ -115,6 +116,20 @@ public class SubConversation extends ConversationNode implements ContainerElemen
 		childs.addAll(this.getAssociation());
 
 		return childs;
+	}
+	
+	public List<Edge> getChildEdges() {
+		List<Edge> edgeList = new ArrayList<Edge>();
+		
+		for(FlowElement fe : this.getFlowElement()) {
+			if(fe instanceof Edge) {
+				edgeList.add((Edge) fe);
+			} else if(fe instanceof ContainerElement) {
+				edgeList.addAll(((ContainerElement) fe).getChildEdges());
+			}
+		}
+		
+		return edgeList;
 	}
 
 	/* Getter & Setter */

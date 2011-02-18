@@ -53,6 +53,7 @@ import de.hpi.bpmn2_0.model.artifacts.TextAnnotation;
 import de.hpi.bpmn2_0.model.bpmndi.di.DiagramElement;
 import de.hpi.bpmn2_0.model.choreography.ChoreographyTask;
 import de.hpi.bpmn2_0.model.connector.Association;
+import de.hpi.bpmn2_0.model.connector.Edge;
 import de.hpi.bpmn2_0.model.data_object.DataObject;
 import de.hpi.bpmn2_0.model.data_object.DataStore;
 import de.hpi.bpmn2_0.model.gateway.ParallelGateway;
@@ -149,6 +150,20 @@ public class SubProcess extends Activity implements ContainerElement,
 		}
 
 		return subprocesses;
+	}
+	
+	public List<Edge> getChildEdges() {
+		List<Edge> edgeList = new ArrayList<Edge>();
+		
+		for(FlowElement fe : this.getFlowElement()) {
+			if(fe instanceof Edge) {
+				edgeList.add((Edge) fe);
+			} else if(fe instanceof ContainerElement) {
+				edgeList.addAll(((ContainerElement) fe).getChildEdges());
+			}
+		}
+		
+		return edgeList;
 	}
 
 	public void acceptVisitor(Visitor v) {

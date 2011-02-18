@@ -67,7 +67,9 @@ public class SubprocessFactory extends AbstractActivityFactory {
 	public BPMNElement createBpmnElement(Shape shape, Configuration configuration) throws BpmnConverterException {
 		BPMNElement bpmnElement = super.createBpmnElement(shape, configuration);
 		
-		handleLinkedDiagrams(bpmnElement.getNode(), shape, configuration);
+		if(bpmnElement != null && bpmnElement.getNode() != null) {
+			handleLinkedDiagrams(bpmnElement.getNode(), shape, configuration);
+		}
 		
 		return bpmnElement;
 	}
@@ -83,8 +85,6 @@ public class SubprocessFactory extends AbstractActivityFactory {
 		} else {
 			bpmnShape.setIsExpanded(true);
 		}
-		
-		//TODO: DiagramLink subproShape.setDiagramLink(shape.getProperty("entry"));
 		
 		return bpmnShape;
 	}
@@ -164,7 +164,9 @@ public class SubprocessFactory extends AbstractActivityFactory {
 	 * @param config
 	 */
 	private void handleLinkedDiagrams(BaseElement baseElement, Shape shape, Configuration config) {
-		if(baseElement == null || !(baseElement instanceof SubProcess) || !shape.getStencilId().matches(".*Collapsed.*")) {
+		if(baseElement == null 
+				|| !((baseElement instanceof SubProcess) || (baseElement instanceof CallActivity)) 
+				|| !shape.getStencilId().matches(".*Collapsed.*")) {
 			return;
 		}
 		
@@ -184,6 +186,34 @@ public class SubprocessFactory extends AbstractActivityFactory {
 		if(linkedDiagram == null || linkedDiagram.getRootElement().size() == 0) {
 			return;
 		}
+		
+		/*
+		 * Handle call activity
+		 */
+		if(baseElement instanceof CallActivity) {
+			CallActivity ca = (CallActivity) baseElement;
+			
+			/*
+			 * Assign called process as called element
+			 */
+			for(BaseElement rootEl : linkedDiagram.getRootElement()) {
+				if(rootEl instanceof Process) {
+					Process p = (Process) rootEl;
+					ca.setCalledElement(p);
+					break;
+				}
+			}
+			
+			if(linkedDiagram.getDiagram().size() > 0) {
+				ca._diagramElement = linkedDiagram.getDiagram().get(0);
+			}
+			
+			return;
+		}
+		
+		/*
+		 * Handle sub process
+		 */
 		
 		SubProcess subProcess = (SubProcess) baseElement;
 		for(BaseElement rootEl : linkedDiagram.getRootElement()) {

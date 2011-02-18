@@ -45,6 +45,7 @@ import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 
+import de.hpi.bpmn2_0.annotations.ContainerElement;
 import de.hpi.bpmn2_0.model.bpmndi.BPMNDiagram;
 import de.hpi.bpmn2_0.model.bpmndi.BPMNPlane;
 import de.hpi.bpmn2_0.model.choreography.Choreography;
@@ -326,6 +327,11 @@ public class Definitions {
 					if (flowElement instanceof Edge) {
 						edges.add((Edge) flowElement);
 					}
+					
+					// Consider edges in container elements
+					if(flowElement instanceof ContainerElement) {
+						edges.addAll(((ContainerElement) flowElement).getChildEdges());
+					}
 				}
 			} else if (rootElement instanceof Collaboration) {
 
@@ -338,8 +344,14 @@ public class Definitions {
 				for (FlowElement flowElement : ((Choreography) rootElement)
 						.getFlowElement()) {
 
-					if (flowElement instanceof Edge)
+					if (flowElement instanceof Edge) {
 						edges.add((Edge) flowElement);
+					}
+					
+					// Consider edges in container elemetns
+					if(flowElement instanceof ContainerElement) {
+						edges.addAll(((ContainerElement) flowElement).getChildEdges());
+					}
 				}
 			}
 		}

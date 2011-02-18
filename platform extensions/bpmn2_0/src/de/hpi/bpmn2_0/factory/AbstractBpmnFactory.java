@@ -253,9 +253,12 @@ public abstract class AbstractBpmnFactory {
 	
 	public BPMNElement createBpmnElement(Shape shape, Configuration configuration) throws BpmnConverterException {
 		BPMNElement bpmnElement = createBpmnElement(shape, new BPMNElement(null, null, null));
-		bpmnElement.getNode()._diagramElement = bpmnElement.getShape();
 		
-		setCustomAttributes(shape, bpmnElement.getNode(), configuration.getMetaData());
+		if(bpmnElement != null && bpmnElement.getNode() != null) {
+			bpmnElement.getNode()._diagramElement = bpmnElement.getShape();
+			
+			setCustomAttributes(shape, bpmnElement.getNode(), configuration.getMetaData());
+		}
 		
 		return bpmnElement;
 	}
@@ -275,6 +278,11 @@ public abstract class AbstractBpmnFactory {
 		while(iterator.hasNext()) {
 			String attributeKey = iterator.next();
 			String attributeValue = shape.getProperty(attributeKey);
+			
+			/* Avoid undefined Signavio meta attributes */
+			if(attributeValue == null) {
+				continue;
+			}
 			
 			SignavioMetaData sigMetaData = new SignavioMetaData(attributeKey, attributeValue);
 			

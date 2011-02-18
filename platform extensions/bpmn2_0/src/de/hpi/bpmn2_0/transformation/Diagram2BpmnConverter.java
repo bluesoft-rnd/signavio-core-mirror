@@ -54,6 +54,7 @@ import de.hpi.bpmn2_0.model.FlowElement;
 import de.hpi.bpmn2_0.model.FlowNode;
 import de.hpi.bpmn2_0.model.Process;
 import de.hpi.bpmn2_0.model.activity.Activity;
+import de.hpi.bpmn2_0.model.activity.CallActivity;
 import de.hpi.bpmn2_0.model.activity.SubProcess;
 import de.hpi.bpmn2_0.model.activity.Task;
 import de.hpi.bpmn2_0.model.artifacts.Artifact;
@@ -113,6 +114,11 @@ public class Diagram2BpmnConverter {
 	private Diagram diagram;
 	private List<BPMNElement> diagramChilds;
 	private List<Process> processes;
+	/* Processes just used to identify all processes in the diagram (used i.e. 
+	 * for CallActivities). They are removed afterwards, to avoid duplicates.
+	 */
+	private List<Process> tmpProcesses;
+	
 	private Definitions definitions;
 	private Configuration configuration;
 	private String editorVersion;
@@ -146,6 +152,19 @@ public class Diagram2BpmnConverter {
 		this.definitions.setId(SignavioUUID.generate());
 		this.diagram = diagram;
 		this.factoryClasses = factoryClasses;
+		this.configuration = new Configuration();
+	}
+	
+	/**
+	 * Also sets the configuration on reformation the element IDs.
+	 * 
+	 * @param diagram
+	 * @param factoryClasses
+	 */
+	public Diagram2BpmnConverter(Diagram diagram,
+			List<Class<? extends AbstractBpmnFactory>> factoryClasses, boolean checkOnSignavioIDs) {
+		this(diagram, factoryClasses);
+		this.configuration.ensureSignavioStyle = checkOnSignavioIDs;
 	}
 
 	/**
@@ -176,7 +195,6 @@ public class Diagram2BpmnConverter {
 			List<Class<? extends AbstractBpmnFactory>> factoryClasses) {
 		this(diagram, factoryClasses);
 
-		this.configuration = new Configuration();
 		this.configuration.getLinkedModels().putAll(linkedModels);
 
 	}
@@ -314,7 +332,10 @@ public class Diagram2BpmnConverter {
 
 		/* Create BPMN elements from shapes */
 		for (Shape childShape : shape.getChildShapes()) {
-			childElements.add(this.createBpmnElementsRecursively(childShape));
+			BPMNElement childEl = this.createBpmnElementsRecursively(childShape);
+			if(childEl != null) {
+				childElements.add(childEl);
+			}
 		}
 
 		if (shape.equals(this.diagram)) {
@@ -333,15 +354,17 @@ public class Diagram2BpmnConverter {
 		} else {
 			bpmnElement = factory.createBpmnElement(shape, this.configuration);
 		}
-
-		/* Add element to flat list of all elements of the diagram */
-		this.addBpmnElement(bpmnElement);
-
-		/* Add childs to current BPMN element */
-		for (BPMNElement child : childElements) {
-			bpmnElement.addChild(child);
+		
+		if(bpmnElement != null) {
+			/* Add element to flat list of all elements of the diagram */
+			this.addBpmnElement(bpmnElement);
+	
+			/* Add childs to current BPMN element */
+			for (BPMNElement child : childElements) {
+				bpmnElement.addChild(child);
+			}
 		}
-
+		
 		return bpmnElement;
 
 	}
@@ -540,8 +563,36 @@ public class Diagram2BpmnConverter {
 		for (BPMNElement ele : childs) {
 			// process.getFlowElement().add((FlowElement) ele.getNode());
 			// subProcess.getFlowElement().add((FlowElement) ele.getNode());
-			if (ele.getNode() instanceof SubProcess)
+			if (ele.getNode() instanceof SubProcess) {
 				this.handleSubProcess((SubProcess) ele.getNode());
+			} else if(ele.getNode() instanceof CallActivity) {
+				this.handleCallActivities((CallActivity) ele.getNode());
+			}
+		}
+	}
+	
+	/**
+	 * In case the {@link CallActivity} calls an expanded subprocess, a new 
+	 * process is created that includes all referenced {@link FlowElement} by 
+	 * the {@link CallActivity}
+	 * 
+	 * @param callAct
+	 */
+	private void handleCallActivities(CallActivity callAct) {
+		Process p = new Process();
+		for(FlowElement fe : callAct._getFlowElementsOfTheGlobalProcess()) {
+			p.getFlowElement().add(fe);
+			if(fe instanceof CallActivity) {
+				handleCallActivities((CallActivity) fe);
+			} else if(fe instanceof SubProcess) {
+				handleSubProcess((SubProcess) fe);
+			}
+		}
+		
+		if(p.getFlowElement().size() > 0) {
+			callAct.setCalledElement(p);
+			this.processes.add(p);
+			this.tmpProcesses.add(p);
 		}
 	}
 
@@ -707,14 +758,18 @@ public class Diagram2BpmnConverter {
 	 */
 	private void identifyProcesses() {
 		this.processes = new ArrayList<Process>();
+		this.tmpProcesses = new ArrayList<Process>();
 
 		List<FlowNode> allNodes = new ArrayList<FlowNode>();
 		this.getAllNodesRecursively(this.diagramChilds, allNodes);
 
 		// handle subprocesses => trivial
 		for (FlowNode flowNode : allNodes) {
-			if (flowNode instanceof SubProcess)
+			if (flowNode instanceof SubProcess) {
 				handleSubProcess((SubProcess) flowNode);
+			} else if(flowNode instanceof CallActivity) {
+				handleCallActivities((CallActivity) flowNode);
+			}
 		}
 
 		/* Handle pools, current solution: only one process per pool */
@@ -779,6 +834,10 @@ public class Diagram2BpmnConverter {
 				el.setProcess(p);
 			}
 		}
+		
+		/* Remove temporary processes from the list */
+		this.processes.removeAll(this.tmpProcesses);
+//		this.tmpProcesses = null;
 	}
 
 	/**
@@ -1048,6 +1107,63 @@ public class Diagram2BpmnConverter {
 				insertSubprocessShapes((SubProcess) flowEle);
 			}
 		}
+		
+		for (Artifact a : subProcess.getArtifact()) {
+			this.definitions.getFirstPlane().getDiagramElement().add(
+					this.bpmnElements.get(a.getId()).getShape());
+		}
+	}
+	
+	/**
+	 * Places the shapes of the elements referenced by the process at diagram's
+	 * shape list.
+	 * 
+	 * @param process
+	 */
+	private boolean insertProcessShapes(Process process) {
+		if (process.isChoreographyProcess())
+			return false;
+
+		/* First insert LaneSets */
+		for (Lane lane : process.getAllLanes()) {
+			this.definitions.getFirstPlane().getDiagramElement().add(
+					this.bpmnElements.get(lane.getId()).getShape());
+		}
+
+		/* Second process elements like tasks */
+
+		for (FlowElement flowEle : process.getFlowElement()) {
+			if (!(flowEle instanceof Edge)) {
+				this.definitions.getFirstPlane().getDiagramElement().add(
+						this.bpmnElements.get(flowEle.getId()).getShape());
+			}
+
+			/* Subprocess elements */
+			if (flowEle instanceof SubProcess) {
+				insertSubprocessShapes((SubProcess) flowEle);
+			}
+		}
+
+		/* Insert Artifacts */
+		for (Artifact a : process.getArtifact()) {
+			this.definitions.getFirstPlane().getDiagramElement().add(
+					this.bpmnElements.get(a.getId()).getShape());
+		}
+		
+		/* Insert Data Objects form IOSpecifications */
+		if(process.getIoSpecification() != null) {
+			for(DataInput dataInput : process.getIoSpecification().getDataInput()) {
+				this.definitions.getFirstPlane().getDiagramElement().add(
+						this.bpmnElements.get(dataInput.getId()).getShape());
+			}
+			
+			for(DataOutput dataOutput : process.getIoSpecification().getDataOutput()) {
+				this.definitions.getFirstPlane().getDiagramElement().add(
+						this.bpmnElements.get(dataOutput.getId()).getShape());
+			}
+		}
+		
+		return true;
 	}
 
 	/**
@@ -1055,48 +1171,52 @@ public class Diagram2BpmnConverter {
 	 */
 	private void insertProcessesIntoDefinitions() {
 		for (Process process : this.processes) {
-			if (process.isChoreographyProcess())
+//			if (process.isChoreographyProcess())
+//				continue;
+//
+//			/* First insert LaneSets */
+//			for (Lane lane : process.getAllLanes()) {
+//				this.definitions.getFirstPlane().getDiagramElement().add(
+//						this.bpmnElements.get(lane.getId()).getShape());
+//			}
+//
+//			/* Second process elements like tasks */
+//
+//			for (FlowElement flowEle : process.getFlowElement()) {
+//				if (!(flowEle instanceof Edge)) {
+//					this.definitions.getFirstPlane().getDiagramElement().add(
+//							this.bpmnElements.get(flowEle.getId()).getShape());
+//				}
+//
+//				/* Subprocess elements */
+//				if (flowEle instanceof SubProcess) {
+//					insertSubprocessShapes((SubProcess) flowEle);
+//				}
+//			}
+//
+//			/* Insert Artifacts */
+//			for (Artifact a : process.getArtifact()) {
+//				this.definitions.getFirstPlane().getDiagramElement().add(
+//						this.bpmnElements.get(a.getId()).getShape());
+//			}
+//			
+//			/* Insert Data Objects form IOSpecifications */
+//			if(process.getIoSpecification() != null) {
+//				for(DataInput dataInput : process.getIoSpecification().getDataInput()) {
+//					this.definitions.getFirstPlane().getDiagramElement().add(
+//							this.bpmnElements.get(dataInput.getId()).getShape());
+//				}
+//				
+//				for(DataOutput dataOutput : process.getIoSpecification().getDataOutput()) {
+//					this.definitions.getFirstPlane().getDiagramElement().add(
+//							this.bpmnElements.get(dataOutput.getId()).getShape());
+//				}
+//			}
+		
+			if(!this.insertProcessShapes(process)) {
 				continue;
-
-			/* First insert LaneSets */
-			for (Lane lane : process.getAllLanes()) {
-				this.definitions.getFirstPlane().getDiagramElement().add(
-						this.bpmnElements.get(lane.getId()).getShape());
-			}
-
-			/* Second process elements like tasks */
-
-			for (FlowElement flowEle : process.getFlowElement()) {
-				if (!(flowEle instanceof Edge)) {
-					this.definitions.getFirstPlane().getDiagramElement().add(
-							this.bpmnElements.get(flowEle.getId()).getShape());
-				}
-
-				/* Subprocess elements */
-				if (flowEle instanceof SubProcess) {
-					insertSubprocessShapes((SubProcess) flowEle);
-				}
-			}
-
-			/* Insert Artifacts */
-			for (Artifact a : process.getArtifact()) {
-				this.definitions.getFirstPlane().getDiagramElement().add(
-						this.bpmnElements.get(a.getId()).getShape());
 			}
 			
-			/* Insert Data Objects form IOSpecifications */
-			if(process.getIoSpecification() != null) {
-				for(DataInput dataInput : process.getIoSpecification().getDataInput()) {
-					this.definitions.getFirstPlane().getDiagramElement().add(
-							this.bpmnElements.get(dataInput.getId()).getShape());
-				}
-				
-				for(DataOutput dataOutput : process.getIoSpecification().getDataOutput()) {
-					this.definitions.getFirstPlane().getDiagramElement().add(
-							this.bpmnElements.get(dataOutput.getId()).getShape());
-				}
-			}
-
 			/* Insert process into document */
 			this.definitions.getRootElement().add(process);
 
@@ -1105,6 +1225,15 @@ public class Diagram2BpmnConverter {
 			 * be overwritten, if a collaboration is contained.
 			 */
 			this.definitions.getFirstPlane().setBpmnElement(process);
+			
+			/*
+			 * Insert just the shapes of the temporary processes, because
+			 * their process elements are already connected to and so inserted 
+			 * in the definitions 
+			 */
+			for(Process p : this.tmpProcesses) {
+				this.insertProcessShapes(p);
+			}
 		}
 	}
 
@@ -1680,9 +1809,9 @@ public class Diagram2BpmnConverter {
 		
 		/* Insert elements into diagram */
 
+		this.insertCollaborationElements();
 		this.insertChoreographyProcessesIntoDefinitions();
 		this.insertProcessesIntoDefinitions();
-		this.insertCollaborationElements();
 
 		/*
 		 * Insert diagram element of edge last, because they are on top of all
@@ -1703,7 +1832,7 @@ public class Diagram2BpmnConverter {
 	 * Ensures all element id have the same Signavio defined style
 	 */
 	private void ensureSignavioUUIDStyle() {
-		if(Configuration.ensureSignavioStyle) {
+		if(this.configuration != null && this.configuration.ensureSignavioStyle) {
 			for(BPMNElement bpmnEl : bpmnElements.values()) {
 				if(!bpmnEl.getId().matches("sid-\\w{4,12}-\\w{4,12}-\\w{4,12}-\\w{4,12}-\\w{4,12}")) {
 					/*
@@ -1818,8 +1947,18 @@ public class Diagram2BpmnConverter {
 					this.definitions.getRootElement().add(callChoreo.getCalledChoreographyRef());
 				}
 			}
+			
+			/*
+			 * Insert elements referenced by a collapsed call activity sub process
+			 */
+			if(bpmnel.getNode() instanceof CallActivity 
+					&& ((CallActivity) bpmnel.getNode())._diagramElement != null) {
+				this.definitions.getDiagram().add(((CallActivity) bpmnel.getNode())._diagramElement);
+			}
 		}
 	}
+	
+	
 
 	/**
 	 * Creates the {@link BPMNDiagram}s for a collapsed sub process and 

@@ -21,7 +21,6 @@
  * SOFTWARE.
  */
 
-
 package de.hpi.bpmn2_0.model.callable;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -29,11 +28,15 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
+import de.hpi.bpmn2_0.model.activity.misc.BusinessRuleTaskImplementation;
 
 /**
- * <p>Java class for tGlobalBusinessRuleTask complex type.
+ * <p>
+ * Java class for tGlobalBusinessRuleTask complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within
+ * this class.
  * 
  * <pre>
  * &lt;complexType name="tGlobalBusinessRuleTask">
@@ -50,39 +53,39 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tGlobalBusinessRuleTask")
-public class GlobalBusinessRuleTask
-    extends GlobalTask
-{
+public class GlobalBusinessRuleTask extends GlobalTask {
 
-    @XmlAttribute(name = "implementation")
-    protected String implementation;
+	/* Constructors */
+	public GlobalBusinessRuleTask() {
+		super();
+	}
 
-    /**
-     * Gets the value of the implementation property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getImplementation() {
-        if (implementation == null) {
-            return "##unspecified";
-        } else {
-            return implementation;
-        }
-    }
+	public GlobalBusinessRuleTask(GlobalTask gt) {
+		super(gt);
+	}
 
-    /**
-     * Sets the value of the implementation property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setImplementation(String value) {
-        this.implementation = value;
-    }
+	@XmlAttribute(name = "implementation")
+	protected BusinessRuleTaskImplementation implementation;
+
+	/**
+	 * Gets the value of the implementation property.
+	 * 
+	 * @return possible object is {@link String }
+	 * 
+	 */
+	public BusinessRuleTaskImplementation getImplementation() {
+		return implementation;
+	}
+
+	/**
+	 * Sets the value of the implementation property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link BusinessRuleTaskImplementation }
+	 * 
+	 */
+	public void setImplementation(BusinessRuleTaskImplementation value) {
+		this.implementation = value;
+	}
 
 }

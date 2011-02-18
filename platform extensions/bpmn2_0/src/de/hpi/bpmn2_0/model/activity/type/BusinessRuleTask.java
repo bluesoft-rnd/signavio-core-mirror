@@ -31,6 +31,8 @@ import javax.xml.bind.annotation.XmlType;
 
 import de.hpi.bpmn2_0.model.activity.Task;
 import de.hpi.bpmn2_0.model.activity.misc.BusinessRuleTaskImplementation;
+import de.hpi.bpmn2_0.model.callable.GlobalBusinessRuleTask;
+import de.hpi.bpmn2_0.model.callable.GlobalTask;
 import de.hpi.bpmn2_0.transformation.Visitor;
 
 
@@ -79,6 +81,13 @@ public class BusinessRuleTask
 	
 	public void acceptVisitor(Visitor v){
 		v.visitBusinessRuleTask(this);
+	}
+	
+	public GlobalTask getAsGlobalTask() {
+		GlobalBusinessRuleTask brGt = new GlobalBusinessRuleTask(super.getAsGlobalTask());
+		brGt.setImplementation(this.getImplementation());
+		
+		return brGt;
 	}
 	
 	

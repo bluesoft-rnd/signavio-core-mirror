@@ -75,6 +75,17 @@ import de.hpi.bpmn2_0.model.activity.resource.ResourceRole;
 public class GlobalTask
     extends CallableElement
 {
+	
+	/* Constructors */
+	public GlobalTask() {
+		super();
+	}
+	
+	public GlobalTask(GlobalTask gt) {
+		super(gt);
+		
+		this.getResourceRole().addAll(gt.getResourceRole());
+	}
 
     @XmlElements({
     	@XmlElement(type = ResourceRole.class),
