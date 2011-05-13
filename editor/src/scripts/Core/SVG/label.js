@@ -528,7 +528,7 @@ ORYX.Core.SVG.Label = Clazz.extend({
 						this.node.textContent = ""; // Remove content
 						textLines.each((function(textLine, index){
 							var tspan = this.node.ownerDocument.createElementNS(ORYX.CONFIG.NAMESPACE_SVG, 'tspan');
-							tspan.textContent = textLine;
+							tspan.textContent = textLine.trim();
 							if (this.fitToElemId) {
 								tspan.setAttributeNS(null, 'x', this.invisibleRenderPoint);
 								tspan.setAttributeNS(null, 'y', this.invisibleRenderPoint);
@@ -607,11 +607,11 @@ ORYX.Core.SVG.Label = Clazz.extend({
 									var newtspan = this.node.ownerDocument.createElementNS(ORYX.CONFIG.NAMESPACE_SVG, 'tspan');
 									if (lastSeperatorIndex <= startIndex) {
 										lastSeperatorIndex = (i == 0) ? i : i-1;
-										newtspan.textContent = tspan.textContent.slice(startIndex, lastSeperatorIndex);
+										newtspan.textContent = tspan.textContent.slice(startIndex, lastSeperatorIndex).trim();
 										//lastSeperatorIndex = i;
 									}
 									else {
-										newtspan.textContent = tspan.textContent.slice(startIndex, ++lastSeperatorIndex);
+										newtspan.textContent = tspan.textContent.slice(startIndex, ++lastSeperatorIndex).trim();
 									}
 									
 									newtspan.setAttributeNS(null, 'x', this.invisibleRenderPoint);
@@ -637,7 +637,7 @@ ORYX.Core.SVG.Label = Clazz.extend({
 								}
 							}
 							
-							tspan.textContent = tspan.textContent.slice(startIndex);
+							tspan.textContent = tspan.textContent.slice(startIndex).trim();
 						}
 						
 						newtspans.push(tspan);
