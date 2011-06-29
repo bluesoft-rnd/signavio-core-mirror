@@ -272,10 +272,10 @@ new function(){
 			// http://code.google.com/p/chromium/issues/detail?id=58493
 			
 			// Check if there exists the bug in the current chrome version
-			var parseNode = (new DOMParser()).parseFromString("<div ext:qtip='tooltip'></div>", "text/xml");
-			if (parseNode.getElementsByTagName("parsererror").length == 0){
-				return;
-			}
+//			var parseNode = (new DOMParser()).parseFromString("<div ext:qtip='tooltip'></div>", "text/xml");
+//			if (parseNode.getElementsByTagName("parsererror").length == 0){
+//				return;
+//			}
 			
 			// @overwrite
 			var inHtml = Ext.DomHelper.insertHtml;
