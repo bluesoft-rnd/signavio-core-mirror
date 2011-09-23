@@ -1,4 +1,4 @@
-package com.signavio.warehouse.model.syntaxchecker;
+package de.hpi.bpmn2_0.validation;
 
 import java.util.List;
 
@@ -10,7 +10,6 @@ import de.hpi.bpmn2_0.exceptions.BpmnConverterException;
 import de.hpi.bpmn2_0.factory.AbstractBpmnFactory;
 import de.hpi.bpmn2_0.model.Definitions;
 import de.hpi.bpmn2_0.transformation.Diagram2BpmnConverter;
-import de.hpi.bpmn2_0.validation.BPMN2SyntaxChecker;
 import de.hpi.diagram.verification.SyntaxChecker;
 
 public class SyntaxCheckerPerformer {
@@ -52,7 +51,7 @@ public class SyntaxCheckerPerformer {
 //	}
 	
 	public JSONObject processDocument(GenericDiagram diagram, List<Class<? extends AbstractBpmnFactory>> factoryClasses) throws JSONException, BpmnConverterException {
-//		GenericDiagram diagram = BasicDiagramBuilder.parseJson(jsonDocument);
+//		GenericDiagram diagram = DiagramBuilder.parseJson(jsonDocument);
 		
 		//TODO: validate edges that are not in the java object model
 //		ArrayList<Shape> edges = this.getEdgesFromDiagram(diagram.getChildShapes());
@@ -96,7 +95,7 @@ public class SyntaxCheckerPerformer {
 //	}
 	
 	protected SyntaxChecker getCheckerBPMN2(GenericDiagram diagram, List<Class<? extends AbstractBpmnFactory>> factoryClasses) throws BpmnConverterException {
-		Diagram2BpmnConverter converter = new Diagram2BpmnConverter(diagram, factoryClasses);
+		Diagram2BpmnConverter converter = new Diagram2BpmnConverter(diagram, factoryClasses, false);
 		
 		Definitions defs = converter.getDefinitionsFromDiagram();
 		return new BPMN2SyntaxChecker(defs);
