@@ -31,8 +31,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.json.JSONException;
-import org.oryxeditor.server.diagram.Diagram;
-import org.oryxeditor.server.diagram.DiagramBuilder;
+import org.oryxeditor.server.diagram.basic.BasicDiagramBuilder;
+import org.oryxeditor.server.diagram.generic.GenericDiagram;
 
 import com.signavio.platform.security.business.FsSecureBusinessObject;
 import com.signavio.platform.util.fsbackend.FileSystemUtil;
@@ -108,8 +108,8 @@ public class FsModel extends FsSecureBusinessObject {
 		}
 		
 		FsModelRevision rev = getHeadRevision();
-		Diagram diagram = DiagramBuilder.parseJson(new String(rev.getRepresentation(RepresentationType.JSON).getContent(), "utf8"));
-		String namespace = diagram.getStencilset().getNamespace();
+		GenericDiagram diagram = BasicDiagramBuilder.parseJson(new String(rev.getRepresentation(RepresentationType.JSON).getContent(), "utf8"));
+		String namespace = diagram.getStencilsetRef().getNamespace();
 		
 		if (ModelTypeManager.getInstance().getModelType(namespace).renameFile(getParentDirectory().getPath(), this.name, name)){
 			this.name = name;
@@ -166,13 +166,13 @@ public class FsModel extends FsSecureBusinessObject {
 	}
 	
 	public void createRevision(String jsonRep, String svgRep, String comment) {
-		Diagram diagram;
+		GenericDiagram diagram;
 		try {
-			diagram = DiagramBuilder.parseJson(jsonRep);
+			diagram = BasicDiagramBuilder.parseJson(jsonRep);
 		} catch (JSONException e) {
 			throw new IllegalArgumentException("JSON representation of diagram is not valid.", e);
 		}
-		String namespace = diagram.getStencilset().getNamespace();
+		String namespace = diagram.getStencilsetRef().getNamespace();
 		ModelTypeManager.getInstance().getModelType(namespace).storeRevisionToModelFile(jsonRep, svgRep, getPath());
 	}
 	
@@ -193,15 +193,15 @@ public class FsModel extends FsSecureBusinessObject {
 	
 	public void delete() {
 		FsModelRevision rev = getHeadRevision();
-		Diagram diagram;
+		GenericDiagram diagram;
 		try {
-			diagram = DiagramBuilder.parseJson(new String(rev.getRepresentation(RepresentationType.JSON).getContent(), "utf8"));
+			diagram = BasicDiagramBuilder.parseJson(new String(rev.getRepresentation(RepresentationType.JSON).getContent(), "utf8"));
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException("Deleting model failed.", e);
 		} catch (JSONException e) {
 			throw new RuntimeException("Deleting model failed.", e);
 		}
-		String namespace = diagram.getStencilset().getNamespace();
+		String namespace = diagram.getStencilsetRef().getNamespace();
 		
 		ModelTypeManager.getInstance().getModelType(namespace).deleteFile(getParentDirectory().getPath(), this.name);
 	}
@@ -225,8 +225,8 @@ public class FsModel extends FsSecureBusinessObject {
 		}
 
 		FsModelRevision rev = getHeadRevision();
-		Diagram diagram = DiagramBuilder.parseJson(new String(rev.getRepresentation(RepresentationType.JSON).getContent(), "utf8"));
-		String namespace = diagram.getStencilset().getNamespace();
+		GenericDiagram diagram = BasicDiagramBuilder.parseJson(new String(rev.getRepresentation(RepresentationType.JSON).getContent(), "utf8"));
+		String namespace = diagram.getStencilsetRef().getNamespace();
 		
 		if (!ModelTypeManager.getInstance().getModelType(namespace).renameFile("", parent.getPath() + File.separator + this.name, newParent.getPath() + File.separator + this.name)){
 			throw new IllegalArgumentException("Cannot move model");

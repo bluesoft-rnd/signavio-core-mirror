@@ -21,19 +21,14 @@
  */
 package com.signavio.warehouse.model.handler;
 
-import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.oryxeditor.server.diagram.Diagram;
-import org.oryxeditor.server.diagram.DiagramBuilder;
 
 import com.signavio.platform.annotations.HandlerConfiguration;
 import com.signavio.platform.annotations.HandlerMethodActivation;
@@ -43,13 +38,9 @@ import com.signavio.platform.handler.BasisHandler;
 import com.signavio.platform.security.business.FsAccessToken;
 import com.signavio.platform.security.business.FsSecureBusinessObject;
 import com.signavio.platform.security.business.FsSecurityManager;
-import com.signavio.platform.util.fsbackend.FileSystemUtil;
 import com.signavio.warehouse.directory.business.FsDirectory;
-import com.signavio.warehouse.directory.business.FsRootDirectory;
 import com.signavio.warehouse.exceptions.EncodingException;
 import com.signavio.warehouse.model.business.FsModel;
-import com.signavio.warehouse.model.business.ModelType;
-import com.signavio.warehouse.model.business.ModelTypeManager;
 import com.signavio.warehouse.revision.business.FsModelRevision;
 import com.signavio.warehouse.revision.business.RepresentationType;
 

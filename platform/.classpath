@@ -32,6 +32,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/junit-4.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/serializer.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/activation.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/platform-extension-syntaxchecker.jar"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/org.json.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/commons-collections-2.1.1.jar"/>

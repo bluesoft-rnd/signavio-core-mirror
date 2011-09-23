@@ -1,7 +1,6 @@
 package com.signavio.warehouse.model.handler;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -10,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.oryxeditor.server.diagram.basic.BasicDiagramBuilder;
 
 import com.signavio.platform.annotations.HandlerConfiguration;
 import com.signavio.platform.exceptions.IORequestException;
@@ -52,7 +52,7 @@ public class SyntaxCheckerHandler extends BasisHandler {
 				
 				SyntaxCheckerPerformer checker = new SyntaxCheckerPerformer();
 				
-				result = checker.processDocument(json, factoryClasses);
+				result = checker.processDocument(BasicDiagramBuilder.parseJson(json), factoryClasses);
 			} //else {
 //				String rdf = req.getParameter("data");
 //				

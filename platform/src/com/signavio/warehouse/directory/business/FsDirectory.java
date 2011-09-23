@@ -32,8 +32,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.json.JSONException;
-import org.oryxeditor.server.diagram.Diagram;
-import org.oryxeditor.server.diagram.DiagramBuilder;
+import org.oryxeditor.server.diagram.basic.BasicDiagramBuilder;
+import org.oryxeditor.server.diagram.generic.GenericDiagram;
 
 import com.signavio.platform.security.business.FsSecureBusinessObject;
 import com.signavio.platform.security.business.util.UUID;
@@ -189,8 +189,9 @@ public class FsDirectory extends FsSecureBusinessObject {
 		
 		String namespace;
 		try {
-			Diagram diagram = new DiagramBuilder().parseJson(jsonRep);
-			namespace = diagram.getStencilset().getNamespace();
+			GenericDiagram diagram = BasicDiagramBuilder.parseJson(jsonRep);
+			
+			namespace = diagram.getStencilsetRef().getNamespace();
 		} catch (JSONException e) {
 			throw new IllegalStateException("Could not create new model", e);
 		}
