@@ -21,9 +21,9 @@
     <circle id="bg_frame" cx="16" cy="16" r="14" stroke="black" fill="url(#background) white" stroke-width="3"/>
 
     <path 
-		style="fill:#000000;
-		fill-opacity:1;
-		stroke:#000000;
+    	fill="black"
+    	stroke="black"
+		style="fill-opacity:1;
 		stroke-width:1;
 		stroke-linejoin:bevel;
 		stroke-opacity:1"

@@ -22,6 +22,7 @@
 	stroke="none"
 	fill="none" />
   <path 
+  	id = "frame"
 	d="M20,1 L1,1 L1,50 L20,50" 
 	oryx:anchors="top bottom left" 
 	stroke="black" 

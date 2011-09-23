@@ -49,47 +49,50 @@
 			stroke="black">
 		</text>
     	
- 	<a id="u" target="_blank">
-	 	<g id="b" 
-			oryx:anchors="bottom">
+ 	
+	 	<g 	id="b" 
+			oryx:anchors="bottom"
+			transform="translate(1)">
 			
-		 	<rect oryx:anchors="bottom" x="44" y="66" width="14" height="14" fill="none" stroke="black" stroke-width="1" />
-			<path oryx:anchors="bottom" fill="none" stroke="black" d="M51 68 v10 M 46 73 h10" stroke-width="1"/>
+		 	<rect id="plusborder" oryx:anchors="bottom" x="43" y="66" width="14" height="14" fill="none" stroke="black" stroke-width="1" />
+			<path id="plus" oryx:anchors="bottom" fill="none" stroke="black" d="M50 68 v10 M 45 73 h10" stroke-width="1"/>
 		
 		</g>
-	</a>
+	
 	<g id="none"></g>
 	<g id="loop">
 		<path
-	         oryx:anchors="bottom"
-	       	style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:2.0999999;stroke-dasharray:none;stroke-opacity:1"
-	         id="path2396"
-	         d="M 50.5,72 L 50.5,75 L 47.5,75 M 50.5,75 A 4.875,4.875 0 1 1 54.5,75"
-			transform="translate(-15.5,0)"
+	        oryx:anchors="bottom"
+	        stroke="black"
+	       	style="opacity:1;fill:none;fill-opacity:1;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:2.0999999;stroke-dasharray:none;stroke-opacity:1"
+	        id="path2396"
+	        d="M 49.5,72 L 49.5,75 L 46.5,75 M 49.5,75 A 4.875,4.875 0 1 1 53.5,75"
+			transform="translate(-15.5)"
 	         />
 	</g>
 	
 
 	<g id="parallel">
-		<path oryx:anchors="bottom" fill="none" stroke="black" d="M47 65 v10 M51 65 v10 M55 65 v10" stroke-width="2" transform="translate(-15 0)" />
+		<path id="parallelpath" oryx:anchors="bottom" fill="none" stroke="black" d="M46 65 v10 M50 65 v10 M54 65 v10" stroke-width="2" transform="translate(-14)" />
 	</g>
 	<g id="sequential">
-		<path oryx:anchors="bottom" fill="none" stroke="#000000" stroke-width="2" d="M42,66H32 M42,70H32 M42,74H32"/>
+		<path id="sequentialpath" oryx:anchors="bottom" fill="none" stroke="#000000" stroke-width="2" d="M45,67 h10 M45,71 h10 M45,75 h10" transform="translate(-14)"/>
 	</g>
 	
 	
-	<g id="adhoc">
-		<text 
+	<g id="adhoc" transform="translate(16)">
+		<path
+			id="adhocpath"
+			d="m 55,70 0,2.0343 c -0.54305,0.60192 -1.04853,1.0324 -1.51647,1.29142 -0.46216,0.25908 -0.94744,0.38857 -1.4558,0.38857 -0.57194,0 -1.23628,-0.22473 -1.99307,-0.67428 -0.0577,-0.0306 -0.10111,-0.0534 -0.12999,-0.0687 -0.0346,-0.0228 -0.0896,-0.0533 -0.16464,-0.0915 -0.80878,-0.47234 -1.4558,-0.70857 -1.94107,-0.70857 -0.46217,0 -0.91566,0.14858 -1.36047,0.44576 -0.44485,0.2895 -0.92434,0.75046 -1.43849,1.38285 l 0,-2.03429 c 0.54881,-0.60194 1.05431,-1.0324 1.51647,-1.29147 0.46793,-0.26666 0.9532,-0.39999 1.45581,-0.39999 0.57191,0 1.24205,0.22856 2.01039,0.68574 0.0461,0.0308 0.0838,0.0533 0.11266,0.0687 0.0404,0.0228 0.0982,0.0533 0.1733,0.0913 0.803,0.4724 1.45002,0.70861 1.94108,0.70857 0.44481,4e-5 0.88676,-0.14475 1.32581,-0.43429 0.43905,-0.2895 0.9272,-0.75425 1.46448,-1.39428"
 			oryx:anchors="bottom"
-			x="61"
-			y="77"
-			font-size="20"
-			transform="translate(14,0)"
-		>~</text>
+			stroke="#000000" 
+			fill="black"
+			stroke-width="1"
+		/>
 	</g>
 	<g id="compensation">
-		<path oryx:anchors="bottom" fill="none" stroke="black" d="M 51 70 L 56 65 L 56 75z M45.7 70 L50.7 75 L 50.7 65z" stroke-width="1"
-		transform="translate(-28,0)" />
+		<path id="compensationpath" oryx:anchors="bottom" fill="none" stroke="black" d="M 50 70 L 55 65 L 55 75z M44.7 70 L49.7 75 L 49.7 65z" stroke-width="1"
+		transform="translate(-27,0)" />
 	</g>
   </g>
 </svg>
