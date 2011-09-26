@@ -3533,204 +3533,204 @@
 				"canContainArtifacts"				
 			]
 		},
-		/*
-		{
-			"type" : 			"node",
-			"id" :				"VerticalPool",
-			"title" :			"Pool",
-			"groups" :			["Swimlanes"],
-			"groups_de" :		["Rollen"],
-			"description" :		"Pools and Lanes represent responsibilities for activities in a process. A pool or a lane can be an organization, a role, or a system.",
-			"description_de" :	"Pools repräsentieren Organisationseinheiten und können durch Lanes weiter aufgefächert bzw. unterstrukturiert werden.",
-			"view" :			"swimlane/vertical.pool.svg",
-			"icon" :			"swimlane/vertical.pool.png",
-			"hide" : 			true,
-			"propertyPackages": [
-				"baseAttributes",
-				"pool",
-				"participantmultiplicity",
-				"process",
-				"bgColor",
-				"borderColor",
-				"processid"
-			],
-			"properties" : [
-				{
-					"id":"bordercolor",
-					"type":"Color",
-					"title":"Border color",
-					"title_de":"Rahmenfarbe",
-					"value":"#000000",
-					"description":"Change the border color for a visual differentiation.",
-					"description_de":"Ändern Sie die Rahmenfarbe für eine visuelle Unterscheidung.",
-					"readonly":false,
-					"optional":false,
-					"refToView":["c", "caption", "captionDisableAntialiasing", "multiinstancepath"],
-					"fill":false,
-					"stroke":true
-				}
-			],
-			"roles" : 			[
-				"all",
-				"messageflow_start",
-				"messageflow_end",
-				"fromtoall",
-				"canContainArtifacts"				
-			],
-			"layout" : [{"type" : "layout.bpmn2_0.pool", "orientation" : "vertical"}]
-		},
-		{
-			"type" : 			"node",
-			"id" :				"CollapsedVerticalPool",
-			"title" :			"Collapsed Pool",
-			"title_de" :		"Zugeklappter Pool",
-			"groups" :			["Swimlanes"],
-			"groups_de" :		["Rollen"],
-			"description" :		"Collapsed Pools hide all internals of the contained processes.",
-			"description_de" :	"Ein zugeklappter Pool (anonym) kommt zum Einsatz, wenn der innere Ablauf eines Kommunikationspartners keine unmittelbare Rolle spielt.",
-			"view" :			"swimlane/vertical.collapsed.pool.svg",
-			"icon" :			"swimlane/vertical.lane.png",
-			"hide" : 			true,
-			"propertyPackages": [
-				"baseAttributes",
-				"pool",
-				"participantmultiplicity",
-				"process",
-				"bgColor",
-				"borderColor",
-				"processid"
-			],
-			"properties" : 		[
-				{
-					"id":"bgcolor",
-					"type":"Color",
-					"title":"Background color",
-					"title_de":"Hintergrundfarbe",
-					"value":"#ffffff",
-					"description":"Change the background color for a visual differentiation.",
-					"description_de":"Verändern Sie die Hintergrundfarbe für eine visuelle Unterscheidung.",
-					"readonly":false,
-					"optional":false,
-					"refToView":"fill_el",
-					"fill":true,
-					"stroke":false,
-					"lightness" : 0.5
-				},
-				{
-					"id":"bordercolor",
-					"type":"Color",
-					"title":"Border color",
-					"title_de":"Rahmenfarbe",
-					"value":"#000000",
-					"description":"Change the border color for a visual differentiation.",
-					"description_de":"Ändern Sie die Rahmenfarbe für eine visuelle Unterscheidung.",
-					"readonly":false,
-					"optional":false,
-					"refToView":["c", "border", "multiinstancepath"],
-					"fill":false,
-					"stroke":true
-				}
-			],
-			"roles" :		 	[
-				"all",
-				"messageflow_start",
-				"messageflow_end",
-				"fromtoall"				
-			]
-		},
-		{
-			"type" : 			"node",
-			"id" :				"VerticalLane",
-			"title" :			"Lane",
-			"groups" :			["Swimlanes"],
-			"groups_de" :		["Rollen"],
-			"description" :		"Pools and Lanes represent responsibilities for activities in a process. A pool or a lane can be an organization, a role, or a system. Lanes sub-divide pools or other lanes hierarchically.",
-			"description_de" :	"Pools und Lanes repräsentieren Rollen. Lanes repräsentieren Verantwortlichkeiten, wie etwa Organisationseinheiten, Stellen oder IT-Systeme. Lanes können hierarchisch in weitere Unter-Lanes untergliedert sein.",
-			"view" :			"swimlane/vertical.lane.svg",
-			"icon" :			"swimlane/vertical.lane.png",
-			"hide" : 			true,
-			"propertyPackages": [
-				"baseAttributes",
-				"borderColor"
-			],
-			"properties" : 		[
-				{
-					"id":"parentpool",
-					"type":"String",
-					"title":"Parent pool",
-					"title_de":"Elternpool",
-					"value":"",
-					"description":"The specified pool the lane belongs to.",
-					"description_de":"Der übergeordnete Pool, zu dem die Lane geört.",
-					"readonly":false,
-					"optional":false,
-					"refToView":"",
-					"length":"30"
-				},
-				{
-					"id":"parentlane",
-					"type":"String",
-					"title":"Parent lane",
-					"title_de":"Elternlane",
-					"value":"",
-					"description":"The specified lane the lane belongs to.",
-					"description_de":"Die Übergeordnete Lane, zu der die Lane gehört.",
-					"readonly":false,
-					"optional":true,
-					"refToView":"",
-					"length":"30"
-				},
-				{
-					"id":"showcaption",
-					"type":"Boolean",
-					"title":"Show caption",
-					"title_de":"Zeige Beschriftung",
-					"value":"true",
-					"description":"",
-					"readonly":true,
-					"optional":false,
-					"refToView": ["caption", "captionDisableAntialiasing", "text_name"],
-					"fill":true,
-					"visible":false,
-					"stroke":false,
-					"hidden":true
-				},
-				{
-					"id":"bgcolor",
-					"type":"Color",
-					"title":"Background color",
-					"title_de":"Hintergrundfarbe",
-					"value":"",
-					"description":"Change the background color for a visual differentiation.",
-					"description_de":"Verändern Sie die Hintergrundfarbe für eine visuelle Unterscheidung.",
-					"readonly":false,
-					"optional":true,
-					"refToView":["fill_el"],
-					"fill":true,
-					"stroke":false,
-					"lightness": 0.5
-				},
-				{
-					"id":"bordercolor",
-					"type":"Color",
-					"title":"Border color",
-					"title_de":"Rahmenfarbe",
-					"value":"#000000",
-					"description":"Change the border color for a visual differentiation.",
-					"description_de":"Ändern Sie die Rahmenfarbe für eine visuelle Unterscheidung.",
-					"readonly":false,
-					"optional":false,
-					"refToView":["border", "captionDisableAntialiasing"],
-					"fill":false,
-					"stroke":true
-				}
-			],
-			"roles": 			[
-				"PoolChild",
-				"fromtoall",
-				"canContainArtifacts"				
-			]
-		},*/
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
         {
             "type" :            "node",
             "id" :              "processparticipant",
