@@ -1,0 +1,10 @@
+*.iml
+*.iws
+*.iwp
+.idea/
+.settings
+.project
+.classpath
+target
+build
+buildApp
