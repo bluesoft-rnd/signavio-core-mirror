@@ -9,6 +9,10 @@
 	if (!Signavio.Core) { Signavio.Core = {} };
 	Signavio.Core.Version = "${version}";
 			</echo>
+		<echo file="build/aperteLinks.js">
+		   var APERTE_STEP_EDITOR_URL = "${jbpmGuiUrl}${aperteStepEditorUrl}";
+		   var APERTE_QUEUE_EDITOR_URL = "${jbpmGuiUrl}${aperteQueueEditorUrl}";
+		</echo>
 	</target>
 
 	<target name="com.signavio.configuration.copy.editor" depends="com.signavio.configuration.createVersionFile">
@@ -16,6 +20,7 @@
 		<copy file="${configuration}/editor/stencilsets.json" tofile="../editor/data/stencilsets/stencilsets.json" overwrite="true" />
 		<copy file="${configuration}/editor/extensions.json" tofile="../editor/data/stencilsets/extensions/extensions.json" overwrite="true" />
 		<copy file="build/version.js" todir="../editor/src/scripts/Plugins/" overwrite="true" />
+		<copy file="build/aperteLinks.js" todir="../editor/src/scripts/Plugins/" overwrite="true" />
 	</target>
 
 	<target name="com.signavio.configuration.copy.explorer" depends="com.signavio.configuration.createVersionFile">
@@ -33,6 +38,11 @@
 		<echo file="../platform/conf/classpath/configuration.properties">
 			host = ${host}
 			fileSystemRootDirectory = ${fileSystemRootDirectory}
+			aperteStepEditorUrl = ${aperteStepEditorUrl}
+			aperteQueueEditorUrl = ${aperteQueueEditorUrl}
+			aperteStepListUrl = ${aperteStepListUrl}
+            aperteOsgiPluginsDir = ${aperteOsgiPluginsDir}
+			jbpmGuiUrl = ${jbpmGuiUrl}
 		</echo>
 	</target>
 
