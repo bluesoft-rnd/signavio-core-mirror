@@ -3,11 +3,17 @@
 
 	<plugins>
 		<plugin source="version.js" name="" />
+		<plugin source="aperteLinks.js" name="" />
 		<plugin source="signavio.js" name="Signavio.Plugins.Loading" />
 
 		<!-- following plugins require Ext -->		
 		<plugin source="toolbar.js" name="ORYX.Plugins.Toolbar" />
 		<plugin source="shapemenu.js" name="ORYX.Plugins.ShapeMenuPlugin">
+			<property group="Alignment" align="Oryx_Top" />
+			<property group="Edit" align="Oryx_Left" />				
+            <notUsesIn namespace="http://b3mn.org/stencilset/bpmn2.0#"/>			
+		</plugin>
+		<plugin source="aperteuishapemenu.js" name="ORYX.Plugins.AperteUiShapeMenuPlugin">
 			<property group="Alignment" align="Oryx_Top" />
 			<property group="Edit" align="Oryx_Left" />					
 		</plugin>
@@ -16,7 +22,11 @@
 			<notUsesIn namespace="http://b3mn.org/stencilset/timjpdl3#"/>
 		</plugin>
 		<plugin source="shaperepository.js" name="ORYX.Plugins.ShapeRepository" />
-		<plugin source="propertywindow.js" name="ORYX.Plugins.PropertyWindow" />
+		<plugin source="propertywindow.js" name="ORYX.Plugins.PropertyWindow">
+		  <notUsesIn namespace="http://b3mn.org/stencilset/bpmn2.0#"/>			
+		</plugin>
+		<plugin source="aperteuipropertywindow.js" name="ORYX.Plugins.AperteUiPropertyWindow" />
+			
 		<plugin source="loading.js" name="ORYX.Plugins.Loading" />
 		<plugin source="canvasResize.js" name="ORYX.Plugins.CanvasResize">
 			<notUsesIn namespace="http://b3mn.org/stencilset/xforms#"/>
@@ -33,7 +43,13 @@
 		<plugin source="arrangement.js" name="ORYX.Plugins.Arrangement">
 			<notUsesIn namespace="http://b3mn.org/stencilset/xforms#"/>
 		</plugin>
-		<plugin source="file.js" name="ORYX.Plugins.Save"/>
+		<plugin source="file.js" name="ORYX.Plugins.Save">
+		  <notUsesIn namespace="http://b3mn.org/stencilset/bpmn2.0#"/>			
+		</plugin>
+		<plugin source="aperteuifile.js" name="ORYX.Plugins.AperteUiSave" />
+		
+		<plugin source="deploy.js" name="ORYX.Plugins.Deploy"/>
+		<plugin source="queueeditor.js" name="ORYX.Plugins.QueueEditor"/>
 		<plugin source="view.js" name="ORYX.Plugins.View" />
 		<plugin source="dragdropresize.js" name="ORYX.Plugins.DragDropResize" />
 		<plugin source="shapeHighlighting.js" name="ORYX.Plugins.HighlightingSelectedShapes" />
@@ -60,7 +76,7 @@
 		</plugin>	
 		
 		<!-- BPMN1.1 specific plugins -->
-		<plugin source="bpmn11.js" name="ORYX.Plugins.BPMN11">
+	<!--	<plugin source="bpmn11.js" name="ORYX.Plugins.BPMN11">
 			<requires namespace="http://b3mn.org/stencilset/bpmn1.1#"/>
 			<requires namespace="http://b3mn.org/stencilset/timjpdl3#"/>
 			<requires namespace="http://b3mn.org/stencilset/jbpm4#"/>
@@ -68,7 +84,7 @@
 		
 		<plugin source="bpmnLayouter.js" name="ORYX.Plugins.BpmnLayouter">
 			<requires namespace="http://b3mn.org/stencilset/bpmn1.1#"/>	
-		</plugin>
+		</plugin> -->
 		
 		<!-- Begin: BPMN2.0 specific plugins -->
 		<plugin source="bpmn2.0/bpmn2.0.js" name="ORYX.Plugins.BPMN2_0">
@@ -77,13 +93,13 @@
 			<requires namespace="http://b3mn.org/stencilset/bpmn2.0choreography#"/>
 		</plugin>
 		
-		<plugin source="bpmn2.0/bpmn2conversation.js" name="ORYX.Plugins.BPMN2CONVERSATION">
+<!--		<plugin source="bpmn2.0/bpmn2conversation.js" name="ORYX.Plugins.BPMN2CONVERSATION">
 			<requires namespace="http://b3mn.org/stencilset/bpmn2.0conversation#" />
 		</plugin>
 		
 		<plugin source="bpmn2.0/bpmn2.0choreography.js" name="ORYX.Plugins.Bpmn2_0Choreography">
 			<requires namespace="http://b3mn.org/stencilset/bpmn2.0choreography#"/>
-		</plugin>		
+		</plugin>		 -->
 		
 		<!-- End: BPMN2.0 specific plugins -->
 	</plugins>
@@ -97,5 +113,7 @@
 		<property group="Z-Order" index="6" />
 		<property group="Docker" index="7" />
 		<property group="Zoom" index="8" />	
+		<property group="Deploy" index="9" />	
+		<property group="QueueEditor" index="a" />	
 	</properties>
 </config>

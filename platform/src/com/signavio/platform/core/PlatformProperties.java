@@ -40,4 +40,14 @@ public interface PlatformProperties {
 	public abstract Set<String> getAdmins();
 
 	public String getRootDirectoryPath();
+	
+	public String getAperteStepEditorUrl();
+	
+	public String getAperteQueueEditorUrl();
+	
+	public String getAperteStepListUrl();
+	
+	public String getAperteOsgiPluginsDir();
+	
+	public String getJbpmGuiUrl();
 }
