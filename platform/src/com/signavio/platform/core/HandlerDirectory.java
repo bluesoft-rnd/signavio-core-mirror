@@ -21,6 +21,10 @@
  */
 package com.signavio.platform.core;
 
+import com.signavio.platform.handler.AbstractHandler;
+import com.signavio.platform.handler.BasisHandler;
+
+import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -28,16 +32,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.servlet.ServletContext;
-
-import com.signavio.platform.handler.AbstractHandler;
-import com.signavio.platform.handler.BasisHandler;
+import java.util.*;
 
 /**
  * HandlerManager implements the manager to hold all HandlerEntries.
@@ -238,6 +233,7 @@ public class HandlerDirectory extends HashMap<String, HandlerEntry> implements D
 		this.registerHandlersOfPackage("com.signavio.warehouse.model.handler");
 		this.registerHandlersOfPackage("com.signavio.warehouse.revision.handler");
 		this.registerHandlersOfPackage("com.signavio.warehouse.search.handler");
+        this.registerHandlersOfPackage("pl.net.bluesoft.rnd.processtool.editor.platform.ext");
 	}
 
     
