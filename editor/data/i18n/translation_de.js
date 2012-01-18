@@ -51,6 +51,21 @@ ORYX.I18N.Arrangement.arDesc = "Rechts ausrichten";
 ORYX.I18N.Arrangement.as = "Größenangleichung";
 ORYX.I18N.Arrangement.asDesc = "Größenangleichung";
 
+if(!ORYX.I18N.Deploy) ORYX.I18N.Deploy = {};
+
+ORYX.I18N.Deploy.deploy = "Deploy.deploy";
+ORYX.I18N.Deploy.group = "Deploy";
+ORYX.I18N.Deploy.deployDesc = "Deploy.desc";
+ORYX.I18N.Deploy.deployAs = "deployAs";
+ORYX.I18N.Deploy.deployDescription = "deploydescription";
+
+if(!ORYX.I18N.QueueEditor) ORYX.I18N.QueueEditor = {};
+
+ORYX.I18N.QueueEditor.queueEditor = "Queue Editor";
+ORYX.I18N.QueueEditor.group = "QueueEditor";
+ORYX.I18N.QueueEditor.desc = "Queue Editor";
+
+
 if(!ORYX.I18N.Edit) ORYX.I18N.Edit = {};
 
 ORYX.I18N.Edit.group = "Edit";
