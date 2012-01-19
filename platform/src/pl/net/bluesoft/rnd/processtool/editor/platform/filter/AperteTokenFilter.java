@@ -2,7 +2,9 @@ package pl.net.bluesoft.rnd.processtool.editor.platform.filter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -23,10 +25,7 @@ public class AperteTokenFilter implements Filter {
     
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        // setup http client
 
-        // check if the servlet is accessible
-        // throw new UnavailableException(10, "Can not connect to Aperte Token Servlet");
     }
 
     @Override
@@ -36,11 +35,38 @@ public class AperteTokenFilter implements Filter {
 
         HttpSession session = req.getSession();
         if (session.getAttribute(APERTE_TOKEN_ATTRIBUTE_NAME) == null) {
-            session.setAttribute(APERTE_TOKEN_ATTRIBUTE_NAME, getAperteToken());
+            PlatformProperties props = Platform.getInstance().getPlatformProperties();
+            if (req.getParameter("token") == null) {
+                //redirect to token generation url
+                res.sendRedirect(props.getServerName() + props.getJbpmGuiUrl() + "/g_token?returl=" + req.getRequestURL() +
+                        (req.getRequestURL().indexOf("?") != -1 ? "&" : "?") +
+                        "token=");
+            } else {
+                //check token using background channel
+                URL u = new URL(props.getServerName() + props.getJbpmGuiUrl() + "/v_token?token=" + req.getParameter("token"));
+                //it has to be url connection!
+                HttpURLConnection urlConnection = (HttpURLConnection) u.openConnection();
+                if (urlConnection.getResponseCode() == 200) {
+                    String login = "";
+                    InputStream is = urlConnection.getInputStream();
+                    int c= 0;
+                    while ((c = is.read()) >= 0) {
+                        login += (char)c;
+                    }
+                    session.setAttribute(APERTE_TOKEN_ATTRIBUTE_NAME, login);
+
+                    filterChain.doFilter(req, res);
+                } else {
+                    res.setStatus(401);//do not redirect, this may result in infinite loop and server ddos
+                }
+
+            }
+
+        } else {
+            // do forward
+            filterChain.doFilter(req, res);
         }
 
-        // do forward
-        filterChain.doFilter(req, res);
     }
 
     @Override
@@ -57,8 +83,7 @@ public class AperteTokenFilter implements Filter {
  	        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
  	        StringBuffer sb = new StringBuffer();
  	        String line;
- 	        while ((line = rd.readLine()) != null)
- 	        {
+ 	        while ((line = rd.readLine()) != null) {
  	            sb.append(line);
  	        }
  	        rd.close();

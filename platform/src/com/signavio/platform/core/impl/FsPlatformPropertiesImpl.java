@@ -40,20 +40,20 @@ import java.util.Set;
  *
  */
 public class FsPlatformPropertiesImpl implements PlatformProperties {
-	private final String serverName;
-	private final String platformUri;
-	private final String explorerUri;
-	private final String editorUri;
-	private final String libsUri;
-	private final String supportedBrowserEditor;
+	private String serverName;
+	private String platformUri;
+	private String explorerUri;
+	private String editorUri;
+	private String libsUri;
+	private String supportedBrowserEditor;
 	
-	private final String rootDirectoryPath;
+	private String rootDirectoryPath;
 	
-	private final String aperteStepEditorUrl;
-	private final String aperteQueueEditorUrl;
-	private final String aperteStepListUrl;
-	private final String aperteOsgiPluginsDir;
-	private final String jbpmGuiUrl;
+	private String aperteStepEditorUrl;
+	private String aperteQueueEditorUrl;
+	private String aperteStepListUrl;
+	private String aperteOsgiPluginsDir;
+	private String jbpmGuiUrl;
 	
 
 	public FsPlatformPropertiesImpl(ServletContext context) {
@@ -79,6 +79,9 @@ public class FsPlatformPropertiesImpl implements PlatformProperties {
         }
 
 		serverName = props.getProperty("host");
+        if (serverName == null) {
+            serverName = "http://localhost:8080/";
+        }
 		platformUri = context.getContextPath() + "/p";
 		explorerUri = context.getContextPath() + "/explorer";
 		editorUri = context.getContextPath() + "/editor";
@@ -103,21 +106,18 @@ public class FsPlatformPropertiesImpl implements PlatformProperties {
 	}
 
     public static String getHomePath() {
-        String homePath = System.getProperty("aperte.workflow.home");
-        if (homePath != null) {
-            return homePath;
-        }
-        
-        homePath = System.getProperty("liferay.home");
-        if (homePath != null) {
-            return homePath;
-        }
 
-        homePath = System.getProperty("catalina.home");
-        if (homePath != null) {
-            return homePath;
+        String[] propertyNames = {
+                "aperte.workflow.home",
+                "liferay.home",
+                "catalina.home",
+                "jboss.home.dir",
+        };
+        for (String propertyName : propertyNames) {
+            String v = System.getProperty(propertyName);
+            if (v != null)
+                return v;
         }
-
         return "";
     }
 	

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project name="Signavio Core Components - Main Build Script">
+<project name="Signavio Core Components - Main Build Script" default="war">
 	<!-- PROPERTIES -->
 	<property file="build.properties" />
 
@@ -56,6 +56,9 @@
 		<delete dir="${dir-jboss-webapps}/${war}.war" />
 	</target>
 
+    <target name="war" depends="build-all-in-one-war">
+
+    </target>
 	<target name="build-all-in-one-war" depends="clean, configure-applications, prepare-explorer-for-all-in-one-war">
 
 		<mkdir dir="${target}" />

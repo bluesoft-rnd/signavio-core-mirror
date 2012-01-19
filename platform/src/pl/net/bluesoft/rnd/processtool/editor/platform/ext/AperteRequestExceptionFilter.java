@@ -9,6 +9,8 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Filter to translate the exception messages
@@ -16,11 +18,13 @@ import java.io.IOException;
 public class AperteRequestExceptionFilter implements Filter {
 
     private static final String SIGNAVIO_REQUEST_EXPECTION_PREFIX = "RequestException Error Code: ";
+    private static final Logger logger = Logger.getLogger(AperteRequestExceptionFilter.class.getName());
     
 	private ServletContext servletContext;
     private AperteMessageBundle messages;
 	
 	private void handleThrowable(Throwable t, HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException  {
+        logger.log(Level.SEVERE, t.getMessage(), t);
 		RequestException re = null;
 		if(t instanceof RequestException) {
 			re = (RequestException) t;
