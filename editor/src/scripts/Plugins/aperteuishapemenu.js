@@ -39,7 +39,7 @@ function editorSetData(retString){
 	var taskNameNewValue = retString.taskName;
 	var oldAC = lastEditedObjecyt.properties['oryx-aperte-conf'];
 	var newAC = Ext.encode(retString.params);
-	
+
     //check UNDO
 	if (taskNameOldValue == taskNameNewValue) {
 	    if (taskNameOldValue == "User") {
@@ -113,30 +113,29 @@ ORYX.Plugins.AperteUiShapeMenuPlugin = ORYX.Plugins.ShapeMenuPlugin.extend({
 		faccade = this.facade;
         var props = lastEditedObjecyt.properties;
 		var type =  props['oryx-tasktype'];
-        this.editorOpenNewWindow(type);
+		var name = props['oryx-name'];
+		var data =  props['oryx-aperte-conf'];
+        this.editorOpenNewWindow(name, type, data);
 	},
 	
     //Opens new popup windows
-    editorOpenNewWindow: function (stepname){
-         //aperteeditorwindow = window.open("", "aperteeditorwindow", "width=500,height=500");
-		var props = lastEditedObjecyt.properties;
-        data =  props['oryx-aperte-conf'];        
+    editorOpenNewWindow: function (stepName, stepType, stepAperteConfig){
 		var iframeName = "ifname";
-		
-		//post_to_url(url,iframeName,{"step_config":data,"restartApplication":"1"});
+		var props = lastEditedObjecyt.properties;
+
 		var rurl = window.location.href;
 		var base_editor_url = rurl.substr(0,rurl.indexOf('editor'));
 		var back_url = base_editor_url+"aperte_post";
 		
 		win = new Ext.Window({
-			width:750,
+			width:900,
 			height:500,
 			autoScroll:false,
 			html:'',
 			modal:true,
 			maximizable:true,
 			cls:'x-window-body-report',
-			title: 'Aperte Step Editor'
+			title:'Aperte Step Editor'
 		});
 		win.on('close', function() {
 			if(Ext.isIE) {
@@ -168,31 +167,43 @@ ORYX.Plugins.AperteUiShapeMenuPlugin = ORYX.Plugins.ShapeMenuPlugin.extend({
 			standardSubmit:true,
 			method:'POST',
 			defaultType:'hidden',
-			items:[	new Ext.form.TextField({id:'fdata',
-						name:'step_config',
+			items:[	new Ext.form.TextField({
+                        id:'stepName',
+                        name:'stepName',
+                        inputType:'text',
+                        fieldLabel:'step_config',
+                        value: stepName
+                    }),
+                    new Ext.form.TextField({
+                        id:'stepType',
+                        name:'stepType',
+                        inputType:'text',
+                        fieldLabel:'stepType',
+                        value: stepType
+                    }),
+			        new Ext.form.TextField({
+			            id:'stepConfig',
+						name:'stepConfig',
 						inputType:'text',
 						fieldLabel:'step_config',
-						value: data
+						value: stepAperteConfig
 					}),
-					new Ext.form.TextField({id:'fre',
+					new Ext.form.TextField({
+					    id:'fre',
 						name:'restartApplication',
 						inputType:'text',
 						fieldLabel:'restartApplication',
 						value: "1"
 					}),
-					new Ext.form.TextField({id:'cbe',
-						name:'callback_url',
+					new Ext.form.TextField({
+					    id:'cbe',
+						name:'callbackUrl',
 						inputType:'text',
-						fieldLabel:'callback_url',
+						fieldLabel:'callbackUrl',
 						value: back_url
 					}),
-					new Ext.form.TextField({id:'ttp',
-						name:'stepname',
-						inputType:'text',
-						fieldLabel:'stepname',
-						value: stepname
-					}),
-					new Ext.form.Hidden({id:'aperteToken',
+					new Ext.form.Hidden({
+					    id:'aperteToken',
                         name:'aperteToken',
                         value: aperteToken
                     })
@@ -249,7 +260,7 @@ ORYX.Plugins.AperteUiShapeMenuPlugin = ORYX.Plugins.ShapeMenuPlugin.extend({
 			icon: 			ORYX.PATH + 'images/aperte_small.png',
 			align: 			ORYX.CONFIG.SHAPEMENU_BOTTOM,
 			group:			0,
-			msg:			"Aperte Editor"
+			msg:			"Aperte Step Editor"
 		});				
 		
 		
