@@ -48,7 +48,7 @@ public class AperteHandler extends BasisHandler {
 
 
         try {
-            JSONObject ret = getStencilExtensionString((String)req.getSession().getAttribute("aperteToken"));
+            JSONObject ret = getStencilExtensionString();
             ret.write( res.getWriter() );
 
         } catch (IOException e) {
@@ -58,8 +58,8 @@ public class AperteHandler extends BasisHandler {
         }
     }
 
-    private JSONObject getStencilExtensionString(String aperteToken) throws IOException, JSONException {
-    	String jo = getDataFromServer(aperteToken);
+    private JSONObject getStencilExtensionString() throws IOException, JSONException {
+    	String jo = getDataFromServer();
     	
     	JSONArray pjo = ((jo == null) ? null : new JSONArray(jo));
 
@@ -303,11 +303,11 @@ public class AperteHandler extends BasisHandler {
         root.put("removeproperties",new JSONArray() );
     }
 
-    private  String getDataFromServer(String aperteToken) throws IOException {
+    private  String getDataFromServer() throws IOException {
         PlatformProperties props = Platform.getInstance().getPlatformProperties();
     	String stepListUrl = props.getServerName() + props.getJbpmGuiUrl() + props.getAperteStepListUrl();
         try {
-        	URL url = new URL(stepListUrl + "&aperteToken=" + aperteToken);
+        	URL url = new URL(stepListUrl);
 	        URLConnection conn = url.openConnection();
 	        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 	        StringBuffer sb = new StringBuffer();
