@@ -13,8 +13,7 @@ import java.util.Map;
 public class JPDLUserTask extends JPDLTask {
 
 	private Widget widget = null;
-	private String commentary; 
-	private String widgetName;
+	private String commentary;
 	
 	private String assignee;
 	private String swimlane;
@@ -49,21 +48,24 @@ public class JPDLUserTask extends JPDLTask {
 	@Override
 	public void fillBasicProperties(JSONObject json) throws JSONException {
 		super.fillBasicProperties(json);
+
+        // Properties from Signavion attributes
+        commentary = json.getJSONObject("properties").getString("documentation");
+
+        // Properties
 		String widgetJson = json.getJSONObject("properties").getString("aperte-conf");
 		if (widgetJson != null && widgetJson.trim().length() != 0) {
-		  widget = new Widget();
-		  widgetJson = Util.replaceXmlEscapeCharacters(widgetJson);
-		  JSONObject widgetJsonObj = new JSONObject(widgetJson);
-		  commentary = widgetJsonObj.getString("commentary");
-		  widgetName = widgetJsonObj.getString("name");
-		  assignee = widgetJsonObj.optString("assignee");
-		  swimlane = widgetJsonObj.optString("swimlane");
-		  candidateGroups = widgetJsonObj.optString("candidate_groups");
-		  JSONArray children = widgetJsonObj.optJSONArray("children");
-		  JSONObject properties = widgetJsonObj.optJSONObject("properties");
-		  JSONObject permissions = widgetJsonObj.optJSONObject("permissions");
-		  widget.setWidgetId(widgetJsonObj.getString("widgetId"));
-		  createWidgetTree(widget, children, properties, permissions);
+            widget = new Widget();
+            widgetJson = Util.replaceXmlEscapeCharacters(widgetJson);
+            JSONObject widgetJsonObj = new JSONObject(widgetJson);
+            assignee = widgetJsonObj.optString("assignee");
+            swimlane = widgetJsonObj.optString("swimlane");
+            candidateGroups = widgetJsonObj.optString("candidate_groups");
+            JSONArray children = widgetJsonObj.optJSONArray("children");
+            JSONObject properties = widgetJsonObj.optJSONObject("properties");
+            JSONObject permissions = widgetJsonObj.optJSONObject("permissions");
+            widget.setWidgetId(widgetJsonObj.getString("widgetId"));
+            createWidgetTree(widget, children, properties, permissions);
 		}
 	}
 	
@@ -151,8 +153,7 @@ public class JPDLUserTask extends JPDLTask {
 		sb.append(generateAttributesXML(widget.getAttributesMap()));
 		sb.append(generateChildrenXML(widget.getChildrenList(), false));
 		sb.append("</widgets>\n");
-		
-		
+
 		if (!outgoing.isEmpty()) {
 		  sb.append("<actions>\n");
  		  for (String resId : outgoing.keySet()) {
