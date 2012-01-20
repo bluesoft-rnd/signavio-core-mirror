@@ -34,7 +34,7 @@ public class AperteTokenFilter implements Filter {
             PlatformProperties props = Platform.getInstance().getPlatformProperties();
             if (req.getParameter("token") == null) {
                 //redirect to token generation url
-                res.sendRedirect(props.getServerName() + props.getJbpmGuiUrl() + "/g_token?returl=" + req.getRequestURL() +
+                res.sendRedirect(props.getJbpmGuiUrl() + "/g_token?returl=" + req.getRequestURL() +
                         (req.getRequestURL().indexOf("?") != -1 ? "&" : "?") +
                         "token=");
             } else {
