@@ -128,10 +128,6 @@ ORYX.Plugins.QueueEditor = Clazz.extend({
 						inputType:'text',
 						fieldLabel:'restartApplication',
 						value: "1"
-					}),
-					new Ext.form.Hidden({id:'aperteToken',
-					    name:'aperteToken',
-					    value: aperteToken
 					})
 		    ]
 		});
