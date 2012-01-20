@@ -201,12 +201,7 @@ ORYX.Plugins.AperteUiShapeMenuPlugin = ORYX.Plugins.ShapeMenuPlugin.extend({
 						inputType:'text',
 						fieldLabel:'callbackUrl',
 						value: back_url
-					}),
-					new Ext.form.Hidden({
-					    id:'aperteToken',
-                        name:'aperteToken',
-                        value: aperteToken
-                    })
+					})
             ]
 		});
  

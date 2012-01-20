@@ -80,7 +80,6 @@ public class EditorHandler extends BasisHandler {
 	@HandlerMethodActivation
     public <T extends FsSecureBusinessObject> void doGet(HttpServletRequest req, HttpServletResponse res, FsAccessToken token, T sbo) {
   		// obtain token used by Aperte
-        final String aperteToken = (String) req.getSession().getAttribute("aperteToken");
         
 		//check for firefox
 		if(!isSupported(req)) {
@@ -133,7 +132,7 @@ public class EditorHandler extends BasisHandler {
 							//set location 
 							res.setHeader("location", req.getRequestURL() + "?id=" + id);
 							//print xhtml site
-							sendEditorXHTML(res, model.getName(), account, aperteToken);
+							sendEditorXHTML(res, model.getName(), account);
 						} 
 //						else if (sbo instanceof ModelRevision) {
 //							//check, if sbo is a model revision
@@ -162,7 +161,7 @@ public class EditorHandler extends BasisHandler {
 						res.setHeader("location", req.getRequestURL() + "?id=" + id);
 						
 //						try {
-							sendEditorXHTML(res, "New Process", account, aperteToken);
+							sendEditorXHTML(res, "New Process", account);
 							//req.getRequestDispatcher("/WEB-INF/jsp/editor.jsp").include(req, res);
 //						} catch (ServletException e1) {
 //							throw new RequestException("servletException", e1);
@@ -208,7 +207,7 @@ public class EditorHandler extends BasisHandler {
 	
     
 	
-	private void sendEditorXHTML(HttpServletResponse res, String title, FsAccount account, String aperteToken) {
+	private void sendEditorXHTML(HttpServletResponse res, String title, FsAccount account) {
 
   		String languageCode = account.getAccountInfo().getLanguageCode();
   		String countryCode = account.getAccountInfo().getCountryCode();
@@ -216,14 +215,14 @@ public class EditorHandler extends BasisHandler {
   		res.setStatus(200);
 		res.setContentType("application/xhtml+xml");
 		try {
-			res.getWriter().print(getEditorXHTML(title, languageCode, countryCode, aperteToken));
+			res.getWriter().print(getEditorXHTML(title, languageCode, countryCode));
 		} catch (IOException e) {
 
 		}
 	}
     
     
-    private String getEditorXHTML(String title, String languageCode, String countryCode, String aperteToken) {
+    private String getEditorXHTML(String title, String languageCode, String countryCode) {
     	
     	String libsUri = Platform.getInstance().getPlatformProperties().getLibsUri();
     	String explorerUri = Platform.getInstance().getPlatformProperties().getExplorerUri();
@@ -297,12 +296,7 @@ public class EditorHandler extends BasisHandler {
       	  	+ "<link rel=\"schema.oryx\" href=\"http://oryx-editor.org/\" />\n"
       	  	+ "<link rel=\"schema.raziel\" href=\"http://raziel.org/\" />\n"
 
-            + "<!-- aperte -->\n"
-            + "<script type='text/javascript'>"
-            + "var aperteToken = '" + aperteToken + "';"
-            + "</script>\n"
-                  
-      	  	+ "</head>\n"
+            + "</head>\n"
       	  	
       	  	+ "<body style=\"overflow:hidden;\">\n" 
       	  	+ "</body>\n"
