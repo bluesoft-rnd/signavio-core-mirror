@@ -58,7 +58,7 @@ ORYX.Plugins.Deploy = Clazz.extend({
 				    Ext.Msg.alert(ORYX.I18N.Oryx.title, ORYX.I18N.Save.comFailed).setIcon(Ext.Msg.WARNING).getDialog().setWidth(260).center().syncSize();
 			} else {
 					var msg = transport.responseText;
-					if (msg != null) {
+					if (msg != null && msg != "") {
 					  msg = Ext.decode(msg);
 					  msg = msg == null ? ORYX.I18N.Save.failed : msg.message;
 					}
@@ -70,7 +70,7 @@ ORYX.Plugins.Deploy = Clazz.extend({
 						
 		}.bind(this);
 				
-		this.sendDeployRequest('POST', "/p/deploy", params, successFn, failure);
+		this.sendDeployRequest('POST', APERTE_DEPLOY_URL, params, successFn, failure);
 		
     },
 	
