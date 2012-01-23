@@ -47,6 +47,8 @@ public interface PlatformProperties {
 	
 	public String getAperteStepListUrl();
 	
+	public String getAperteButtonListUrl();
+	
 	public String getAperteOsgiPluginsDir();
 	
 	public String getJbpmGuiUrl();
