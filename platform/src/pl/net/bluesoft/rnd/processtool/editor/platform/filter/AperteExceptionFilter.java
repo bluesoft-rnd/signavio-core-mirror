@@ -102,6 +102,8 @@ public class AperteExceptionFilter implements Filter {
             } else {
                 // handle unknown object
                 // make sure to remove the content signavio is adding to the message
+                builder.append(t.getClass().getSimpleName());
+                builder.append(": ");
                 builder.append(removeSignavioExceptionPrefix(t.getLocalizedMessage()));
             }
 
