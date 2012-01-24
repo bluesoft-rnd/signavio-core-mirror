@@ -15,4 +15,5 @@ platform/conf/classpath/configuration.properties
 editor/data/stencilsets/stencilsets.json
 editor/data/stencilsets/extensions/extensions.json
 editor/src/scripts/Plugins/version.js
+editor/src/scripts/Plugins/aperteLinks.js
 

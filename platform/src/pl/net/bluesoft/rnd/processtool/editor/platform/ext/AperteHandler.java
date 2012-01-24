@@ -31,8 +31,6 @@ public class AperteHandler extends BasisHandler {
 	
 	public AperteHandler(ServletContext servletContext) {
 		super(servletContext);
-		
-
 	}
 
 	/**
@@ -43,18 +41,17 @@ public class AperteHandler extends BasisHandler {
     public <T extends FsSecureBusinessObject> void doGet(HttpServletRequest req, HttpServletResponse res, FsAccessToken token, T sbo) {
   	
   		// Set status code and write the representation
-  			res.setStatus(200);
-  			res.setContentType("application/json");
-
+		res.setStatus(200);
+		res.setContentType("application/json");
 
         try {
             JSONObject ret = getStencilExtensionString();
             ret.write( res.getWriter() );
 
         } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.error(e);
         } catch (JSONException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.error(e);
         }
     }
 
