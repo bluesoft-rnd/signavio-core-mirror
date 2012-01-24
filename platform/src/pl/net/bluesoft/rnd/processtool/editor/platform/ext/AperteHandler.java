@@ -3,27 +3,25 @@
  */
 package pl.net.bluesoft.rnd.processtool.editor.platform.ext;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.signavio.platform.annotations.HandlerConfiguration;
 import com.signavio.platform.core.Platform;
 import com.signavio.platform.core.PlatformProperties;
 import com.signavio.platform.handler.BasisHandler;
 import com.signavio.platform.security.business.FsAccessToken;
 import com.signavio.platform.security.business.FsSecureBusinessObject;
+import org.apache.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 
 
 @HandlerConfiguration(uri = "/aperte_definitions", rel="aperte")
@@ -31,6 +29,7 @@ public class AperteHandler extends BasisHandler {
 	
 	private final static Logger logger = Logger.getLogger(AperteHandler.class);
 	private final static PlatformProperties props = Platform.getInstance().getPlatformProperties();
+
 	public AperteHandler(ServletContext servletContext) {
 		super(servletContext);
 		

@@ -6,35 +6,42 @@ var lastEditedObjecyt;
 var win;
 var faccade;
 
-/*function post_to_url(url,target, params) {
-    var form = document.createElement('form');
-    form.action = url;
-    form.method = 'POST';
-    form.style="display:none;";
-    form.id="aperteeditorform";
-    form.target=target;
-    for (var i in params) {
-        if (params.hasOwnProperty(i)) {
-            var input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = i;
-            input.value = params[i];
-            form.appendChild(input);
-        }
-    }
-    document.body.appendChild(form);
-    form.submit();
-    form.remove();
-} */
+/**
+ * Decode HTML entities, e.g. &lt;b&gt; changes into <b>
+ */
+function htmlDecode(input) {
+	var e = document.createElement('div');
+	e.innerHTML = input;
+	return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+}
 
+/**
+ * Parses all editor properties
+ */
+function editorParseProperties(obj) {
+	if (typeof obj.children != "undefined") {
+		for (var i = 0; i < obj.children.length; i++) {
+			editorParseProperties(obj.children[i]);
+		}
+	}
+	if (typeof obj.properties != "properties") {
+		for (p in obj.properties) {
+			obj.properties[p] = htmlDecode(obj.properties[p]);
+		}
+	}
+}
 
-// sets data for component
+/**
+ * Sets data for component
+ */
 function editorSetData(retString){
-    if (retString == null || retString == "")
-	  return;
+    if (retString == null || retString == "") {
+	    return;
+	}
 	  
     retString = Ext.decode(retString.replace(/&quot;/g,'"'));
-	
+    editorParseProperties(retString.params);
+
 	var taskNameOldValue = lastEditedObjecyt.properties['oryx-tasktype'];
 	var taskNameNewValue = retString.taskName;
 	var oldAC = lastEditedObjecyt.properties['oryx-aperte-conf'];
