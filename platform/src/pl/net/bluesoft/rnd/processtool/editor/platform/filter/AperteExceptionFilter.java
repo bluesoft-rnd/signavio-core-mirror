@@ -1,9 +1,10 @@
-package pl.net.bluesoft.rnd.processtool.editor.platform.ext;
+package pl.net.bluesoft.rnd.processtool.editor.platform.filter;
 
 import com.signavio.platform.exceptions.RequestException;
 import com.signavio.platform.util.StringUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
+import pl.net.bluesoft.rnd.processtool.editor.platform.ext.AperteMessageBundle;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -15,16 +16,17 @@ import java.util.logging.Logger;
 /**
  * Filter to translate the exception messages
  */
-public class AperteRequestExceptionFilter implements Filter {
+public class AperteExceptionFilter implements Filter {
 
     private static final String SIGNAVIO_REQUEST_EXPECTION_PREFIX = "RequestException Error Code: ";
-    private static final Logger logger = Logger.getLogger(AperteRequestExceptionFilter.class.getName());
+    private static final Logger logger = Logger.getLogger(AperteExceptionFilter.class.getName());
     
 	private ServletContext servletContext;
     private AperteMessageBundle messages;
 	
 	private void handleThrowable(Throwable t, HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException  {
         logger.log(Level.SEVERE, t.getMessage(), t);
+
 		RequestException re = null;
 		if(t instanceof RequestException) {
 			re = (RequestException) t;
@@ -33,12 +35,9 @@ public class AperteRequestExceptionFilter implements Filter {
 		}
 
         // Prepare response and message
-        String message = null;
+        String message = describeException(t);
 		if (re != null) {
 			res.setStatus(re.getHttpStatusCode());
-            StringBuilder builder = new StringBuilder();
-            describeException(re, builder);
-            message = builder.toString();
 		} else if (t instanceof SecurityException || t.getCause() instanceof SecurityException) {
 			res.setStatus(403);
         } else {
@@ -84,6 +83,12 @@ public class AperteRequestExceptionFilter implements Filter {
         messages.addPropertiesFromClasspath("/signavio-error-codes.properties");
 	}
     
+    private String describeException(Throwable t) {
+        StringBuilder builder = new StringBuilder();
+        describeException(t, builder);
+        return builder.toString();
+    }
+    
     private void describeException(Throwable t, StringBuilder builder) {
         if (t != null) {
             if (t instanceof RequestException) {
@@ -109,11 +114,6 @@ public class AperteRequestExceptionFilter implements Filter {
                 describeException(t.getCause(), builder);
             }
         }
-    }
-    
-    private String handleMessage(String message) {
-        
-        return message;
     }
     
     private String removeSignavioExceptionPrefix(String message) {

@@ -15,13 +15,16 @@ import org.apache.log4j.Logger;
 import com.signavio.platform.core.Platform;
 import com.signavio.platform.core.PlatformProperties;
 
+/**
+ * Filter to provide authentication between modeler webapp and aperte runtime environment
+ */
 public class AperteTokenFilter implements Filter {
 
     private static final String APERTE_TOKEN_ATTRIBUTE_NAME = "aperteToken";
     
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-
+        // do nothing
     }
 
     @Override
@@ -67,8 +70,7 @@ public class AperteTokenFilter implements Filter {
 
     @Override
     public void destroy() {
-       // destroy http client
+       // do nothing
     }
 
-   
 }

@@ -25,7 +25,7 @@
 	<!--FILTER-->
 	<filter>
 		<filter-name>RequestExceptionFilter</filter-name>
-		<filter-class>pl.net.bluesoft.rnd.processtool.editor.platform.ext.AperteRequestExceptionFilter</filter-class>
+		<filter-class>pl.net.bluesoft.rnd.processtool.editor.platform.filter.AperteExceptionFilter</filter-class>
 	</filter>
 
 	<filter>
