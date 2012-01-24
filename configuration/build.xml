@@ -43,7 +43,8 @@
 			aperteQueueEditorUrl = ${aperteQueueEditorUrl}
 			aperteStepListUrl = ${aperteStepListUrl}
 			aperteOsgiPluginsDir = ${aperteOsgiPluginsDir}
-			jbpmGuiUrl = ${jbpmGuiUrl}
+			aperteButtonListUrl = ${aperteButtonListUrl}
+            jbpmGuiUrl = ${jbpmGuiUrl}
 		</echo>
 	</target>
 

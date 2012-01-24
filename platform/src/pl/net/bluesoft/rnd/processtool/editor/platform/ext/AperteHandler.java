@@ -28,9 +28,12 @@ import java.net.URLConnection;
 public class AperteHandler extends BasisHandler {
 	
 	private final static Logger logger = Logger.getLogger(AperteHandler.class);
-	
+	private final static PlatformProperties props = Platform.getInstance().getPlatformProperties();
+
 	public AperteHandler(ServletContext servletContext) {
 		super(servletContext);
+		
+
 	}
 
 	/**
@@ -41,32 +44,29 @@ public class AperteHandler extends BasisHandler {
     public <T extends FsSecureBusinessObject> void doGet(HttpServletRequest req, HttpServletResponse res, FsAccessToken token, T sbo) {
   	
   		// Set status code and write the representation
-		res.setStatus(200);
-		res.setContentType("application/json");
+  			res.setStatus(200);
+  			res.setContentType("application/json");
+
 
         try {
             JSONObject ret = getStencilExtensionString();
             ret.write( res.getWriter() );
 
         } catch (IOException e) {
-            logger.error(e);
+            logger.error("Error while reading data", e);
         } catch (JSONException e) {
-            logger.error(e);
+            logger.error("Error while parsing data", e);
         }
     }
 
     private JSONObject getStencilExtensionString() throws IOException, JSONException {
-    	String jo = getDataFromServer();
-    	
-    	JSONArray pjo = ((jo == null) ? null : new JSONArray(jo));
-
 
         JSONObject root = new JSONObject();
 
         setGlobalParams(root);
         root.put( "stencils", new JSONArray());
 
-        addProperties(pjo, root);
+        addProperties(root);
 
         addRules(root);
         removeStencils(root);
@@ -74,11 +74,11 @@ public class AperteHandler extends BasisHandler {
         return root;
     }
 
-    private void addProperties(JSONArray pjo, JSONObject root) throws JSONException {
+    private void addProperties(JSONObject root) throws IOException,JSONException {
         JSONArray properties = new JSONArray();
         root.put( "properties", properties);
 
-        modifyTaskProperties(pjo, properties);
+        modifyTaskProperties(properties);
         modifySequenceFlowProperties(properties);
         modifyBpmnProperties(properties);
     }
@@ -177,7 +177,7 @@ public class AperteHandler extends BasisHandler {
 	  
 	  
 
-    private void modifyTaskProperties(JSONArray pjo, JSONArray properties) throws JSONException {
+    private void modifyTaskProperties(JSONArray properties) throws IOException,JSONException {
         JSONObject obj1 = new JSONObject();
         properties.put(obj1);
 
@@ -190,10 +190,10 @@ public class AperteHandler extends BasisHandler {
 
         o_prop.put(getAperteConf());
         
-        o_prop.put(getAperteTaskTypes(pjo));
+        o_prop.put(getAperteTaskTypes());
     }
     
-    private void modifySequenceFlowProperties(JSONArray properties) throws JSONException {
+    private void modifySequenceFlowProperties(JSONArray properties) throws IOException,JSONException {
     	JSONObject obj1 = new JSONObject();
         properties.put(obj1);
 
@@ -221,6 +221,56 @@ public class AperteHandler extends BasisHandler {
 	    o.put("title","Priority"); o.put("description","Priority");
 	    o.put("readonly",false);  o.put("optional",false);
 	    o_prop.put(o);
+	    
+	    o = new JSONObject();
+        o.put("id","button-label");    o.put("type","String");
+	    o.put("title","Label"); o.put("description","Label");
+	    o.put("readonly",false);  o.put("optional",false);
+	    o_prop.put(o);
+	    
+	    o = new JSONObject();
+        o.put("id","button-desc");    o.put("type","String");
+	    o.put("title","Description"); o.put("description","Description");
+	    o.put("readonly",false);  o.put("optional",false);
+	    o_prop.put(o);
+	    
+	    o_prop.put(getAperteButtons());
+	    
+	    o = new JSONObject();
+	    JSONArray complexItems = new JSONArray();
+	    o.put("id","action-attributes");    o.put("type","Complex");
+	    o.put("title","Action attributes"); o.put("description","Action attributes");
+	    o.put("readonly",false);  o.put("optional",true);
+	    o.put("complexItems", complexItems);
+	    o_prop.put(o);
+	    
+	    JSONObject complexItem = new JSONObject();
+	    //note: signavio does not allow for the '-' sign to appear in 'id' 
+	    complexItem.put("id","attributename");	    complexItem.put("name","Attribute name");
+	    complexItem.put("type","String");   complexItem.put("value","");
+	    complexItem.put("width",100);       complexItem.put("optional",true);
+	    complexItems.put(complexItem);
+	    
+	    complexItem = new JSONObject();
+	    complexItem.put("id","attributevalue");      complexItem.put("name","Attribute value");
+	    complexItem.put("type","String");   complexItem.put("value","");
+	    complexItem.put("width",100);	    complexItem.put("optional",true);
+	    complexItems.put(complexItem);
+	    
+	    o = new JSONObject();
+	    complexItems = new JSONArray();
+	    o.put("id","action-permissions");    o.put("type","Complex");
+	    o.put("title","Action permissions"); o.put("description","Action permissions");
+	    o.put("readonly",false);  o.put("optional",true);
+	    o.put("complexItems", complexItems);
+	    o_prop.put(o);
+	    
+	    complexItem = new JSONObject();
+	    complexItem.put("id","rolename");	    complexItem.put("name","Role name");
+	    complexItem.put("type","String");   complexItem.put("value","");
+	    complexItem.put("width",100);       complexItem.put("optional",true);
+	    complexItems.put(complexItem);
+	    
 	    
     }
 
@@ -300,28 +350,26 @@ public class AperteHandler extends BasisHandler {
         root.put("removeproperties",new JSONArray() );
     }
 
-    private  String getDataFromServer() throws IOException {
-        PlatformProperties props = Platform.getInstance().getPlatformProperties();
-    	String stepListUrl = props.getServerName() + props.getJbpmGuiUrl() + props.getAperteStepListUrl();
+    private String getAperteData(String aperteUrl) throws IOException {
         try {
-        	URL url = new URL(stepListUrl);
+        	URL url = new URL(aperteUrl);
 	        URLConnection conn = url.openConnection();
 	        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 	        StringBuffer sb = new StringBuffer();
 	        String line;
-	        while ((line = rd.readLine()) != null)
-	        {
+	        while ((line = rd.readLine()) != null) {
 	            sb.append(line);
 	        }
 	        rd.close();
 	        return sb.toString();
         } catch (IOException e) {
-        	logger.error("Error reading data from " + stepListUrl, e);
+        	logger.error("Error reading data from " + aperteUrl, e);
         	return null;
         }
     }
-
-    private  JSONObject getAperteConf() throws JSONException {
+    
+    
+    private JSONObject getAperteConf() throws JSONException {
             JSONObject o = new JSONObject();
             o.put("id","aperte-conf");
 		    o.put("type","String");
@@ -343,7 +391,7 @@ public class AperteHandler extends BasisHandler {
       }
     
     
-     private  JSONObject getAperteTaskTypes(JSONArray pjo) throws JSONException {
+     private JSONObject getAperteTaskTypes() throws IOException, JSONException {
             JSONObject o = new JSONObject();
             o.put("id","tasktype");
 		    o.put("type","Choice");
@@ -375,6 +423,12 @@ public class AperteHandler extends BasisHandler {
 		    c4.put("icon" , "activity/list/type.user.png");
 			c4.put("refToView","userTask");
 			
+			
+	    	String stepListUrl = props.getServerName() + props.getJbpmGuiUrl() + props.getAperteStepListUrl();
+	    	String stepList = getAperteData(stepListUrl);
+	    	
+	    	JSONArray pjo = ((stepList == null) ? null : new JSONArray(stepList));
+			
             if (pjo != null) { 
 			 for(int i=0;i<pjo.length();i++){
                 JSONObject oo = (JSONObject) pjo.get(i);
@@ -391,6 +445,44 @@ public class AperteHandler extends BasisHandler {
              }
             }
         return o;
+    }
+     
+     private JSONObject getAperteButtons() throws IOException, JSONException {
+         JSONObject o = new JSONObject();
+         o.put("id","button-type");
+		 o.put("type","Choice");
+		 o.put("title","Button type");
+		 o.put("title_de","Button type");
+		 o.put("value","");
+		 o.put("description","Defines button types.");
+		 o.put("description_de","Defines button types.");
+		 o.put("readonly",false);
+		 o.put("optional",false);
+		 o.put("refToView","");
+         JSONArray items = new JSONArray();
+         o.put("items" ,items);
+       	 
+         String buttonListUrl = props.getServerName() + props.getJbpmGuiUrl() + props.getAperteButtonListUrl();
+	     String buttonList = getAperteData(buttonListUrl);
+	    	
+	     JSONArray pjo = ((buttonList == null) ? null : new JSONArray(buttonList));
+			
+         if (pjo != null) { 
+			 for(int i=0;i<pjo.length();i++) {
+                String name = (String)pjo.get(i);
+
+                JSONObject cc = new JSONObject();
+                items.put(cc);
+                cc.put("id","x"+(10+i));
+			    cc.put("title",name);
+			    cc.put("title_de",name);
+			    cc.put("value",name);
+		        cc.put("icon" , "activity/list/type.service.png");
+			    cc.put("refToView","serviceTask");
+             }
+         }
+        
+         return o;
     }
     
 }
