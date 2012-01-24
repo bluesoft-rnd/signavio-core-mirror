@@ -3,7 +3,7 @@ package pl.net.bluesoft.rnd.processtool.editor.jpdl.object;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import pl.net.bluesoft.rnd.processtool.editor.Util;
+import pl.net.bluesoft.rnd.processtool.editor.XmlUtil;
 import pl.net.bluesoft.rnd.processtool.editor.Widget;
 
 import java.util.Iterator;
@@ -56,7 +56,7 @@ public class JPDLUserTask extends JPDLTask {
 		String widgetJson = json.getJSONObject("properties").getString("aperte-conf");
 		if (widgetJson != null && widgetJson.trim().length() != 0) {
             widget = new Widget();
-            widgetJson = Util.replaceXmlEscapeCharacters(widgetJson);
+            widgetJson = XmlUtil.replaceXmlEscapeCharacters(widgetJson);
             JSONObject widgetJsonObj = new JSONObject(widgetJson);
             assignee = widgetJsonObj.optString("assignee");
             swimlane = widgetJsonObj.optString("swimlane");
@@ -126,7 +126,14 @@ public class JPDLUserTask extends JPDLTask {
 		sb.append("<attributes>\n");
 		for (String key : attributesMap.keySet()) {
 			Object value = attributesMap.get(key);
-			sb.append(String.format("<config.ProcessStateWidgetAttribute name=\"%s\" value=\"%s\"/>", key, value));
+            if (value instanceof String) {
+                String strValue = (String) value;
+                if (XmlUtil.containsXmlEscapeCharacters(strValue)) {
+                    sb.append(String.format("<config.ProcessStateWidgetAttribute name=\"%s\"><value>%s</value></config.ProcessStateWidgetAttribute>", key, XmlUtil.wrapCDATA(strValue)));
+                } else {
+                    sb.append(String.format("<config.ProcessStateWidgetAttribute name=\"%s\" value=\"%s\"/>", key, value));
+                }
+            }
 		}
 		sb.append("</attributes>\n");
 		return sb.toString();
