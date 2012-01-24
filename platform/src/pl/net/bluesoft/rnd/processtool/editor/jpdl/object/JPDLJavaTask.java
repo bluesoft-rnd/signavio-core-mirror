@@ -1,13 +1,12 @@
 package pl.net.bluesoft.rnd.processtool.editor.jpdl.object;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import pl.net.bluesoft.rnd.processtool.editor.XmlUtil;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import pl.net.bluesoft.rnd.processtool.editor.Util;
 
 public class JPDLJavaTask extends JPDLTask {
 	
@@ -51,7 +50,7 @@ public class JPDLJavaTask extends JPDLTask {
 		super.fillBasicProperties(json);
 		String stepDataJson = json.getJSONObject("properties").getString("aperte-conf");
 		if (stepDataJson != null && stepDataJson.trim().length() != 0) {
-		  stepDataJson = Util.replaceXmlEscapeCharacters(stepDataJson);
+		  stepDataJson = XmlUtil.replaceXmlEscapeCharacters(stepDataJson);
 		  JSONObject stepDataJsonObj = new JSONObject(stepDataJson);
 		  Iterator i = stepDataJsonObj.keys();
 		  while(i.hasNext()) {
