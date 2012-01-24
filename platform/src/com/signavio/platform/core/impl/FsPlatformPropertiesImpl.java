@@ -52,6 +52,7 @@ public class FsPlatformPropertiesImpl implements PlatformProperties {
 	private String aperteStepEditorUrl;
 	private String aperteQueueEditorUrl;
 	private String aperteStepListUrl;
+	private String aperteButtonListUrl;
 	private String aperteOsgiPluginsDir;
 	private String jbpmGuiUrl;
 	
@@ -90,6 +91,7 @@ public class FsPlatformPropertiesImpl implements PlatformProperties {
 		aperteStepEditorUrl = props.getProperty("aperteStepEditorUrl");
 		aperteQueueEditorUrl = props.getProperty("aperteQueueEditorUrl");
 		aperteStepListUrl = props.getProperty("aperteStepListUrl");
+		aperteButtonListUrl = props.getProperty("aperteButtonListUrl");
 		
 		String tempAperteOsgiPluginsDir = props.getProperty("aperteOsgiPluginsDir");
 		if (tempAperteOsgiPluginsDir != null && !tempAperteOsgiPluginsDir.trim().isEmpty()) {
@@ -176,6 +178,10 @@ public class FsPlatformPropertiesImpl implements PlatformProperties {
 	
 	public String getAperteStepListUrl() {
 		return aperteStepListUrl;
+	}
+	
+	public String getAperteButtonListUrl() {
+		return aperteButtonListUrl;
 	}
 	
 	public String getAperteOsgiPluginsDir() {

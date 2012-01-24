@@ -1,14 +1,15 @@
 package pl.net.bluesoft.rnd.processtool.editor.jpdl.object;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import pl.net.bluesoft.rnd.processtool.editor.Util;
-import pl.net.bluesoft.rnd.processtool.editor.Widget;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import pl.net.bluesoft.rnd.processtool.editor.Util;
+import pl.net.bluesoft.rnd.processtool.editor.Widget;
 
 public class JPDLUserTask extends JPDLTask {
 
@@ -158,8 +159,11 @@ public class JPDLUserTask extends JPDLTask {
 		  sb.append("<actions>\n");
  		  for (String resId : outgoing.keySet()) {
  			JPDLTransition trans = outgoing.get(resId);
-		    sb.append(String.format("<config.ProcessStateAction autohide=\"%s\" bpmName=\"%s\" buttonName=\"Default\" ", trans.getAutoHide(), trans.getName()));
-		    sb.append(String.format("description=\"%s\" label=\"%s\" priority=\"%s\" skipSaving=\"%s\" />\n", trans.getTargetName(), trans.getTargetName(), trans.getPriority(), trans.getSkipSaving()));
+		    sb.append(String.format("<config.ProcessStateAction autohide=\"%s\" bpmName=\"%s\" buttonName=\"%s\" ", trans.getAutoHide(), trans.getName(), trans.getButtonName()));
+		    sb.append(String.format("description=\"%s\" label=\"%s\" priority=\"%s\" skipSaving=\"%s\" >\n", trans.getDescription(), trans.getLabel(), trans.getPriority(), trans.getSkipSaving()));
+		    sb.append(trans.generateActionPermissionsXML());
+		    sb.append(trans.generateActionAttributesXML());
+		    sb.append("</config.ProcessStateAction>\n");
  		  }
  		  sb.append("</actions>\n");
 		}
@@ -167,6 +171,8 @@ public class JPDLUserTask extends JPDLTask {
 		return sb.toString();
 	}
 
+	
+	
 	public String getSwimlane() {
 		return swimlane;
 	}
