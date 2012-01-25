@@ -9,6 +9,7 @@ public class Widget {
   
 	private List<Widget> childrenList = new ArrayList<Widget>();
 	private String widgetId;
+    private Integer priority;
 	private Map<String,Object> attributesMap = new HashMap<String,Object>();
 	private Map<String,Object> permissionsMap = new HashMap<String,Object>();
 	
@@ -55,4 +56,12 @@ public class Widget {
 	public void putPermission(String key, Object value) {
 		permissionsMap.put(key, value);
 	}
+
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
+    }
 }
