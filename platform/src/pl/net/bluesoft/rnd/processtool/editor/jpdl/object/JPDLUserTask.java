@@ -16,7 +16,7 @@ public class JPDLUserTask extends JPDLTask {
 
     private static final Logger logger = Logger.getLogger(JPDLUserTask.class);
 
-	private Widget widget = null;
+	private Widget widget;
 	private String commentary;
 	
 	private String assignee;
@@ -53,10 +53,10 @@ public class JPDLUserTask extends JPDLTask {
 	public void fillBasicProperties(JSONObject json) throws JSONException {
 		super.fillBasicProperties(json);
 
-        // Properties from Signavion attributes
+        // Properties from Signavio Core model attributes
         commentary = json.getJSONObject("properties").getString("documentation");
 
-        // Properties
+        // Properties from Step Editor attributes
 		String widgetJson = json.getJSONObject("properties").getString("aperte-conf");
 		if (widgetJson != null && widgetJson.trim().length() != 0) {
             widget = new Widget();
@@ -69,6 +69,7 @@ public class JPDLUserTask extends JPDLTask {
             JSONObject properties = widgetJsonObj.optJSONObject("properties");
             JSONObject permissions = widgetJsonObj.optJSONObject("permissions");
             widget.setWidgetId(widgetJsonObj.getString("widgetId"));
+            widget.setPriority(widgetJsonObj.getInt("priority"));
             createWidgetTree(widget, children, properties, permissions);
 		}
 	}
@@ -95,6 +96,7 @@ public class JPDLUserTask extends JPDLTask {
 				JSONObject obj = children.getJSONObject(i);
 				Widget n = new Widget();
 				n.setWidgetId(obj.getString("widgetId"));
+                n.setPriority(obj.getInt("priority"));
 				w.addChildWidget(n);
 				createWidgetTree(n, obj.optJSONArray("children"), obj.optJSONObject("properties"), obj.optJSONObject("permissions"));
 			}
@@ -111,7 +113,7 @@ public class JPDLUserTask extends JPDLTask {
 		    sb.append("<children>\n");
         }
 		for (Widget w : list) {
-			sb.append(String.format("<config.ProcessStateWidget className=\"%s\" priority=\"1\">\n", w.getWidgetId()));
+			sb.append(String.format("<config.ProcessStateWidget className=\"%s\" priority=\"%d\">\n", w.getWidgetId(), w.getPriority()));
 			sb.append(generatePermissionsXML(w.getPermissionsMap()));
 			sb.append(generateAttributesXML(w.getAttributesMap()));
 			sb.append(generateChildrenXML(w.getChildrenList(), true));
