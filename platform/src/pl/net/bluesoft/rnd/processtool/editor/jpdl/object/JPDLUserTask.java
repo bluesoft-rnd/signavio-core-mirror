@@ -165,11 +165,7 @@ public class JPDLUserTask extends JPDLTask {
 		  sb.append("<actions>\n");
  		  for (String resId : outgoing.keySet()) {
  			JPDLTransition trans = outgoing.get(resId);
-		    sb.append(String.format("<config.ProcessStateAction autohide=\"%s\" bpmName=\"%s\" buttonName=\"%s\" ", trans.getAutoHide(), trans.getName(), trans.getButtonName()));
-		    sb.append(String.format("description=\"%s\" label=\"%s\" priority=\"%s\" skipSaving=\"%s\" >\n", trans.getDescription(), trans.getLabel(), trans.getPriority(), trans.getSkipSaving()));
-		    sb.append(trans.generateActionPermissionsXML());
-		    sb.append(trans.generateActionAttributesXML());
-		    sb.append("</config.ProcessStateAction>\n");
+ 			sb.append(trans.generateStateActionXML());
  		  }
  		  sb.append("</actions>\n");
 		}

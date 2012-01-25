@@ -45,6 +45,8 @@ public interface PlatformProperties {
 	
 	public String getAperteQueueEditorUrl();
 	
+	public String getAperteActionEditorUrl();
+	
 	public String getAperteStepListUrl();
 	
 	public String getAperteButtonListUrl();

@@ -18,6 +18,11 @@ ORYX.Plugins.AperteUiPropertyWindow = ORYX.Plugins.PropertyWindow.extend({
 		     aperteConfArr[shape.getId()] = shape.properties["oryx-aperte-conf"];
 		   });
 		}
+		if (key == 'oryx-button-type') {
+		   selectedElements.each(function(shape){
+		     aperteConfArr[shape.getId()] = shape.properties["oryx-action-properties"];
+		   });
+		}
 		
 		var oldValues 	= this.oldValues;	
 		
@@ -41,6 +46,8 @@ ORYX.Plugins.AperteUiPropertyWindow = ORYX.Plugins.PropertyWindow.extend({
 						shape.setProperty(this.key, this.newValue);
 						if (this.key == "oryx-tasktype")
 						  shape.setProperty("oryx-aperte-conf", "");
+						if (this.key == "oryx-button-type")
+						  shape.setProperty("oryx-action-properties", "");
 					}
 				}.bind(this));
 				this.facade.setSelection(this.selectedElements);
@@ -52,6 +59,8 @@ ORYX.Plugins.AperteUiPropertyWindow = ORYX.Plugins.PropertyWindow.extend({
 					shape.setProperty(this.key, this.oldValues[shape.getId()]);
 					if (this.key == "oryx-tasktype")
 					  shape.setProperty("oryx-aperte-conf", this.aperteConfArr[shape.getId()]);
+					if (this.key == "oryx-button-type")
+					  shape.setProperty("oryx-action-properties", this.aperteConfArr[shape.getId()]);
 				}.bind(this));
 				this.facade.setSelection(this.selectedElements);
 				this.facade.getCanvas().update();
