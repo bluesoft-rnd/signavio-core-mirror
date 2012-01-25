@@ -82,8 +82,6 @@ public abstract class JPDLObject {
 			String taskType = obj.getJSONObject("properties").getString("tasktype");
 			if ("User".equals(taskType))
 			  ret = new JPDLUserTask();
-			else if ("None".equals(taskType))
-			  throw new UnsupportedJPDLObjectException("Task type 'None' is not supported.");
 			else
 			  ret = new JPDLJavaTask();
 		} else if ("SequenceFlow".equals(stencilId)) {

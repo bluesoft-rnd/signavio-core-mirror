@@ -416,7 +416,7 @@ ORYX.Plugins.AperteUiShapeMenuPlugin = ORYX.Plugins.ShapeMenuPlugin.extend({
 	},
 	showAperteStepEditorButton: function(elements){
 		if(elements.length != 1) return;
-		if(elements[0].properties['oryx-tasktype'] != null && elements[0].properties['oryx-tasktype'] != "None"){
+		if(elements[0].properties['oryx-tasktype'] != null && elements[0].properties['oryx-tasktype'] != ""){
 			this.aperteStepEditorButton.prepareToShow();
 		}
 		
