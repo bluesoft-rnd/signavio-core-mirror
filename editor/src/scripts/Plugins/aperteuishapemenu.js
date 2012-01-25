@@ -7,31 +7,6 @@ var win;
 var faccade;
 
 /**
- * Decode HTML entities, e.g. &lt;b&gt; changes into <b>
- */
-function htmlDecode(input) {
-	var e = document.createElement('div');
-	e.innerHTML = input;
-	return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
-}
-
-/**
- * Parses all editor properties
- */
-function editorParseProperties(obj) {
-	if (typeof obj.children != "undefined") {
-		for (var i = 0; i < obj.children.length; i++) {
-			editorParseProperties(obj.children[i]);
-		}
-	}
-	if (typeof obj.properties != "properties") {
-		for (p in obj.properties) {
-			obj.properties[p] = htmlDecode(obj.properties[p]);
-		}
-	}
-}
-
-/**
  * Sets data for component
  */
 function editorSetStepData(retString){
@@ -40,7 +15,6 @@ function editorSetStepData(retString){
 	}
 	  
     retString = Ext.decode(retString.replace(/&quot;/g,'"'));
-    editorParseProperties(retString.params);
 
 	var taskNameOldValue = lastEditedObjecyt.properties['oryx-tasktype'];
 	var taskNameNewValue = retString.taskName;
