@@ -368,7 +368,7 @@ public class AperteHandler extends BasisHandler {
 		    o.put("type","Choice");
 			o.put("title","Tasktype");
 			o.put("title_de","Tasktyp");
-			o.put("value","None");
+			o.put("value","User");
 			o.put("description","Defines the tasks type which is shown in the left upper corner of the task.");
 			o.put("description_de","Definiert den Aufgabentyp, der in der linken oberen Ecke der Task angezeigt wird.");
 			o.put("readonly",false);
@@ -377,13 +377,7 @@ public class AperteHandler extends BasisHandler {
             JSONArray items = new JSONArray();
             o.put("items" ,items);
 
-            JSONObject c1 = new JSONObject();
-            items.put(c1);
-			c1.put("id","c1");
-            c1.put("title","None");
-			c1.put("title_de","Kein Typ");
-			c1.put("value","None");
-			c1.put("refToView","none");
+            
 
             JSONObject c4 = new JSONObject();
             items.put(c4);
@@ -424,7 +418,7 @@ public class AperteHandler extends BasisHandler {
 		 o.put("type","Choice");
 		 o.put("title","Button type");
 		 o.put("title_de","Button type");
-		 o.put("value","");
+		 o.put("value","Default");
 		 o.put("description","Defines button types.");
 		 o.put("description_de","Defines button types.");
 		 o.put("readonly",false);
