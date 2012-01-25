@@ -1,14 +1,13 @@
 package pl.net.bluesoft.rnd.processtool.editor.jpdl.object;
 
+import java.util.*;
+
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import pl.net.bluesoft.rnd.processtool.editor.XmlUtil;
 
 public class JPDLTransition extends JPDLObject {
   
@@ -16,23 +15,16 @@ public class JPDLTransition extends JPDLObject {
 		
 	}
 	
-	private static final String DEFAULT_SKIP_SAVING = "true";
-	private static final String DEFAULT_AUTO_HIDE = "true";
-	private static final String DEFAULT_PRIORITY = "10";
 	private static final String DEFAULT_BUTTON_NAME = "Default";
 	
 	private String target;
     private String targetName;
     
     //action properties
-    private String skipSaving;
-    private String autoHide;
-    private String priority;
-    private String label;
-    private String description;
     private String buttonName;
     private List<String> actionPermissions = new ArrayList<String>();
     private Map<String,String> actionAttributes = new HashMap<String,String>();
+    private Map<String,Object> actionAutowiredProperties = new HashMap<String,Object>();
     
     //for 'decision'
     private String condition;
@@ -53,30 +45,6 @@ public class JPDLTransition extends JPDLObject {
 		this.targetName = targetName;
 	}
 
-	public String getSkipSaving() {
-		return skipSaving;
-	}
-
-	public void setSkipSaving(String skipSaving) {
-		this.skipSaving = skipSaving;
-	}
-
-	public String getAutoHide() {
-		return autoHide;
-	}
-
-	public void setAutoHide(String autoHide) {
-		this.autoHide = autoHide;
-	}
-
-	public String getPriority() {
-		return priority;
-	}
-
-	public void setPriority(String priority) {
-		this.priority = priority;
-	}
-
 	public String getCondition() {
 		return condition;
 	}
@@ -85,22 +53,6 @@ public class JPDLTransition extends JPDLObject {
 		this.condition = condition;
 	}
 	
-	public String getLabel() {
-		return label;
-	}
-
-	public void setLabel(String label) {
-		this.label = label;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
 	public String getButtonName() {
 		return buttonName;
 	}
@@ -109,40 +61,53 @@ public class JPDLTransition extends JPDLObject {
 		this.buttonName = buttonName;
 	}
 
-	public String generateActionPermissionsXML() {
+	private String generateActionPermissionsXML() {
 		StringBuffer sb = new StringBuffer();
-		sb.append("<permissions>\n");
+		if (!actionPermissions.isEmpty()) {
+		  sb.append("<permissions>\n");
+		}
 		for (String perm : actionPermissions) {
 			sb.append(String.format("<config.ProcessStateActionPermission roleName=\"%s\" />\n", perm));
 		}
-		sb.append("</permissions>\n");
+		if (!actionPermissions.isEmpty()) {
+		  sb.append("</permissions>\n");
+		}
 		return sb.toString();
 	}
 	
-	public String generateActionAttributesXML() {
+	private String generateActionAttributesXML() {
 		StringBuffer sb = new StringBuffer();
-		sb.append("<attributes>\n");
+		if (!actionAttributes.isEmpty()) {
+		  sb.append("<attributes>\n");
+		}
 		for (String name : actionAttributes.keySet()) {
 			sb.append(String.format("<config.ProcessStateActionAttribute name=\"%s\" value=\"%s\" />\n", name, actionAttributes.get(name)));
 		}
-		sb.append("</attributes>\n");
+		if (!actionAttributes.isEmpty()) {
+		  sb.append("</attributes>\n");
+		}
 		return sb.toString();
+	}
+	
+	public String generateStateActionXML() {
+		StringBuffer sb = new StringBuffer();
+		sb.append(String.format("<config.ProcessStateAction bpmName=\"%s\" buttonName=\"%s\" ", name, buttonName));
+		for (String name : actionAutowiredProperties.keySet()) {
+			sb.append(String.format("%s=\"%s\" ", name, actionAutowiredProperties.get(name)));
+		}
+	    sb.append(" >\n");
+	    sb.append(generateActionPermissionsXML());
+	    sb.append(generateActionAttributesXML());
+	    sb.append("</config.ProcessStateAction>\n");
+	    return sb.toString();
 	}
  
 	public void fillBasicProperties(JSONObject json) throws JSONException {
 		super.fillBasicProperties(json);
 		target = json.getJSONObject("target").getString("resourceId");
-		skipSaving = json.getJSONObject("properties").getString("skip-saving");
-		autoHide = json.getJSONObject("properties").getString("auto-hide");
-		priority = json.getJSONObject("properties").getString("priority");
-		label = json.getJSONObject("properties").getString("button-label");
-		description = json.getJSONObject("properties").getString("button-desc");
 		buttonName = json.getJSONObject("properties").getString("button-type");
 		condition = json.getJSONObject("properties").getString("conditionexpression");
 		
-		if (StringUtils.isEmpty(skipSaving)) skipSaving = DEFAULT_SKIP_SAVING;
-		if (StringUtils.isEmpty(autoHide)) autoHide = DEFAULT_AUTO_HIDE;
-		if (StringUtils.isEmpty(priority)) priority = DEFAULT_PRIORITY;
 		if (StringUtils.isEmpty(buttonName)) buttonName = DEFAULT_BUTTON_NAME;
 		
 		JSONObject permissions = json.getJSONObject("properties").optJSONObject("action-permissions");
@@ -161,6 +126,16 @@ public class JPDLTransition extends JPDLObject {
 				 actionAttributes.put(obj.optString("attributename"), obj.optString("attributevalue"));
 			 }
 		}
+		String autowiredProps = json.getJSONObject("properties").optString("action-properties");
+		if (!StringUtils.isEmpty(autowiredProps)) {
+			JSONObject jsonObj = new JSONObject(XmlUtil.replaceXmlEscapeCharacters(autowiredProps));
+			Iterator i = jsonObj.keys();
+		    while (i.hasNext()) {
+		    	String key = (String)i.next();
+		    	actionAutowiredProperties.put(key, jsonObj.get(key));
+		    }
+		}
+		
 	}
 	
 }
