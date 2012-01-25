@@ -8,7 +8,6 @@ import org.json.JSONObject;
 import pl.net.bluesoft.rnd.processtool.editor.Widget;
 import pl.net.bluesoft.rnd.processtool.editor.XmlUtil;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -131,15 +130,11 @@ public class JPDLUserTask extends JPDLTask {
 		sb.append("<attributes>\n");
 		for (String key : attributesMap.keySet()) {
 			Object value = attributesMap.get(key);
-            try {
-                String strValue = new String(Base64.decodeBase64(((String) value).getBytes()), "UTF-8");
-                if (XmlUtil.containsXmlEscapeCharacters(strValue)) {
-                    sb.append(String.format("<config.ProcessStateWidgetAttribute name=\"%s\"><value>%s</value></config.ProcessStateWidgetAttribute>", key, XmlUtil.wrapCDATA(strValue)));
-                } else {
-                    sb.append(String.format("<config.ProcessStateWidgetAttribute name=\"%s\" value=\"%s\"/>", key, value));
-                }
-            } catch (UnsupportedEncodingException e) {
-                logger.error("Failed to decode process state widget attribute " + key, e);
+            String strValue = new String(Base64.decodeBase64(((String) value).getBytes()));
+            if (XmlUtil.containsXmlEscapeCharacters(strValue)) {
+                sb.append(String.format("<config.ProcessStateWidgetAttribute name=\"%s\"><value>%s</value></config.ProcessStateWidgetAttribute>", key, XmlUtil.wrapCDATA(strValue)));
+            } else {
+                sb.append(String.format("<config.ProcessStateWidgetAttribute name=\"%s\" value=\"%s\"/>", key, strValue));
             }
 		}
 		sb.append("</attributes>\n");
