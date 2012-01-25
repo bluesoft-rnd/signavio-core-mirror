@@ -95,7 +95,6 @@ public class AperteHandler extends BasisHandler {
         obj1.put("properties",o_prop);
 
         o_prop.put(getProcessFileName());
-        o_prop.put(getProcessVersion());
         o_prop.put(getBundleName());
         o_prop.put(getBundleDescription());
         o_prop.put(getProcessToolDeployment());
@@ -128,16 +127,7 @@ public class AperteHandler extends BasisHandler {
     
     
     
-    private JSONObject getProcessVersion() throws JSONException {
-    	 JSONObject o = new JSONObject();
-         o.put("id","aperte-process-version");
-		   o.put("type","String");
-		   o.put("title","Aperte process version number");
-		   o.put("description","Aperte process version number");
-		   o.put("readonly",false);
-		   o.put("optional",true);
-         return o;
-    }
+    
     
   
     
@@ -204,39 +194,10 @@ public class AperteHandler extends BasisHandler {
         JSONArray o_prop= new JSONArray();
         obj1.put("properties",o_prop);
         
-        JSONObject o = new JSONObject();
-        o.put("id","skip-saving");    o.put("type","Boolean");
-	    o.put("title","Skip saving"); o.put("description","Skip saving");
-	    o.put("readonly",false);  o.put("optional",false);
-	    o_prop.put(o);
-	    
-	    o = new JSONObject();
-        o.put("id","auto-hide");    o.put("type","Boolean");
-	    o.put("title","Auto hide"); o.put("description","Auto hide");
-	    o.put("readonly",false);  o.put("optional",false);
-	    o_prop.put(o);
-	    
-	    o = new JSONObject();
-        o.put("id","priority");    o.put("type","Integer");
-	    o.put("title","Priority"); o.put("description","Priority");
-	    o.put("readonly",false);  o.put("optional",false);
-	    o_prop.put(o);
-	    
-	    o = new JSONObject();
-        o.put("id","button-label");    o.put("type","String");
-	    o.put("title","Label"); o.put("description","Label");
-	    o.put("readonly",false);  o.put("optional",false);
-	    o_prop.put(o);
-	    
-	    o = new JSONObject();
-        o.put("id","button-desc");    o.put("type","String");
-	    o.put("title","Description"); o.put("description","Description");
-	    o.put("readonly",false);  o.put("optional",false);
-	    o_prop.put(o);
-	    
+        	    
 	    o_prop.put(getAperteButtons());
 	    
-	    o = new JSONObject();
+	    JSONObject o = new JSONObject();
 	    JSONArray complexItems = new JSONArray();
 	    o.put("id","action-attributes");    o.put("type","Complex");
 	    o.put("title","Action attributes"); o.put("description","Action attributes");
@@ -267,9 +228,19 @@ public class AperteHandler extends BasisHandler {
 	    
 	    complexItem = new JSONObject();
 	    complexItem.put("id","rolename");	    complexItem.put("name","Role name");
-	    complexItem.put("type","String");   complexItem.put("value","");
+	    complexItem.put("type","String");   complexItem.put("value",".*");
 	    complexItem.put("width",100);       complexItem.put("optional",true);
 	    complexItems.put(complexItem);
+	    
+	    o = new JSONObject();
+        o.put("id","action-properties");
+	    o.put("type","String");
+	    o.put("title","Action autowired properties");
+	    o.put("description","Action autowired properties");
+	    o.put("readonly",true);
+	    o.put("optional",true);
+	    o_prop.put(o);
+
 	    
 	    
     }

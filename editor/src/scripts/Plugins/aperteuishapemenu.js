@@ -34,7 +34,7 @@ function editorParseProperties(obj) {
 /**
  * Sets data for component
  */
-function editorSetData(retString){
+function editorSetStepData(retString){
     if (retString == null || retString == "") {
 	    return;
 	}
@@ -103,7 +103,45 @@ function editorSetData(retString){
 			}
 		});
 	
-	// Instanciated the class
+	// Instantiated the class
+	var command = new commandClass();
+		
+	// Execute the command
+	faccade.executeCommands([command]);
+	
+	win.close();
+}
+
+function editorSetActionData(retString) {
+   if (retString == null || retString == "")
+	  return;
+	  
+    retString = Ext.decode(retString.replace(/&quot;/g,'"'));
+	
+	var taskNameOldValue = lastEditedObjecyt.properties['oryx-button-type'];
+	var taskNameNewValue = retString.buttonType;
+	var oldAC = lastEditedObjecyt.properties['oryx-action-properties'];
+	var newAC = Ext.encode(retString.items);
+
+    var commandClass = ORYX.Core.Command.extend({
+			construct: function(){
+				this.lastEditedObj 	     = lastEditedObjecyt;
+				this.oldTaskType         = taskNameOldValue;
+				this.newTaskType         = taskNameNewValue;
+				this.oldAperteConf		 = oldAC;
+				this.newAperteConf		 = newAC;
+			},			
+			execute: function(){
+				this.lastEditedObj.properties['oryx-action-properties'] = this.newAperteConf;
+				this.lastEditedObj.properties['oryx-button-type'] = this.newTaskType;
+			},
+			rollback: function(){
+				this.lastEditedObj.properties['oryx-action-properties'] = this.oldAperteConf;
+				this.lastEditedObj.properties['oryx-button-type'] = this.oldTaskType;
+			}
+		});
+	
+	// Instantiated the class
 	var command = new commandClass();
 		
 	// Execute the command
@@ -113,7 +151,7 @@ function editorSetData(retString){
 }
 
 ORYX.Plugins.AperteUiShapeMenuPlugin = ORYX.Plugins.ShapeMenuPlugin.extend({
-    runAperte: function() {
+    runAperteStepEditor: function() {
 		var elements = this.currentShapes;
 		if(elements.length != 1) return;
 		lastEditedObjecyt = elements[0];
@@ -122,11 +160,23 @@ ORYX.Plugins.AperteUiShapeMenuPlugin = ORYX.Plugins.ShapeMenuPlugin.extend({
 		var type =  props['oryx-tasktype'];
 		var name = props['oryx-name'];
 		var data =  props['oryx-aperte-conf'];
-        this.editorOpenNewWindow(name, type, data);
+        this.openStepEditorWindow(name, type, data);
 	},
 	
-    //Opens new popup windows
-    editorOpenNewWindow: function (stepName, stepType, stepAperteConfig){
+	runAperteActionEditor: function() {
+	    var elements = this.currentShapes;
+		if(elements.length != 1) return;
+		lastEditedObjecyt = elements[0];
+		faccade = this.facade;
+        var props = lastEditedObjecyt.properties;
+		var type =  props['oryx-button-type'];
+		var name = props['oryx-name'];
+		var data =  props['oryx-action-properties'];
+        this.openActionEditorWindow(name, type, data);
+	},
+	
+    //Opens new popup window
+    openStepEditorWindow: function (stepName, stepType, stepAperteConfig){
 		var iframeName = "ifname";
 		var props = lastEditedObjecyt.properties;
 
@@ -228,6 +278,110 @@ ORYX.Plugins.AperteUiShapeMenuPlugin = ORYX.Plugins.ShapeMenuPlugin.extend({
 		Ext.emptyFn.defer(200); // frame on ready?
 		form.getForm().submit();
     },
+	
+	openActionEditorWindow: function (buttonName, buttonType, actionParameters){
+		var iframeName = "ifname";
+		var props = lastEditedObjecyt.properties;
+
+		var rurl = window.location.href;
+		var base_editor_url = rurl.substr(0,rurl.indexOf('editor'));
+		var back_url = base_editor_url+"aperte_post";
+		
+		win = new Ext.Window({
+			width:900,
+			height:500,
+			autoScroll:false,
+			html:'',
+			modal:true,
+			maximizable:true,
+			cls:'x-window-body-report',
+			title:'Aperte Action Editor'
+		});
+		win.on('close', function() {
+			if(Ext.isIE) {
+				win.body.dom.firstChild.src = "javascript:false";
+			}
+		}, win);
+			
+		var id = Ext.id();
+		var frame = document.createElement('iframe');
+ 
+		frame.id = id;
+		frame.name = id;
+		frame.frameBorder = '0';
+		frame.width = '100%';
+		frame.height = '100%';
+		frame.src = '';//Ext.isIE ? Ext.SSL_SECURE_URL : "javascript:;";
+ 
+		win.show();
+		win.body.appendChild(frame);
+ 
+		// Seems to be workaround for IE having name readonly.
+		if(Ext.isIE) {
+			document.frames[id].name = id;
+		}
+		
+		var form = new Ext.FormPanel({
+			url: APERTE_ACTION_EDITOR_URL,
+			renderTo:Ext.getBody(),
+			standardSubmit:true,
+			method:'POST',
+			defaultType:'hidden',
+			items:[	new Ext.form.TextField({
+                        id:'buttonName',
+                        name:'buttonName',
+                        inputType:'text',
+                        fieldLabel:'buttonName',
+                        value: buttonName
+                    }),
+                    new Ext.form.TextField({
+                        id:'buttonType',
+                        name:'buttonType',
+                        inputType:'text',
+                        fieldLabel:'buttonType',
+                        value: buttonType
+                    }),
+			        new Ext.form.TextField({
+			            id:'actionParameters',
+						name:'actionParameters',
+						inputType:'text',
+						fieldLabel:'actionParameters',
+						value: actionParameters
+					}),
+					new Ext.form.TextField({
+					    id:'fre',
+						name:'restartApplication',
+						inputType:'text',
+						fieldLabel:'restartApplication',
+						value: "1"
+					}),
+					new Ext.form.TextField({
+					    id:'cbe',
+						name:'callbackUrl',
+						inputType:'text',
+						fieldLabel:'callbackUrl',
+						value: back_url
+					})
+            ]
+		});
+ 
+		form.getForm().el.dom.action = form.url;
+		form.getForm().el.dom.target = id;
+			
+		if(!Ext.isGecko) {
+			var mask = new Ext.LoadMask(win.id, {msg:"Loading..."});
+			mask.show();
+		}
+ 
+		Ext.EventManager.on(frame, 'load', function() {
+			if(mask !== undefined) { mask.hide(); }
+			form.destroy();
+		});
+ 
+		Ext.emptyFn.defer(200); // frame on ready?
+		form.getForm().submit();
+    },
+
 
 	createMorphMenu: function() {
 		
@@ -256,33 +410,52 @@ ORYX.Plugins.AperteUiShapeMenuPlugin = ORYX.Plugins.ShapeMenuPlugin.extend({
 		});				
 		
 		// Create the button to show the morph menu
-		var buttonAperte = new ORYX.Plugins.ShapeMenuButton({
-		    id:				"AperteIdButton",
-			callback:		this.runAperte.bind(this), 
+		var buttonAperteStepEditor = new ORYX.Plugins.ShapeMenuButton({
+		    id:				"AperteStepEditorBtnId",
+			callback:		this.runAperteStepEditor.bind(this), 
 			icon: 			ORYX.PATH + 'images/aperte_small.png',
 			align: 			ORYX.CONFIG.SHAPEMENU_BOTTOM,
 			group:			0,
 			msg:			"Aperte Step Editor"
 		});				
 		
-		
+		var buttonAperteActionEditor = new ORYX.Plugins.ShapeMenuButton({
+		    id:				"AperteActionEditorBtnId",
+			callback:		this.runAperteActionEditor.bind(this), 
+			icon: 			ORYX.PATH + 'images/aperte_small.png',
+			align: 			ORYX.CONFIG.SHAPEMENU_BOTTOM,
+			group:			0,
+			msg:			"Aperte Action Editor"
+		});			
+
 		
 		this.shapeMenu.setNumberOfButtonsPerLevel(ORYX.CONFIG.SHAPEMENU_BOTTOM, 2)
 		this.shapeMenu.addButton(button);
-		this.shapeMenu.addButton(buttonAperte);
+		this.shapeMenu.addButton(buttonAperteStepEditor);
+		this.shapeMenu.addButton(buttonAperteActionEditor);
 		
 		this.morphMenu.getEl().appendTo(button.node);		
 		this.morphButton = button;
-		this.aperteButton = buttonAperte;
+		this.aperteStepEditorButton = buttonAperteStepEditor;
+		this.aperteActionEditorButton = buttonAperteActionEditor;
 		
 	},
-	showAperteButton: function(elements){
+	showAperteStepEditorButton: function(elements){
 		if(elements.length != 1) return;
 		if(elements[0].properties['oryx-tasktype'] != null && elements[0].properties['oryx-tasktype'] != "None"){
-			this.aperteButton.prepareToShow();
+			this.aperteStepEditorButton.prepareToShow();
 		}
 		
 	},
+	
+	showAperteActionEditorButton: function(elements){
+		if(elements.length != 1) return;
+		if(elements[0].properties['oryx-button-type'] != null && elements[0].properties['oryx-button-type'] != ""){
+			this.aperteActionEditorButton.prepareToShow();
+		}
+		
+	},
+
 	
 	showShapeMenu: function( dontGenerateNew ) {
 	
@@ -297,8 +470,8 @@ ORYX.Plugins.AperteUiShapeMenuPlugin = ORYX.Plugins.ShapeMenuPlugin.extend({
 				// Show the Morph Button
 				this.showMorphButton(this.currentShapes);
 				// Show the Morph Button
-				this.showAperteButton(this.currentShapes);
-				
+				this.showAperteStepEditorButton(this.currentShapes);
+				this.showAperteActionEditorButton(this.currentShapes);
 				
 				// Show the Stencil Buttons
 				this.showStencilButtons(this.currentShapes);	
