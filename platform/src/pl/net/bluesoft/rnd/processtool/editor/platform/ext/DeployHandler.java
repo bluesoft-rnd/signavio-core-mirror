@@ -121,15 +121,14 @@ public class DeployHandler extends BasisHandler {
 
             // MANIFEST
             String processFileName = jsonObj.getJSONObject("properties").optString("aperte-process-filename");
-            String processVersion = jsonObj.getJSONObject("properties").optString("aperte-process-version");
-
+            
             String bundleDesc = jsonObj.getJSONObject("properties").optString("mf-bundle-description");
             String bundleName = jsonObj.getJSONObject("properties").optString("mf-bundle-name");
             String processToolDeployment = jsonObj.getJSONObject("properties").optString("mf-processtool-deployment");
 
             if (isEmpty(bundleDesc) || isEmpty(bundleName)
-            || isEmpty(processToolDeployment) || isEmpty(processFileName) || isEmpty(processVersion)) {
-              throw new RequestException("Diagram attributes: Aperte process filename, Aperte process version number, Manifest: Bundle-Name, Manifest: Bundle-Description, Manifest: ProcessTool-Process-Deployment must not be empty.");
+            || isEmpty(processToolDeployment) || isEmpty(processFileName)) {
+              throw new RequestException("Diagram attributes: Aperte process filename, Manifest: Bundle-Name, Manifest: Bundle-Description, Manifest: ProcessTool-Process-Deployment must not be empty.");
             }
             Manifest mf = getManifest(bundleName, bundleDesc, processToolDeployment);
 
@@ -155,7 +154,7 @@ public class DeployHandler extends BasisHandler {
             // copy to osgi-plugins
             PlatformProperties props =  Platform.getInstance().getPlatformProperties();
             String osgiPluginsDir = props.getAperteOsgiPluginsDir();
-            copy(tempJar, new File(osgiPluginsDir + File.separator + processFileName + "-" + processVersion + ".jar"));
+            copy(tempJar, new File(osgiPluginsDir + File.separator + processFileName + ".jar"));
 
             // delete temporary directory
             tempJar.delete();

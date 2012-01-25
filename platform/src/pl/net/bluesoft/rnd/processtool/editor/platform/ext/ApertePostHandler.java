@@ -30,15 +30,20 @@ public class ApertePostHandler extends BasisHandler {
         
         String stepEditor = jParams.optString("step_editor");
         String queueEditor = jParams.optString("queue_editor");
+        String actionEditor = jParams.optString("action_editor");
+
 
         PrintWriter out = null;
         try {
             out = res.getWriter();
             if (stepEditor != null && stepEditor.trim().length() > 0) {
-                out.println("<html><head></head><body><script type=\"text/javascript\">window.parent.editorSetData(\"" + stepEditor + "\"); " + "</script></body></html>");
+                out.println("<html><head></head><body><script type=\"text/javascript\">window.parent.editorSetStepData(\"" + stepEditor + "\"); " + "</script></body></html>");
             } else if (queueEditor != null && queueEditor.trim().length() > 0) {
                 out.println("<html><head></head><body><script type=\"text/javascript\">window.parent.editorSetQueueData(\"" + queueEditor + "\"); " + "</script></body></html>");
+            } else if (actionEditor != null && actionEditor.trim().length() > 0) {
+            	out.println("<html><head></head><body><script type=\"text/javascript\">window.parent.editorSetActionData(\"" + actionEditor + "\"); " + "</script></body></html>");
             }
+
             out.close();
         } catch (IOException e) {
             logger.error(e);
