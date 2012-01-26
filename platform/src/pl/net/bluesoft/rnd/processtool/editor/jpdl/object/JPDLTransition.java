@@ -9,6 +9,8 @@ import org.json.JSONObject;
 
 import pl.net.bluesoft.rnd.processtool.editor.XmlUtil;
 
+import com.signavio.platform.exceptions.RequestException;
+
 public class JPDLTransition extends JPDLObject {
   
 	protected JPDLTransition() {
@@ -104,9 +106,16 @@ public class JPDLTransition extends JPDLObject {
  
 	public void fillBasicProperties(JSONObject json) throws JSONException {
 		super.fillBasicProperties(json);
-		target = json.getJSONObject("target").getString("resourceId");
+		if (json.optJSONObject("target") != null) {
+		  target = json.getJSONObject("target").getString("resourceId");
+		} else {
+		  throw new RequestException("Transition has no target.");
+		}
 		buttonName = json.getJSONObject("properties").getString("button-type");
 		condition = json.getJSONObject("properties").getString("conditionexpression");
+		if (!StringUtils.isEmpty(condition) && !condition.startsWith("#{")) {
+			condition = "#{" + condition + "}";
+		}
 		
 		if (StringUtils.isEmpty(buttonName)) buttonName = DEFAULT_BUTTON_NAME;
 		
