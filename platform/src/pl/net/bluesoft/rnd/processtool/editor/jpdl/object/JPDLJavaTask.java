@@ -61,4 +61,8 @@ public class JPDLJavaTask extends JPDLTask {
 		}
 	}
 	
+	@Override
+	public String getObjectName() {
+		return "Automatic step";
+	}
 }

@@ -18,4 +18,9 @@ public class JPDLStartEvent extends JPDLComponent {
 		sb.append("</start>\n");
 		return sb.toString();
     }
+	
+	@Override
+	public String getObjectName() {
+		return "Start Event";
+	}
 }

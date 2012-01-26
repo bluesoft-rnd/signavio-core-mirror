@@ -1,16 +1,20 @@
 package pl.net.bluesoft.rnd.processtool.editor.jpdl.object;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import pl.net.bluesoft.rnd.processtool.editor.Widget;
 import pl.net.bluesoft.rnd.processtool.editor.XmlUtil;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import com.signavio.platform.exceptions.RequestException;
 
 public class JPDLUserTask extends JPDLTask {
 
@@ -65,12 +69,26 @@ public class JPDLUserTask extends JPDLTask {
             assignee = widgetJsonObj.optString("assignee");
             swimlane = widgetJsonObj.optString("swimlane");
             candidateGroups = widgetJsonObj.optString("candidate_groups");
+            checkAssignee();
             JSONArray children = widgetJsonObj.optJSONArray("children");
             JSONObject properties = widgetJsonObj.optJSONObject("properties");
             JSONObject permissions = widgetJsonObj.optJSONObject("permissions");
             widget.setWidgetId(widgetJsonObj.getString("widgetId"));
             widget.setPriority(widgetJsonObj.getInt("priority"));
             createWidgetTree(widget, children, properties, permissions);
+		}
+	}
+	
+	private void checkAssignee() {
+		boolean b1 = StringUtils.isEmpty(assignee);
+		boolean b2 = StringUtils.isEmpty(swimlane);
+		boolean b3 = StringUtils.isEmpty(candidateGroups);
+		if (b1 && b2 && b3) {
+			throw new RequestException("Fill in assignee, swimlane or candidateGroups for UserTask '" + name + "'");
+		}
+		if ( (b1 && b2 && !b3) || (b1 && !b2 && b3) || (!b1 && b2 && b3) ) {
+		} else {
+			throw new RequestException("Only one of fields: assignee, swimlane, candidateGroups can be filled for UserTask '" + name + "'");
 		}
 	}
 	
@@ -181,5 +199,8 @@ public class JPDLUserTask extends JPDLTask {
 		return swimlane;
 	}
 	
-	
+	@Override
+	public String getObjectName() {
+		return "User task";
+	}	
 }

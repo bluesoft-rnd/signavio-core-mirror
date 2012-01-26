@@ -18,4 +18,9 @@ public class JPDLEndEvent extends JPDLComponent {
 		sb.append("</end>\n");
 		return sb.toString();
     }
+	
+	@Override
+	public String getObjectName() {
+		return "End Event";
+	}
 }
