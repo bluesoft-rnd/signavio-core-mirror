@@ -3,6 +3,7 @@ package pl.net.bluesoft.rnd.processtool.editor;
 import java.io.IOException;
 import java.util.*;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
@@ -21,7 +22,6 @@ import pl.net.bluesoft.rnd.processtool.editor.jpdl.queue.QueueDef;
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.queue.QueueRight;
 
 import com.signavio.platform.exceptions.RequestException;
-import com.signavio.platform.util.fsbackend.FileSystemUtil;
 
 public class JPDLGenerator {
   
@@ -30,13 +30,41 @@ public class JPDLGenerator {
 	private Map<String, JPDLTransition> transitionMap = new HashMap<String, JPDLTransition>();
 	private SortedMap<Integer, QueueDef> queueConf;
 	private final Logger logger = Logger.getLogger(JPDLGenerator.class);
-	private String processName;
 	private static final ObjectMapper mapper = new ObjectMapper();
 	
-	public void generate(String json, String jpdlPath, String ptcPath, String queuePath) {
+	private String processName;
+	private String processFileName;
+    private String bundleDesc;
+    private String bundleName;
+    private String processToolDeployment;
+	
+	
+	public void init(String json) {
 		try {
 		  JSONObject jsonObj = new JSONObject(json);
+		  
 		  processName = jsonObj.getJSONObject("properties").getString("name");
+		  processFileName = jsonObj.getJSONObject("properties").optString("aperte-process-filename");
+          bundleDesc = jsonObj.getJSONObject("properties").optString("mf-bundle-description");
+          bundleName = jsonObj.getJSONObject("properties").optString("mf-bundle-name");
+          processToolDeployment = jsonObj.getJSONObject("properties").optString("mf-processtool-deployment");
+
+          if (StringUtils.isEmpty(processName)) {
+			  throw new RequestException("Process name is empty.");
+		  }
+          if (StringUtils.isEmpty(processFileName)) {
+			  throw new RequestException("Aperte process filename is empty.");
+		  }
+          if (StringUtils.isEmpty(bundleName)) {
+			  throw new RequestException("Manifest Bundle-Name is empty.");
+		  }
+          if (StringUtils.isEmpty(bundleDesc)) {
+			  throw new RequestException("Manifest Bundle-Description is empty.");
+		  }
+          if (StringUtils.isEmpty(processToolDeployment)) {
+			  throw new RequestException("Manifest: ProcessTool-Process-Deployment is empty.");
+		  }
+          
 		  String queueConfJson = jsonObj.getJSONObject("properties").optString("queue-conf");
 		  if (queueConfJson != null && queueConfJson.trim().length() > 0) {
 		    queueConf = mapper.readValue(queueConfJson, new TypeReference<SortedMap<Integer,QueueDef>>(){});
@@ -48,10 +76,11 @@ public class JPDLGenerator {
 			  JSONObject obj = childShapes.getJSONObject(i);
 			  JPDLObject jpdlObject = JPDLObject.getJPDLObject(obj);
 			  jpdlObject.fillBasicProperties(obj);
-			  if (jpdlObject instanceof JPDLComponent)
+			  if (jpdlObject instanceof JPDLComponent) {
 			    componentMap.put(jpdlObject.getResourceId(), (JPDLComponent)jpdlObject);
-			  else if (jpdlObject instanceof JPDLTransition)
-				transitionMap.put(jpdlObject.getResourceId(), (JPDLTransition)jpdlObject);
+			  } else if (jpdlObject instanceof JPDLTransition) {
+			    transitionMap.put(jpdlObject.getResourceId(), (JPDLTransition)jpdlObject);
+			  }
 		  }
 		} catch (JSONException e) {
 			logger.error("Error while generating JPDL file.", e);
@@ -70,7 +99,7 @@ public class JPDLGenerator {
 			throw new RequestException(e.getMessage());
 		}
 		
-		//drugie przejscie, uzupelnienie mapy tranzycji
+		//second pass, complete the transition map
 		for (String key : componentMap.keySet()) {
 			JPDLComponent cmp = componentMap.get(key);
 			for (String resourceId : cmp.getOutgoing().keySet()) {
@@ -79,14 +108,10 @@ public class JPDLGenerator {
 				cmp.putTransition(resourceId, transition);
 			}
 		}
-		
-		generateJpdlFile(jpdlPath);
-		generatePtcFile(ptcPath);
-		generateQueueFile(queuePath);
 	
 	}
 	
-	private void generateJpdlFile(String jpdlPath) {
+	public String generateJpdl() {
 		StringBuffer jpdl = new StringBuffer();
 		jpdl.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 		jpdl.append(String.format("<process name=\"%s\" xmlns=\"http://jbpm.org/4.4/jpdl\">\n", processName));
@@ -116,17 +141,16 @@ public class JPDLGenerator {
 		
 		jpdl.append("</process>");
 		
-		FileSystemUtil.deleteFileOrDirectory(jpdlPath);
-		FileSystemUtil.createFile(jpdlPath, jpdl.toString());
+		return jpdl.toString();
 	}
 	
-	private void generatePtcFile(String ptcPath) {
+	public String generateProcessToolConfig() {
         StringBuffer ptc = new StringBuffer();
         ptc.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         ptc.append(String.format("<config.ProcessDefinitionConfig bpmDefinitionKey=\"%s\" description=\"%s\" processName=\"%s\" comment=\"%s\">\n", processName, processName, processName, processName));
         ptc.append("<states>\n");
         
-		//generowanie process-tool-config'a
+		//processtool-config.xml generation
 		for (String key : componentMap.keySet()) {
 			JPDLComponent cmp = componentMap.get(key);
 			if (cmp instanceof JPDLUserTask) {
@@ -139,11 +163,10 @@ public class JPDLGenerator {
 		
 		ptc.append("</states>\n");
 		ptc.append("</config.ProcessDefinitionConfig>\n");
-		FileSystemUtil.deleteFileOrDirectory(ptcPath);
-		FileSystemUtil.createFile(ptcPath, ptc.toString());
+		return ptc.toString();
 	}
 	
-	private void generateQueueFile(String queuePath) {
+	public String generateQueuesConfig() {
 		
 		StringBuffer q = new StringBuffer();
 		q.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
@@ -163,30 +186,27 @@ public class JPDLGenerator {
 		}
 		
 		q.append("</list>\n");
-		FileSystemUtil.deleteFileOrDirectory(queuePath);
-		FileSystemUtil.createFile(queuePath, q.toString());
+		return q.toString();
 	}
-	/*public static String readFile(String fname) {
-		StringBuffer sb = new StringBuffer();
-		try {
-		    BufferedReader in = new BufferedReader(new FileReader(fname));
-		    String str;
-		    while ((str = in.readLine()) != null) {
-		        sb.append(str);
-		    }
-		    in.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return sb.toString();
+
+	public String getProcessName() {
+		return processName;
+	}
+
+	public String getProcessFileName() {
+		return processFileName;
+	}
+
+	public String getBundleDesc() {
+		return bundleDesc;
+	}
+
+	public String getBundleName() {
+		return bundleName;
+	}
+
+	public String getProcessToolDeployment() {
+		return processToolDeployment;
 	}
 	
-	
-    public static void main(String[] args) {
-	   new JPDLGenerator().generate(
-			  readFile("c:\\LB\\bls_aperteworkflow\\maintest.json"),
-			  "c:\\LB\\bls_aperteworkflow\\out.jpdl.xml",
-			  "c:\\LB\\bls_aperteworkflow\\out.process-tool-config.xml"
-		 );
-    }*/
 }
