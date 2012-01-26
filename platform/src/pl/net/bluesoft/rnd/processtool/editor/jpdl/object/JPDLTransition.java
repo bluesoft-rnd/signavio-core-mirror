@@ -109,7 +109,7 @@ public class JPDLTransition extends JPDLObject {
 		if (json.optJSONObject("target") != null) {
 		  target = json.getJSONObject("target").getString("resourceId");
 		} else {
-		  throw new RequestException("Transition has no target.");
+		  throw new RequestException("Transition '" + name + "' has no target.");
 		}
 		buttonName = json.getJSONObject("properties").getString("button-type");
 		condition = json.getJSONObject("properties").getString("conditionexpression");
@@ -147,4 +147,8 @@ public class JPDLTransition extends JPDLObject {
 		
 	}
 	
+	@Override
+	public String getObjectName() {
+		return "Transition";
+	}
 }

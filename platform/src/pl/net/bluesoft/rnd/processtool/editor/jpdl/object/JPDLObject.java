@@ -1,9 +1,12 @@
 package pl.net.bluesoft.rnd.processtool.editor.jpdl.object;
 
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.exception.UnsupportedJPDLObjectException;
+
+import com.signavio.platform.exceptions.RequestException;
 
 public abstract class JPDLObject {
 	
@@ -11,6 +14,8 @@ public abstract class JPDLObject {
 	
 	protected String resourceId;
 	protected String name;
+	
+	public abstract String getObjectName();
 	
 	public String getX1() {
 		return x1;
@@ -68,6 +73,9 @@ public abstract class JPDLObject {
 		
 		resourceId = json.getString("resourceId");
 		name = json.getJSONObject("properties").getString("name");
+		if (StringUtils.isEmpty(name)) {
+			throw new RequestException("Object '" + getObjectName() + "' has no name.");
+		}
 	}
 	
     public static JPDLObject getJPDLObject(JSONObject obj) throws JSONException, UnsupportedJPDLObjectException {

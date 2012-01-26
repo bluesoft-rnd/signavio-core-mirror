@@ -27,5 +27,11 @@ public class JPDLDecision extends JPDLComponent {
 		sb.append("</decision>");
 		return sb.toString();
     }
+
+
+	@Override
+	public String getObjectName() {
+		return "Decision";
+	}
 	
 }
