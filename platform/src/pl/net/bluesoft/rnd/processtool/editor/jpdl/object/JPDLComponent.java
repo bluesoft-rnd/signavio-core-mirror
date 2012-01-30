@@ -45,7 +45,7 @@ public abstract class JPDLComponent extends JPDLObject {
 		
 		for (String targetResourceId : outgoing.keySet()) {
 			JPDLTransition transition = outgoing.get(targetResourceId);
-			sb.append(String.format("<transition name=\"%s\" to=\"%s\">\n", transition.getName(), transition.getTargetName()));
+			sb.append(String.format("<transition %s name=\"%s\" to=\"%s\">\n", transition.getDockers(), transition.getName(), transition.getTargetName()));
 			if (transition.getCondition() != null && transition.getCondition().trim().length() > 0) {
 				sb.append(String.format("<condition expr=\"%s\"/>\n", transition.getCondition()));
 			}

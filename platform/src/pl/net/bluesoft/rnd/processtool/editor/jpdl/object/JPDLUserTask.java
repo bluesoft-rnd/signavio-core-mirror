@@ -22,6 +22,7 @@ public class JPDLUserTask extends JPDLTask {
 
 	private Widget widget;
 	private String commentary;
+	private String description;
 	
 	private String assignee;
 	private String swimlane;
@@ -46,7 +47,7 @@ public class JPDLUserTask extends JPDLTask {
 		else if (swimlane != null && swimlane.trim().length() > 0)
 			taskConf = String.format("swimlane=\"%s\"", swimlane);
 		
-		sb.append(String.format("<task %s name=\"%s\" g=\"%s,%s,%s,%s\">\n", taskConf,name,x1,y1,TASK_X,TASK_Y));
+		sb.append(String.format("<task %s name=\"%s\" g=\"%d,%d,%d,%d\">\n", taskConf,name,x1,y1,x2-x1,y2-y1));
 		//sb.append(String.format("<description>Original ID: '%s'</description>\n", resourceId));
 		sb.append(getTransitionsXML());
 		sb.append("</task>\n");
@@ -59,6 +60,7 @@ public class JPDLUserTask extends JPDLTask {
 
         // Properties from Signavio Core model attributes
         commentary = json.getJSONObject("properties").getString("documentation");
+        description = json.getJSONObject("properties").getString("description");
 
         // Properties from Step Editor attributes
 		String widgetJson = json.getJSONObject("properties").getString("aperte-conf");
@@ -176,7 +178,7 @@ public class JPDLUserTask extends JPDLTask {
 	 
 	public String generateWidgetXML() {
 		StringBuffer sb = new StringBuffer();
-		sb.append(String.format("<config.ProcessStateConfiguration description=\"description\" name=\"%s\" commentary=\"%s\">\n", name, commentary));
+		sb.append(String.format("<config.ProcessStateConfiguration description=\"%s\" name=\"%s\" commentary=\"%s\">\n", description, name, commentary));
 		sb.append("<widgets>\n");
 		sb.append(generatePermissionsXML(widget.getPermissionsMap()));
 		sb.append(generateAttributesXML(widget.getAttributesMap()));
