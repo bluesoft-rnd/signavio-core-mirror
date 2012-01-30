@@ -47,7 +47,7 @@ public class JPDLUserTask extends JPDLTask {
 		else if (swimlane != null && swimlane.trim().length() > 0)
 			taskConf = String.format("swimlane=\"%s\"", swimlane);
 		
-		sb.append(String.format("<task %s name=\"%s\" g=\"%s,%s,%s,%s\">\n", taskConf,name,x1,y1,TASK_X,TASK_Y));
+		sb.append(String.format("<task %s name=\"%s\" g=\"%d,%d,%d,%d\">\n", taskConf,name,x1,y1,x2-x1,y2-y1));
 		//sb.append(String.format("<description>Original ID: '%s'</description>\n", resourceId));
 		sb.append(getTransitionsXML());
 		sb.append("</task>\n");

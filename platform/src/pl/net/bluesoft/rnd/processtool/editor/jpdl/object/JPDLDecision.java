@@ -10,10 +10,7 @@ public class JPDLDecision extends JPDLComponent {
     	
 	}
 	
-    protected static final String DECISION_X = "100";
-	protected static final String DECISION_Y = "50";
-	
-	@Override
+    @Override
 	public void fillBasicProperties(JSONObject json) throws JSONException {
 		super.fillBasicProperties(json);
 	}
@@ -22,7 +19,7 @@ public class JPDLDecision extends JPDLComponent {
     @Override
 	public String toXML() { 
     	StringBuffer sb = new StringBuffer();
-    	sb.append(String.format("<decision name=\"%s\" g=\"%s,%s,%s,%s\">\n", name,x1,y1,DECISION_X,DECISION_Y));
+    	sb.append(String.format("<decision name=\"%s\" g=\"%d,%d,%d,%d\">\n", name,x1,y1,x2-x1,y2-y1));
 		sb.append(getTransitionsXML());
 		sb.append("</decision>");
 		return sb.toString();
