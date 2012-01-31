@@ -7,8 +7,6 @@ public abstract class JPDLTask extends JPDLComponent {
   
 	protected String taskType;
 	
-	protected static final String TASK_X = "100";
-	protected static final String TASK_Y = "50";
 	
 	public String getTaskType() {
 		return taskType;
