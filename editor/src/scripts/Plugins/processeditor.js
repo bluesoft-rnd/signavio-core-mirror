@@ -65,12 +65,11 @@ ORYX.Plugins.ProcessEditor = Clazz.extend({
 	
 	editorOpenProcessWindow: function (processConf){
          
-        var iframeName = "ifname";
-		
+        // get callback url
 		var rurl = window.location.href;
-		var base_editor_url = rurl.substr(0, rurl.indexOf('editor'));
-		var back_url = base_editor_url + "aperte_post";
-		
+		var baseEditorUrl = rurl.substr(0, rurl.indexOf('editor'));
+		var callbackUrl = baseEditorUrl + "aperte_post";
+
 		processWin = new Ext.Window({
 			width:800,
 			height:600,
@@ -104,7 +103,7 @@ ORYX.Plugins.ProcessEditor = Clazz.extend({
 		if(Ext.isIE) {
 			document.frames[id].name = id;
 		}
-		
+
 		var form = new Ext.FormPanel({
 			url: APERTE_PROCESS_EDITOR_URL,
 			renderTo:Ext.getBody(),
@@ -119,11 +118,18 @@ ORYX.Plugins.ProcessEditor = Clazz.extend({
 						value: processConf
 					}),
 					new Ext.form.TextField({
+					    id:'processModelDirectory',
+					    name:'processModelDirectory',
+					    fieldLabel:'processModelDirectory',
+					    inputType:'text',
+					    value:
+					}),
+					new Ext.form.TextField({
 					    id:'callbackUrl',
 						name:'callbackUrl',
 						fieldLabel:'callbackUrl',
 						inputType:'text',
-						value: back_url
+						value: callbackUrl
 					}),
 					new Ext.form.TextField({
 					    id:'restartApplication',
