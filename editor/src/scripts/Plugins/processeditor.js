@@ -122,7 +122,7 @@ ORYX.Plugins.ProcessEditor = Clazz.extend({
 					    name:'processModelDirectory',
 					    fieldLabel:'processModelDirectory',
 					    inputType:'text',
-					    value:
+					    value: ''
 					}),
 					new Ext.form.TextField({
 					    id:'callbackUrl',
