@@ -1,5 +1,7 @@
 package pl.net.bluesoft.rnd.processtool.editor;
 
+import org.aperteworkflow.editor.domain.Permission;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +13,7 @@ public class Widget {
 	private String widgetId;
     private Integer priority;
 	private Map<String,Object> attributesMap = new HashMap<String,Object>();
-	private Map<String,Object> permissionsMap = new HashMap<String,Object>();
+	private List<Permission> permissions = new ArrayList<Permission>();
 	
 	public void addChildWidget(Widget w) {
 		childrenList.add(w);
@@ -45,16 +47,16 @@ public class Widget {
 		attributesMap.put(key, value);
 	}
 	
-	public Map<String, Object> getPermissionsMap() {
-		return permissionsMap;
+	public List<Permission> getPermissions() {
+		return permissions;
 	}
 
-	public void setPermissionsMap(Map<String, Object> permissionsMap) {
-		this.permissionsMap = permissionsMap;
+	public void setPermissions(List<Permission> permissions) {
+		this.permissions = permissions;
 	}
 	
-	public void putPermission(String key, Object value) {
-		permissionsMap.put(key, value);
+	public void addPermission(Permission p) {
+		permissions.add(p);
 	}
 
     public Integer getPriority() {
