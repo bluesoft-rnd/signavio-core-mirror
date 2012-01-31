@@ -37,7 +37,7 @@
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/org.json.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/jackson-core-asl-1.9.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/jackson-mapper-asl-1.9.0.jar"/>
-		<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/commons-collections-2.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/commons-collections-2.1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/javassist.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/jta.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/dom4j-1.6.1.jar"/>
@@ -80,6 +80,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/catalina-ha.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/catalina-tribes.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/catalina.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/step-editor-0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/xalan.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/xercesImpl.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/serializer.jar"/>

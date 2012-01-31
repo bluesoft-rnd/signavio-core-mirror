@@ -65,6 +65,11 @@ ORYX.I18N.QueueEditor.queueEditor = "Queue Editor";
 ORYX.I18N.QueueEditor.group = "QueueEditor";
 ORYX.I18N.QueueEditor.desc = "Queue Editor";
 
+if(!ORYX.I18N.QueueEditor) ORYX.I18N.QueueEditor = {};
+
+ORYX.I18N.ProcessEditor.queueEditor = "Process Editor";
+ORYX.I18N.ProcessEditor.group = "ProcessEditor";
+ORYX.I18N.ProcessEditor.desc = "Process Editor";
 
 if(!ORYX.I18N.Edit) ORYX.I18N.Edit = {};
 
