@@ -9,6 +9,9 @@ import org.json.JSONObject;
 
 import pl.net.bluesoft.rnd.processtool.editor.XmlUtil;
 
+import com.signavio.platform.exceptions.RequestException;
+
+
 public class JPDLTransition extends JPDLObject {
   
 	protected JPDLTransition() {
@@ -19,6 +22,7 @@ public class JPDLTransition extends JPDLObject {
 	
 	private String target;
     private String targetName;
+    private List<Docker> dockers;
     
     //action properties
     private String buttonName;
@@ -104,9 +108,29 @@ public class JPDLTransition extends JPDLObject {
  
 	public void fillBasicProperties(JSONObject json) throws JSONException {
 		super.fillBasicProperties(json);
-		target = json.getJSONObject("target").getString("resourceId");
+		
+		JSONArray dockerArray = json.getJSONArray("dockers");
+		
+		dockers = new ArrayList<Docker>();
+		for (int i = 1; i < dockerArray.length()-1; i++) {
+			JSONObject docker = dockerArray.getJSONObject(i);
+			int x = round(docker.getString("x"));
+			int y = round(docker.getString("y"));
+			dockers.add(new Docker(x, y));
+		}
+		
+		
+		
+		if (json.optJSONObject("target") != null) {
+		  target = json.getJSONObject("target").getString("resourceId");
+		} else {
+		  throw new RequestException("Transition '" + name + "' has no target.");
+		}
 		buttonName = json.getJSONObject("properties").getString("button-type");
 		condition = json.getJSONObject("properties").getString("conditionexpression");
+		if (!StringUtils.isEmpty(condition) && !condition.startsWith("#{")) {
+			condition = "#{" + condition + "}";
+		}
 		
 		if (StringUtils.isEmpty(buttonName)) buttonName = DEFAULT_BUTTON_NAME;
 		
@@ -138,4 +162,44 @@ public class JPDLTransition extends JPDLObject {
 		
 	}
 	
+	@Override
+	public String getObjectName() {
+		return "Transition";
+	}
+	
+	public String getDockers(int offsetX, int offsetY) {
+		StringBuffer dockerString = new StringBuffer();
+		for(Docker d : dockers) {
+			dockerString.append(d.getX()+offsetX).append(",").append(d.getY()+offsetY);
+			if(dockers.indexOf(d) == dockers.size() - 1)
+				dockerString.append(":0,0");
+			else
+				dockerString.append(";");
+		}
+		return "g=\"" + dockerString.toString() + "\"";
+	}
+	
+	private class Docker {
+		private int x;
+		private int y;
+		
+		public int getX() {
+			return x;
+		}
+		public void setX(int x) {
+			this.x = x;
+		}
+		public int getY() {
+			return y;
+		}
+		public void setY(int y) {
+			this.y = y;
+		}
+		
+		public Docker(int x, int y) {
+			super();
+			this.x = x;
+			this.y = y;
+		}
+	}
 }

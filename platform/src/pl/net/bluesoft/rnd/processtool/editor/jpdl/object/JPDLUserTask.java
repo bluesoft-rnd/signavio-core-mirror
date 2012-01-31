@@ -1,16 +1,20 @@
 package pl.net.bluesoft.rnd.processtool.editor.jpdl.object;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import pl.net.bluesoft.rnd.processtool.editor.Widget;
 import pl.net.bluesoft.rnd.processtool.editor.XmlUtil;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import com.signavio.platform.exceptions.RequestException;
 
 public class JPDLUserTask extends JPDLTask {
 
@@ -18,6 +22,7 @@ public class JPDLUserTask extends JPDLTask {
 
 	private Widget widget;
 	private String commentary;
+	private String description;
 	
 	private String assignee;
 	private String swimlane;
@@ -42,7 +47,10 @@ public class JPDLUserTask extends JPDLTask {
 		else if (swimlane != null && swimlane.trim().length() > 0)
 			taskConf = String.format("swimlane=\"%s\"", swimlane);
 		
-		sb.append(String.format("<task %s name=\"%s\" g=\"%s,%s,%s,%s\">\n", taskConf,name,x1,y1,TASK_X,TASK_Y));
+		sb.append(String.format("<task %s name=\"%s\" g=\"%d,%d,%d,%d\">\n", taskConf,name,
+                boundsX, boundsY, width, height
+//                x1,y1,x2-x1,y2-y1
+        ));
 		//sb.append(String.format("<description>Original ID: '%s'</description>\n", resourceId));
 		sb.append(getTransitionsXML());
 		sb.append("</task>\n");
@@ -55,6 +63,7 @@ public class JPDLUserTask extends JPDLTask {
 
         // Properties from Signavio Core model attributes
         commentary = json.getJSONObject("properties").getString("documentation");
+        description = json.getJSONObject("properties").getString("description");
 
         // Properties from Step Editor attributes
 		String widgetJson = json.getJSONObject("properties").getString("aperte-conf");
@@ -65,12 +74,26 @@ public class JPDLUserTask extends JPDLTask {
             assignee = widgetJsonObj.optString("assignee");
             swimlane = widgetJsonObj.optString("swimlane");
             candidateGroups = widgetJsonObj.optString("candidate_groups");
+            checkAssignee();
             JSONArray children = widgetJsonObj.optJSONArray("children");
             JSONObject properties = widgetJsonObj.optJSONObject("properties");
             JSONObject permissions = widgetJsonObj.optJSONObject("permissions");
             widget.setWidgetId(widgetJsonObj.getString("widgetId"));
             widget.setPriority(widgetJsonObj.getInt("priority"));
             createWidgetTree(widget, children, properties, permissions);
+		}
+	}
+	
+	private void checkAssignee() {
+		boolean b1 = StringUtils.isEmpty(assignee);
+		boolean b2 = StringUtils.isEmpty(swimlane);
+		boolean b3 = StringUtils.isEmpty(candidateGroups);
+		if (b1 && b2 && b3) {
+			throw new RequestException("Fill in assignee, swimlane or candidateGroups for UserTask '" + name + "'");
+		}
+		if ( (b1 && b2 && !b3) || (b1 && !b2 && b3) || (!b1 && b2 && b3) ) {
+		} else {
+			throw new RequestException("Only one of fields: assignee, swimlane, candidateGroups can be filled for UserTask '" + name + "'");
 		}
 	}
 	
@@ -158,7 +181,7 @@ public class JPDLUserTask extends JPDLTask {
 	 
 	public String generateWidgetXML() {
 		StringBuffer sb = new StringBuffer();
-		sb.append(String.format("<config.ProcessStateConfiguration description=\"description\" name=\"%s\" commentary=\"%s\">\n", name, commentary));
+		sb.append(String.format("<config.ProcessStateConfiguration description=\"%s\" name=\"%s\" commentary=\"%s\">\n", description, name, commentary));
 		sb.append("<widgets>\n");
 		sb.append(generatePermissionsXML(widget.getPermissionsMap()));
 		sb.append(generateAttributesXML(widget.getAttributesMap()));
@@ -181,5 +204,8 @@ public class JPDLUserTask extends JPDLTask {
 		return swimlane;
 	}
 	
-	
+	@Override
+	public String getObjectName() {
+		return "User task";
+	}	
 }

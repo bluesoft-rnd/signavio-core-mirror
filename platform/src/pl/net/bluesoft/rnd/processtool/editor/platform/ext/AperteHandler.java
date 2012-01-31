@@ -180,6 +180,15 @@ public class AperteHandler extends BasisHandler {
 
         o_prop.put(getAperteConf());
         
+        JSONObject o = new JSONObject();
+        o.put("id","description");
+	    o.put("type","String");
+	    o.put("title","Description");
+	    o.put("description","Task description");
+	    o.put("readonly",false);
+	    o.put("optional",true);
+	    o_prop.put(o);
+        
         o_prop.put(getAperteTaskTypes());
     }
     
