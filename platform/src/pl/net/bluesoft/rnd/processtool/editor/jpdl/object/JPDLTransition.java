@@ -112,7 +112,7 @@ public class JPDLTransition extends JPDLObject {
 		JSONArray dockerArray = json.getJSONArray("dockers");
 		
 		dockers = new ArrayList<Docker>();
-		for (int i = 0; i < dockerArray.length(); i++) {
+		for (int i = 1; i < dockerArray.length()-1; i++) {
 			JSONObject docker = dockerArray.getJSONObject(i);
 			int x = round(docker.getString("x"));
 			int y = round(docker.getString("y"));
@@ -167,12 +167,12 @@ public class JPDLTransition extends JPDLObject {
 		return "Transition";
 	}
 	
-	public String getDockers() {
+	public String getDockers(int offsetX, int offsetY) {
 		StringBuffer dockerString = new StringBuffer();
 		for(Docker d : dockers) {
-			dockerString.append(d.getX()).append(",").append(d.getY());
+			dockerString.append(d.getX()+offsetX).append(",").append(d.getY()+offsetY);
 			if(dockers.indexOf(d) == dockers.size() - 1)
-				dockerString.append(":");
+				dockerString.append(":0,0");
 			else
 				dockerString.append(";");
 		}

@@ -19,7 +19,8 @@ public class JPDLJavaTask extends JPDLTask {
 	@Override
 	public String toXML() { 
 		StringBuffer sb = new StringBuffer();
-		sb.append(String.format("<java auto-wire=\"true\" cache=\"false\" class=\"pl.net.bluesoft.rnd.pt.ext.jbpm.JbpmStepAction\" g=\"%d,%d,%d,%d\" method=\"invoke\" name=\"%s\" var=\"result\">\n", x1,y1,x2-x1,y2-y1,name));
+		sb.append(String.format("<java auto-wire=\"true\" cache=\"false\" class=\"pl.net.bluesoft.rnd.pt.ext.jbpm.JbpmStepAction\" " +
+                "g=\"%d,%d,%d,%d\" method=\"invoke\" name=\"%s\" var=\"result\">\n", boundsX, boundsY, width, height,name));
 		sb.append("<field name=\"stepName\">\n");
 		sb.append(String.format("<string value=\"%s\"/>\n",taskType));
 		sb.append("</field>\n");

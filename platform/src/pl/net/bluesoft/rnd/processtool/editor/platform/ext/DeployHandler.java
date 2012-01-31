@@ -1,21 +1,33 @@
 package pl.net.bluesoft.rnd.processtool.editor.platform.ext;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
 import javax.servlet.ServletContext;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Result;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
+import org.apache.batik.dom.svg.SVGDOMImplementation;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.TranscodingHints;
 import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import org.w3c.dom.*;
 import pl.net.bluesoft.rnd.processtool.editor.JPDLGenerator;
 
 import com.signavio.platform.annotations.HandlerConfiguration;
@@ -54,17 +66,63 @@ public class DeployHandler extends BasisHandler {
 		return mf;
 	}
 	
+    private List<Element> getChildrenByName(Element parent, String name) {
+        ArrayList<Element> res = new ArrayList<Element>();
+        NodeList g = parent.getChildNodes();
+        for (int i=0; i < g.getLength(); i++) {
+            Node item = g.item(i);
+            if (item instanceof Element) {
+                Element e = (Element) item;
+                if (name.equals(e.getTagName())) {
+                    res.add(e);
+                }
+            }
+        }
+        return res;
+    }
 	private byte[] svg2png(byte[] svg) throws TranscoderException {
-		ByteArrayInputStream bais = new ByteArrayInputStream(svg);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		TranscoderInput input = new TranscoderInput(bais);
-		TranscoderOutput output = new TranscoderOutput(baos);
-		new PNGTranscoder().transcode(input, output);
-		byte[] png = baos.toByteArray();
-		return png;
+//            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+//            Transformer transformer = transformerFactory.newTransformer();
+//            DOMSource source = new DOMSource(document);
+//            ByteArrayOutputStream tmpBaos = new ByteArrayOutputStream();
+//            Result result = new StreamResult(tmpBaos);
+//            transformer.transform(source, result);
+
+        ByteArrayInputStream bais = new ByteArrayInputStream(svg);
+        TranscoderInput input = new TranscoderInput(bais);
+        TranscoderOutput output = new TranscoderOutput(baos);
+        PNGTranscoder pngTranscoder = new PNGTranscoder();
+        pngTranscoder.transcode(input, output);
+        return baos.toByteArray();      
 	}
-    
-	private void addPackageDirs(String packageName, JarOutputStream target) throws IOException {
+
+    private String[] getGraphOffset(byte[] svg) {
+        String[] vs;
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document document = db.parse(new ByteArrayInputStream(svg));
+
+            for (Element e : getChildrenByName(document.getDocumentElement(), "g")) {
+                for (Element ee : getChildrenByName(e, "g")) {
+
+                    String transform = ee.getAttribute("transform");
+                    if (transform != null) {//GOTCHA!
+                        //e.g. translate(-194.30433654785156, -36)
+                        transform = transform.replace("translate(", "").replace(")", "").replace(" ", "");
+                        return transform.split(",", 2);
+
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return new String[]{"0", "0"};
+    }
+
+    private void addPackageDirs(String packageName, JarOutputStream target) throws IOException {
 		String[] packageElems = packageName.split("\\.");
 		String[] dirNames = new String[packageElems.length];
 		for (int i = 0; i < packageElems.length; i++) {
@@ -119,10 +177,14 @@ public class DeployHandler extends BasisHandler {
             String fileNameWithPath = parent.getPath() + File.separator + fileName;
 
             byte [] jsonData = ModelTypeManager.getInstance().getModelType(signavioXMLExtension).getRepresentationInfoFromModelFile(RepresentationType.JSON, fileNameWithPath);
-            byte [] svgData = ModelTypeManager.getInstance().getModelType(signavioXMLExtension).getRepresentationInfoFromModelFile(RepresentationType.SVG, fileNameWithPath);
+            byte [] svgData = ModelTypeManager.getInstance().getModelType(signavioXMLExtension)
+                    .getRepresentationInfoFromModelFile(RepresentationType.SVG, fileNameWithPath);
             String jsonRep = new String(jsonData, "utf-8");
 
-            JPDLGenerator gen = new JPDLGenerator();
+            String[] vs = getGraphOffset(svgData);
+            int offsetX = Math.round(Float.parseFloat(vs[0]));
+            int offsetY = Math.round(Float.parseFloat(vs[1]));
+            JPDLGenerator gen = new JPDLGenerator(offsetX, offsetY);
             gen.init(jsonRep);
             
             // MANIFEST

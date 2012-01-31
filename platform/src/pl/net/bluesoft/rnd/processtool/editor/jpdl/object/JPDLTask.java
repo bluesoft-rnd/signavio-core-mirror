@@ -7,7 +7,6 @@ public abstract class JPDLTask extends JPDLComponent {
   
 	protected String taskType;
 	
-	
 	public String getTaskType() {
 		return taskType;
 	}

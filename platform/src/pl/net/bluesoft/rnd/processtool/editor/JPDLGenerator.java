@@ -37,9 +37,16 @@ public class JPDLGenerator {
     private String bundleDesc;
     private String bundleName;
     private String processToolDeployment;
-	
-	
-	public void init(String json) {
+    private int offsetY;
+    private int offsetX;
+
+    public JPDLGenerator(int offsetX, int offsetY) {
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
+    }
+
+
+    public void init(String json) {
 		try {
 		  JSONObject jsonObj = new JSONObject(json);
 		  
@@ -71,17 +78,18 @@ public class JPDLGenerator {
 		  } else {
 			queueConf = new TreeMap<Integer, QueueDef>();
 		  }
-		  JSONArray childShapes = jsonObj.getJSONArray("childShapes");
-		  for (int i = 0; i < childShapes.length(); i++) {
-			  JSONObject obj = childShapes.getJSONObject(i);
-			  JPDLObject jpdlObject = JPDLObject.getJPDLObject(obj);
-			  jpdlObject.fillBasicProperties(obj);
-			  if (jpdlObject instanceof JPDLComponent) {
-			    componentMap.put(jpdlObject.getResourceId(), (JPDLComponent)jpdlObject);
-			  } else if (jpdlObject instanceof JPDLTransition) {
-			    transitionMap.put(jpdlObject.getResourceId(), (JPDLTransition)jpdlObject);
-			  }
-		  }
+            JSONArray childShapes = jsonObj.getJSONArray("childShapes");
+            for (int i = 0; i < childShapes.length(); i++) {
+                JSONObject obj = childShapes.getJSONObject(i);
+                JPDLObject jpdlObject = JPDLObject.getJPDLObject(obj);
+                jpdlObject.fillBasicProperties(obj);
+                if (jpdlObject instanceof JPDLComponent) {
+                    ((JPDLComponent) jpdlObject).applyOffset(offsetX, offsetY);
+                    componentMap.put(jpdlObject.getResourceId(), (JPDLComponent) jpdlObject);
+                } else if (jpdlObject instanceof JPDLTransition) {
+                    transitionMap.put(jpdlObject.getResourceId(), (JPDLTransition) jpdlObject);
+                }
+            }
 		} catch (JSONException e) {
 			logger.error("Error while generating JPDL file.", e);
 			throw new RequestException("Error while generating JPDL file.", e);
