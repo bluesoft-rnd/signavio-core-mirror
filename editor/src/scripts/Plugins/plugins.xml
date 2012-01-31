@@ -50,6 +50,7 @@
 		
 		<plugin source="deploy.js" name="ORYX.Plugins.Deploy"/>
 		<plugin source="queueeditor.js" name="ORYX.Plugins.QueueEditor"/>
+        <plugin source="processeditor.js" name="ORYX.Plugins.ProcessEditor"/>
 		<plugin source="view.js" name="ORYX.Plugins.View" />
 		<plugin source="dragdropresize.js" name="ORYX.Plugins.DragDropResize" />
 		<plugin source="shapeHighlighting.js" name="ORYX.Plugins.HighlightingSelectedShapes" />
@@ -114,6 +115,7 @@
 		<property group="Docker" index="7" />
 		<property group="Zoom" index="8" />	
 		<property group="Deploy" index="9" />	
-		<property group="QueueEditor" index="a" />	
+		<property group="QueueEditor" index="a" />
+        <property group="ProcessEditor" index="p" />
 	</properties>
 </config>

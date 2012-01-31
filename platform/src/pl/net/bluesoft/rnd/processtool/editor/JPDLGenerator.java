@@ -1,10 +1,10 @@
 package pl.net.bluesoft.rnd.processtool.editor;
 
-import java.io.IOException;
-import java.util.*;
-
+import com.signavio.platform.exceptions.RequestException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.aperteworkflow.editor.domain.Permission;
+import org.aperteworkflow.editor.domain.ProcessConfig;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -12,7 +12,6 @@ import org.codehaus.jackson.type.TypeReference;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.exception.UnsupportedJPDLObjectException;
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.JPDLComponent;
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.JPDLObject;
@@ -21,7 +20,8 @@ import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.JPDLUserTask;
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.queue.QueueDef;
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.queue.QueueRight;
 
-import com.signavio.platform.exceptions.RequestException;
+import java.io.IOException;
+import java.util.*;
 
 public class JPDLGenerator {
   
@@ -29,6 +29,9 @@ public class JPDLGenerator {
 	private Map<String, JPDLComponent> componentMap = new HashMap<String, JPDLComponent>(); 
 	private Map<String, JPDLTransition> transitionMap = new HashMap<String, JPDLTransition>();
 	private SortedMap<Integer, QueueDef> queueConf;
+    
+    private ProcessConfig processConfig;
+    
 	private final Logger logger = Logger.getLogger(JPDLGenerator.class);
 	private static final ObjectMapper mapper = new ObjectMapper();
 	
@@ -78,6 +81,12 @@ public class JPDLGenerator {
 		  } else {
 			queueConf = new TreeMap<Integer, QueueDef>();
 		  }
+
+            String processConfJson = jsonObj.getJSONObject("properties").optString("process-conf");
+            if (processConfJson != null && !processConfJson.trim().isEmpty()) {
+                processConfig = mapper.readValue(processConfJson, ProcessConfig.class);
+            }
+
             JSONArray childShapes = jsonObj.getJSONArray("childShapes");
             for (int i = 0; i < childShapes.length(); i++) {
                 JSONObject obj = childShapes.getJSONObject(i);
@@ -156,6 +165,19 @@ public class JPDLGenerator {
         StringBuffer ptc = new StringBuffer();
         ptc.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         ptc.append(String.format("<config.ProcessDefinitionConfig bpmDefinitionKey=\"%s\" description=\"%s\" processName=\"%s\" comment=\"%s\">\n", processName, processName, processName, processName));
+
+        if (processConfig != null) {
+            if (processConfig.getProcessPermissions() != null && !processConfig.getProcessPermissions().isEmpty()) {
+                ptc.append("<permissions>\n");
+
+                for (Permission permission : processConfig.getProcessPermissions()) {
+                    ptc.append(String.format("<config.ProcessDefinitionPermission privilegeName=\"%s\" roleName=\"%s\"/>", permission.getPrivilegeName(), permission.getRoleName()));
+                }
+
+                ptc.append("</permissions>\n");
+            }
+        }
+
         ptc.append("<states>\n");
         
 		//processtool-config.xml generation
@@ -173,7 +195,7 @@ public class JPDLGenerator {
 		ptc.append("</config.ProcessDefinitionConfig>\n");
 		return ptc.toString();
 	}
-	
+
 	public String generateQueuesConfig() {
 		
 		StringBuffer q = new StringBuffer();

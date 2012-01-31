@@ -99,6 +99,7 @@ public class AperteHandler extends BasisHandler {
         o_prop.put(getBundleDescription());
         o_prop.put(getProcessToolDeployment());
 		o_prop.put(getQueueConf());
+        o_prop.put(getProcessConf());
         o_prop.put(getMessageProperties());
     }
 
@@ -369,6 +370,17 @@ public class AperteHandler extends BasisHandler {
   		   o.put("optional",true);
           return o;
       }
+    
+    private JSONObject getProcessConf() throws JSONException {
+        JSONObject o = new JSONObject();
+        o.put("id", "process-conf");
+        o.put("type", "String");
+        o.put("title", "Aperte process configuration");
+        o.put("description", "Aperte process configuration");
+        o.put("readonly", true);
+        o.put("optional", true);
+        return o;
+    }
     
     
      private JSONObject getAperteTaskTypes() throws IOException, JSONException {

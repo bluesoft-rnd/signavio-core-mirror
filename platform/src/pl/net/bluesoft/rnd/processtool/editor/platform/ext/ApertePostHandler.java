@@ -31,17 +31,19 @@ public class ApertePostHandler extends BasisHandler {
         String stepEditor = jParams.optString("step_editor");
         String queueEditor = jParams.optString("queue_editor");
         String actionEditor = jParams.optString("action_editor");
-
+        String processEditor = jParams.optString("process_editor");
 
         PrintWriter out = null;
         try {
             out = res.getWriter();
-            if (stepEditor != null && stepEditor.trim().length() > 0) {
+            if (stepEditor != null && !stepEditor.trim().isEmpty()) {
                 out.println("<html><head></head><body><script type=\"text/javascript\">window.parent.editorSetStepData(\"" + stepEditor + "\"); " + "</script></body></html>");
-            } else if (queueEditor != null && queueEditor.trim().length() > 0) {
+            } else if (queueEditor != null && !queueEditor.trim().isEmpty()) {
                 out.println("<html><head></head><body><script type=\"text/javascript\">window.parent.editorSetQueueData(\"" + queueEditor + "\"); " + "</script></body></html>");
-            } else if (actionEditor != null && actionEditor.trim().length() > 0) {
+            } else if (actionEditor != null && !actionEditor.trim().isEmpty()) {
             	out.println("<html><head></head><body><script type=\"text/javascript\">window.parent.editorSetActionData(\"" + actionEditor + "\"); " + "</script></body></html>");
+            } else if (processEditor != null && !processEditor.trim().isEmpty()) {
+                out.println("<html><head></head><body><script type=\"text/javascript\">window.parent.editorSetProcessData(\"" + processEditor + "\"); " + "</script></body></html>");
             }
 
             out.close();
