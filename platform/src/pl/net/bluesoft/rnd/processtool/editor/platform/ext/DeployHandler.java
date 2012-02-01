@@ -175,7 +175,8 @@ public class DeployHandler extends BasisHandler {
             String signavioXMLExtension = SignavioModelType.class.getAnnotation(ModelTypeFileExtension.class).fileExtension();
             String fileName = name + signavioXMLExtension;
             String fileNameWithPath = parent.getPath() + File.separator + fileName;
-
+            String logoFileNameWithPath = parent.getPath() + File.separator + name + ".processdefinition-logo.png";
+            
             byte [] jsonData = ModelTypeManager.getInstance().getModelType(signavioXMLExtension).getRepresentationInfoFromModelFile(RepresentationType.JSON, fileNameWithPath);
             byte [] svgData = ModelTypeManager.getInstance().getModelType(signavioXMLExtension)
                     .getRepresentationInfoFromModelFile(RepresentationType.SVG, fileNameWithPath);
@@ -205,6 +206,13 @@ public class DeployHandler extends BasisHandler {
             addEntry(processDir + "processdefinition.jpdl.xml", target, new ByteArrayInputStream(gen.generateJpdl().getBytes("UTF-8")));
             addEntry(processDir + "processtool-config.xml", target, new ByteArrayInputStream(gen.generateProcessToolConfig().getBytes("UTF-8")));
             addEntry(processDir + "queues-config.xml", target, new ByteArrayInputStream(gen.generateQueuesConfig().getBytes("UTF-8")));
+            
+            // logo may not exist so check
+            File logoFile = new File(logoFileNameWithPath);
+            if (logoFile.exists()) {
+                addEntry(processDir + "processdefinition-logo.png", target, new FileInputStream(logoFile));
+            }
+            
             // close the JAR
             target.close();
 
