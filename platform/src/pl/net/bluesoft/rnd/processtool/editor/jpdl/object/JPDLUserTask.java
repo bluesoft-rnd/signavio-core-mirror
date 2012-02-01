@@ -128,13 +128,13 @@ public class JPDLUserTask extends JPDLTask {
     private List<Permission> generatePermissionsFromJSON(JSONArray permissions) throws JSONException {
         List<Permission> permissionsList = new ArrayList<Permission>();
         if (permissions != null) {
-for (int i = 0; i < permissions.length(); i++) {
-JSONObject obj = permissions.getJSONObject(i);
-Permission p = new Permission();
-p.setRoleName(obj.getString("roleName"));
-p.setPrivilegeName(obj.getString("prilegeName"));
-permissionsList.add(p);
-}
+            for (int i = 0; i < permissions.length(); i++) {
+                JSONObject obj = permissions.getJSONObject(i);
+                Permission p = new Permission();
+                p.setRoleName(obj.getString("roleName"));
+                p.setPrivilegeName(obj.getString("privilegeName"));
+                permissionsList.add(p);
+        }
         }
         return permissionsList;
     }
