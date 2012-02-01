@@ -189,7 +189,15 @@ public class AperteHandler extends BasisHandler {
 	    o.put("readonly",false);
 	    o.put("optional",true);
 	    o_prop.put(o);
-        
+
+        o = new JSONObject();
+        JSONArray complexItems = new JSONArray();
+   	    o.put("id","step-permissions");    o.put("type","Complex");
+   	    o.put("title","Step permissions"); o.put("description","Step permissions");
+   	    o.put("readonly",true);  o.put("optional",true);
+   	    o.put("complexItems", complexItems);
+	    o_prop.put(o);
+
         o_prop.put(getAperteTaskTypes());
     }
     
