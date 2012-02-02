@@ -112,6 +112,8 @@ public class JPDLTransition extends JPDLObject {
 		JSONArray dockerArray = json.getJSONArray("dockers");
 		
 		dockers = new ArrayList<Docker>();
+        //TODO support when somebody is not using default dock point on a node
+//		for (int i = 0; i < dockerArray.length(); i++) { //go through all the dockers, since you can dock transition line to many places on a node
 		for (int i = 1; i < dockerArray.length()-1; i++) {
 			JSONObject docker = dockerArray.getJSONObject(i);
 			int x = round(docker.getString("x"));
