@@ -1,10 +1,6 @@
 package pl.net.bluesoft.rnd.processtool.editor.jpdl.object;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import com.signavio.platform.exceptions.RequestException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -12,11 +8,13 @@ import org.aperteworkflow.editor.domain.Permission;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import pl.net.bluesoft.rnd.processtool.editor.Widget;
 import pl.net.bluesoft.rnd.processtool.editor.XmlUtil;
 
-import com.signavio.platform.exceptions.RequestException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class JPDLUserTask extends JPDLTask {
 

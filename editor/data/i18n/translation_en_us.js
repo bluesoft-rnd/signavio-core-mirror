@@ -57,7 +57,7 @@ if(!ORYX.I18N.Deploy) ORYX.I18N.Deploy = {};
 
 ORYX.I18N.Deploy.deploy = "Deploy.deploy";
 ORYX.I18N.Deploy.group = "Deploy";
-ORYX.I18N.Deploy.deployDesc = "Deploy.desc";
+ORYX.I18N.Deploy.deployDesc = "Deploy the process";
 ORYX.I18N.Deploy.deployAs = "deployAs";
 ORYX.I18N.Deploy.deployDescription = "deploydescription";
 
