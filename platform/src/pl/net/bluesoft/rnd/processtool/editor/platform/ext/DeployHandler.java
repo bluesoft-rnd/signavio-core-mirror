@@ -203,7 +203,7 @@ public class DeployHandler extends BasisHandler {
 
             // messages are not
             String msgs = gen.getMessages();
-            if (msgs != null || !msgs.trim().isEmpty()) {
+            if (msgs != null && !msgs.trim().isEmpty()) {
                 mf.getMainAttributes().put(new Attributes.Name("ProcessTool-I18N-Property"), "messages.properties");
                 String decoded = new String(Base64.decodeBase64(msgs), "US-ASCII"); // remember to decode
                 addEntry(processDir + "messages.properties", target, new ByteArrayInputStream(decoded.getBytes("US-ASCII")));
