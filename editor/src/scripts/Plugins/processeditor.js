@@ -104,6 +104,10 @@ ORYX.Plugins.ProcessEditor = Clazz.extend({
 			document.frames[id].name = id;
 		}
 
+        var processModelDirectory = faccade.getModelMetaData()['parent']
+        var processModelFileName = faccade.getModelMetaData()['name']
+        var processModelNew = faccade.getModelMetaData()['new']
+
 		var form = new Ext.FormPanel({
 			url: APERTE_PROCESS_EDITOR_URL,
 			renderTo:Ext.getBody(),
@@ -122,8 +126,29 @@ ORYX.Plugins.ProcessEditor = Clazz.extend({
 					    name:'processModelDirectory',
 					    fieldLabel:'processModelDirectory',
 					    inputType:'text',
-					    value: null //?
+					    value: processModelDirectory
 					}),
+					new Ext.form.TextField({
+                        id:'processModelFileName',
+                        name:'processModelFileName',
+                        fieldLabel:'processModelFileName',
+                        inputType:'text',
+                        value: processModelFileName
+                    }),
+                    new Ext.form.TextField({
+                        id:'processModelNew',
+                        name:'processModelNew',
+                        fieldLabel:'processModelNew',
+                        inputType:'text',
+                        value: processModelNew
+                    }),
+                    new Ext.form.TextField({
+                        id:'modelerRepoDirectory',
+                        name:'modelerRepoDirectory',
+                        fieldLabel:'modelerRepoDirectory',
+                        inputType:'text',
+                        value: MODELER_REPO_DIR
+                    }),
 					new Ext.form.TextField({
 					    id:'callbackUrl',
 						name:'callbackUrl',

@@ -119,6 +119,9 @@ public class AperteExceptionFilter implements Filter {
     }
     
     private String removeSignavioExceptionPrefix(String message) {
+        if (message == null) {
+            return "";
+        }
         if (message.startsWith(SIGNAVIO_REQUEST_EXPECTION_PREFIX)) {
             return message.substring(SIGNAVIO_REQUEST_EXPECTION_PREFIX.length());
         } else {

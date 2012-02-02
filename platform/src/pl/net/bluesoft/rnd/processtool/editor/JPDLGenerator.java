@@ -5,6 +5,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.aperteworkflow.editor.domain.Permission;
 import org.aperteworkflow.editor.domain.ProcessConfig;
+import org.aperteworkflow.editor.domain.Queue;
+import org.aperteworkflow.editor.domain.QueueRolePermission;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -18,7 +20,6 @@ import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.JPDLObject;
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.JPDLTransition;
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.JPDLUserTask;
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.queue.QueueDef;
-import pl.net.bluesoft.rnd.processtool.editor.jpdl.queue.QueueRight;
 
 import java.io.IOException;
 import java.util.*;
@@ -201,19 +202,50 @@ public class JPDLGenerator {
 		StringBuffer q = new StringBuffer();
 		q.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 		q.append("<list>\n");
-		
-		for (Integer i : queueConf.keySet()) {
-			QueueDef qd = queueConf.get(i);
-			q.append(String.format("<config.ProcessQueueConfig name=\"%s\" description=\"%s\">\n", qd.getName(), qd.getDescription()));
-			SortedMap<Integer,QueueRight> rights = qd.getRights();
-			q.append("<rights>\n");
-			for (Integer j : rights.keySet()) {
-			  QueueRight qr = rights.get(j);
-			  q.append(String.format("<config.ProcessQueueRight roleName=\"%s\" browseAllowed=\"%b\"/>\n", qr.getRoleName(), qr.isBrowseAllowed()));
-			}
-			q.append("</rights>\n");
-			q.append("</config.ProcessQueueConfig>\n");
-		}
+
+        if (processConfig != null) {
+            if (processConfig.getQueues() != null && !processConfig.getQueues().isEmpty()) {
+                for (Queue queue : processConfig.getQueues()) {
+                    String description = queue.getDescription();
+                    if (description == null) {
+                        description = queue.getName();
+                    }
+                    
+                    q.append(String.format(
+                            "<config.ProcessQueueConfig name=\"%s\" description=\"%s\">\n",
+                            queue.getName(),
+                            description
+                    ));
+                    q.append("<rights>\n");
+
+                    if (queue.getRolePermissions() != null && !queue.getRolePermissions().isEmpty()) {
+                        for (QueueRolePermission rolePermission : queue.getRolePermissions()) {
+                            q.append(String.format(
+                                    "<config.ProcessQueueRight roleName=\"%s\" browseAllowed=\"%b\"/>\n",
+                                    rolePermission.getRoleName(),
+                                    rolePermission.isBrowsingAllowed()
+                            ));
+                        }
+                    }
+                    
+                    q.append("</rights>\n");
+                    q.append("</config.ProcessQueueConfig>\n");
+                }
+            }
+        }
+
+//		for (Integer i : queueConf.keySet()) {
+//			QueueDef qd = queueConf.get(i);
+//			q.append(String.format("<config.ProcessQueueConfig name=\"%s\" description=\"%s\">\n", qd.getName(), qd.getDescription()));
+//			SortedMap<Integer,QueueRight> rights = qd.getRights();
+//			q.append("<rights>\n");
+//			for (Integer j : rights.keySet()) {
+//			  QueueRight qr = rights.get(j);
+//			  q.append(String.format("<config.ProcessQueueRight roleName=\"%s\" browseAllowed=\"%b\"/>\n", qr.getRoleName(), qr.isBrowseAllowed()));
+//			}
+//			q.append("</rights>\n");
+//			q.append("</config.ProcessQueueConfig>\n");
+//		}
 		
 		q.append("</list>\n");
 		return q.toString();
@@ -238,5 +270,12 @@ public class JPDLGenerator {
 	public String getProcessToolDeployment() {
 		return processToolDeployment;
 	}
+    
+    public String getMessages() {
+        if (processConfig == null) {
+            return null;
+        }
+        return processConfig.getMessages();
+    }
 	
 }
