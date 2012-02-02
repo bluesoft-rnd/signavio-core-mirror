@@ -1,35 +1,5 @@
 package pl.net.bluesoft.rnd.processtool.editor.platform.ext;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.jar.Attributes;
-import java.util.jar.JarEntry;
-import java.util.jar.JarOutputStream;
-import java.util.jar.Manifest;
-
-import javax.servlet.ServletContext;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Result;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.apache.batik.dom.svg.SVGDOMImplementation;
-import org.apache.batik.transcoder.TranscoderException;
-import org.apache.batik.transcoder.TranscoderInput;
-import org.apache.batik.transcoder.TranscoderOutput;
-import org.apache.batik.transcoder.TranscodingHints;
-import org.apache.batik.transcoder.image.PNGTranscoder;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import org.w3c.dom.*;
-import pl.net.bluesoft.rnd.processtool.editor.JPDLGenerator;
-
 import com.signavio.platform.annotations.HandlerConfiguration;
 import com.signavio.platform.annotations.HandlerMethodActivation;
 import com.signavio.platform.core.Platform;
@@ -43,6 +13,30 @@ import com.signavio.warehouse.model.business.ModelTypeFileExtension;
 import com.signavio.warehouse.model.business.ModelTypeManager;
 import com.signavio.warehouse.model.business.modeltype.SignavioModelType;
 import com.signavio.warehouse.revision.business.RepresentationType;
+import org.apache.batik.transcoder.TranscoderException;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.image.PNGTranscoder;
+import org.apache.commons.codec.binary.Base64;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import pl.net.bluesoft.rnd.processtool.editor.JPDLGenerator;
+
+import javax.servlet.ServletContext;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
 
 @HandlerConfiguration(uri = "/deploy", rel="deploy")
 public class DeployHandler extends BasisHandler {
@@ -206,6 +200,14 @@ public class DeployHandler extends BasisHandler {
             addEntry(processDir + "processdefinition.jpdl.xml", target, new ByteArrayInputStream(gen.generateJpdl().getBytes("UTF-8")));
             addEntry(processDir + "processtool-config.xml", target, new ByteArrayInputStream(gen.generateProcessToolConfig().getBytes("UTF-8")));
             addEntry(processDir + "queues-config.xml", target, new ByteArrayInputStream(gen.generateQueuesConfig().getBytes("UTF-8")));
+
+            // messages are not
+            String msgs = gen.getMessages();
+            if (msgs != null || !msgs.trim().isEmpty()) {
+                mf.getMainAttributes().put(new Attributes.Name("ProcessTool-I18N-Property"), "messages.properties");
+                String decoded = new String(Base64.decodeBase64(msgs), "US-ASCII"); // remember to decode
+                addEntry(processDir + "messages.properties", target, new ByteArrayInputStream(decoded.getBytes("US-ASCII")));
+            }
             
             // logo may not exist so check
             File logoFile = new File(logoFileNameWithPath);

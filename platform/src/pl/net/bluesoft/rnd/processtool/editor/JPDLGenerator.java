@@ -270,5 +270,12 @@ public class JPDLGenerator {
 	public String getProcessToolDeployment() {
 		return processToolDeployment;
 	}
+    
+    public String getMessages() {
+        if (processConfig == null) {
+            return null;
+        }
+        return processConfig.getMessages();
+    }
 	
 }
