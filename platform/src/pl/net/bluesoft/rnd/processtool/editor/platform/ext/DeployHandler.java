@@ -188,7 +188,8 @@ public class DeployHandler extends BasisHandler {
             byte[] png = svg2png(svgData);
 
             // create new temporary JAR
-            File tempJar = File.createTempFile("jar", null, new File(parent.getPath()));
+            File tempJar = File.createTempFile("aw-deploy-", ".tmp");
+            tempJar.deleteOnExit();
             JarOutputStream target = new JarOutputStream(new FileOutputStream(tempJar), mf);
             addPackageDirs(gen.getProcessToolDeployment(), target);
 
@@ -223,7 +224,6 @@ public class DeployHandler extends BasisHandler {
 
             // delete temporary directory
             tempJar.delete();
-		  
 		} catch (JSONException e) {
 			throw new RequestException("JSONException", e);
 		} catch (UnsupportedEncodingException e) {
