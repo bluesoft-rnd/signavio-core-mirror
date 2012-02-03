@@ -11,7 +11,6 @@
 			</echo>
 		<echo file="build/aperteLinks.js">
 		   var APERTE_STEP_EDITOR_URL = "${jbpmGuiUrl}${aperteStepEditorUrl}";
-		   var APERTE_QUEUE_EDITOR_URL = "${jbpmGuiUrl}${aperteQueueEditorUrl}";
 		   var APERTE_ACTION_EDITOR_URL = "${jbpmGuiUrl}${aperteActionEditorUrl}";
            var APERTE_PROCESS_EDITOR_URL = "${jbpmGuiUrl}${aperteProcessEditorUrl}";
 		   var APERTE_DEPLOY_URL = "/${war}/p/deploy";
@@ -42,7 +41,6 @@
 			host = ${host}
 			fileSystemRootDirectory = ${fileSystemRootDirectory}
 			aperteStepEditorUrl = ${aperteStepEditorUrl}
-			aperteQueueEditorUrl = ${aperteQueueEditorUrl}
 			aperteActionEditorUrl = ${aperteActionEditorUrl}
 			aperteStepListUrl = ${aperteStepListUrl}
 			aperteOsgiPluginsDir = ${aperteOsgiPluginsDir}

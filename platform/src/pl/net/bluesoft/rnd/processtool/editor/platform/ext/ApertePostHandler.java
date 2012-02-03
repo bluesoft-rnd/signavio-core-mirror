@@ -29,7 +29,6 @@ public class ApertePostHandler extends BasisHandler {
         JSONObject jParams = (JSONObject) req.getAttribute("params");
         
         String stepEditor = jParams.optString("step_editor");
-        String queueEditor = jParams.optString("queue_editor");
         String actionEditor = jParams.optString("action_editor");
         String processEditor = jParams.optString("process_editor");
 
@@ -38,8 +37,6 @@ public class ApertePostHandler extends BasisHandler {
             out = res.getWriter();
             if (stepEditor != null && !stepEditor.trim().isEmpty()) {
                 out.println("<html><head></head><body><script type=\"text/javascript\">window.parent.editorSetStepData(\"" + stepEditor + "\"); " + "</script></body></html>");
-            } else if (queueEditor != null && !queueEditor.trim().isEmpty()) {
-                out.println("<html><head></head><body><script type=\"text/javascript\">window.parent.editorSetQueueData(\"" + queueEditor + "\"); " + "</script></body></html>");
             } else if (actionEditor != null && !actionEditor.trim().isEmpty()) {
             	out.println("<html><head></head><body><script type=\"text/javascript\">window.parent.editorSetActionData(\"" + actionEditor + "\"); " + "</script></body></html>");
             } else if (processEditor != null && !processEditor.trim().isEmpty()) {

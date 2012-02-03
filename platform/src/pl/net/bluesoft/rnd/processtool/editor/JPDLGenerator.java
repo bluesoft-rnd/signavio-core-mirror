@@ -1,6 +1,8 @@
 package pl.net.bluesoft.rnd.processtool.editor;
 
-import com.signavio.platform.exceptions.RequestException;
+import java.io.IOException;
+import java.util.*;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.aperteworkflow.editor.domain.Permission;
@@ -10,26 +12,24 @@ import org.aperteworkflow.editor.domain.QueueRolePermission;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.exception.UnsupportedJPDLObjectException;
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.JPDLComponent;
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.JPDLObject;
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.JPDLTransition;
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.JPDLUserTask;
-import pl.net.bluesoft.rnd.processtool.editor.jpdl.queue.QueueDef;
 
-import java.io.IOException;
-import java.util.*;
+import com.signavio.platform.exceptions.RequestException;
 
 public class JPDLGenerator {
   
 	//key = resourceId
 	private Map<String, JPDLComponent> componentMap = new HashMap<String, JPDLComponent>(); 
 	private Map<String, JPDLTransition> transitionMap = new HashMap<String, JPDLTransition>();
-	private SortedMap<Integer, QueueDef> queueConf;
+
     
     private ProcessConfig processConfig;
     
@@ -76,12 +76,7 @@ public class JPDLGenerator {
 			  throw new RequestException("Manifest: ProcessTool-Process-Deployment is empty.");
 		  }
           
-		  String queueConfJson = jsonObj.getJSONObject("properties").optString("queue-conf");
-		  if (queueConfJson != null && queueConfJson.trim().length() > 0) {
-		    queueConf = mapper.readValue(queueConfJson, new TypeReference<SortedMap<Integer,QueueDef>>(){});
-		  } else {
-			queueConf = new TreeMap<Integer, QueueDef>();
-		  }
+		  
 
             String processConfJson = jsonObj.getJSONObject("properties").optString("process-conf");
             if (processConfJson != null && !processConfJson.trim().isEmpty()) {
@@ -233,19 +228,6 @@ public class JPDLGenerator {
                 }
             }
         }
-
-//		for (Integer i : queueConf.keySet()) {
-//			QueueDef qd = queueConf.get(i);
-//			q.append(String.format("<config.ProcessQueueConfig name=\"%s\" description=\"%s\">\n", qd.getName(), qd.getDescription()));
-//			SortedMap<Integer,QueueRight> rights = qd.getRights();
-//			q.append("<rights>\n");
-//			for (Integer j : rights.keySet()) {
-//			  QueueRight qr = rights.get(j);
-//			  q.append(String.format("<config.ProcessQueueRight roleName=\"%s\" browseAllowed=\"%b\"/>\n", qr.getRoleName(), qr.isBrowseAllowed()));
-//			}
-//			q.append("</rights>\n");
-//			q.append("</config.ProcessQueueConfig>\n");
-//		}
 		
 		q.append("</list>\n");
 		return q.toString();
