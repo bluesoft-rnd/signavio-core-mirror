@@ -277,5 +277,12 @@ public class JPDLGenerator {
         }
         return processConfig.getMessages();
     }
+    
+    public byte[] getProcessIcon() {
+        if (processConfig == null) {
+            return null;
+        }
+        return processConfig.getProcessIcon();
+    }
 	
 }
