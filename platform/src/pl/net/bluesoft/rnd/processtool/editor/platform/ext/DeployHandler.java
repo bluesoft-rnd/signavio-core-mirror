@@ -33,6 +33,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
@@ -202,11 +203,27 @@ public class DeployHandler extends BasisHandler {
             addEntry(processDir + "queues-config.xml", target, new ByteArrayInputStream(gen.generateQueuesConfig().getBytes("UTF-8")));
 
             // messages are not
-            String msgs = gen.getMessages();
-            if (msgs != null && !msgs.trim().isEmpty()) {
-                mf.getMainAttributes().put(new Attributes.Name("ProcessTool-I18N-Property"), "messages.properties");
-                String decoded = new String(Base64.decodeBase64(msgs), "US-ASCII"); // remember to decode
-                addEntry(processDir + "messages.properties", target, new ByteArrayInputStream(decoded.getBytes("US-ASCII")));
+            Map<String, String> messages = gen.getMessages();
+            if (messages != null && !messages.isEmpty()) {
+                String propertiesFiles = "";
+                for (String langCode : messages.keySet()) {
+                    String propertiesFilename = "messages_" + langCode + ".properties";
+
+                    String messagesContent = messages.get(langCode);
+                    if (messagesContent != null) {
+                        // make sure to decode, ugly place but for now it stays here
+                        messagesContent = new String(Base64.decodeBase64(messagesContent), "US-ASCII");
+                        addEntry(processDir + propertiesFilename, target, new ByteArrayInputStream(messagesContent.getBytes("US-ASCII")));
+                        propertiesFiles += propertiesFilename + ",";
+                    }
+                }
+
+                if (propertiesFiles != null && !propertiesFiles.isEmpty()) {
+                    if (propertiesFiles.endsWith(",")) {
+                        propertiesFiles = propertiesFiles.substring(0, propertiesFiles.length() - 1);
+                    }
+                    mf.getMainAttributes().put(new Attributes.Name("ProcessTool-I18N-Property"), propertiesFiles);
+                }
             }
             
             // logo may not exist so make sure to check

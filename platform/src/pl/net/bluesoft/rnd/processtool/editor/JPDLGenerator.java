@@ -271,7 +271,7 @@ public class JPDLGenerator {
 		return processToolDeployment;
 	}
     
-    public String getMessages() {
+    public Map<String, String> getMessages() {
         if (processConfig == null) {
             return null;
         }
