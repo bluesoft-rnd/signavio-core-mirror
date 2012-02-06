@@ -50,7 +50,6 @@ public class FsPlatformPropertiesImpl implements PlatformProperties {
 	private String rootDirectoryPath;
 	
 	private String aperteStepEditorUrl;
-	private String aperteQueueEditorUrl;
 	private String aperteActionEditorUrl;
 	private String aperteStepListUrl;
 	private String aperteButtonListUrl;
@@ -91,7 +90,6 @@ public class FsPlatformPropertiesImpl implements PlatformProperties {
 		libsUri = context.getContextPath() + "/libs";
 		
 		aperteStepEditorUrl = props.getProperty("aperteStepEditorUrl");
-		aperteQueueEditorUrl = props.getProperty("aperteQueueEditorUrl");
 		aperteActionEditorUrl = props.getProperty("aperteActionEditorUrl");
 		aperteStepListUrl = props.getProperty("aperteStepListUrl");
 		aperteButtonListUrl = props.getProperty("aperteButtonListUrl");
@@ -174,10 +172,6 @@ public class FsPlatformPropertiesImpl implements PlatformProperties {
 	
 	public String getAperteStepEditorUrl() {
 		return aperteStepEditorUrl;
-	}
-	
-	public String getAperteQueueEditorUrl() {
-		return aperteQueueEditorUrl;
 	}
 	
 	public String getAperteActionEditorUrl() {
