@@ -43,8 +43,6 @@ public interface PlatformProperties {
 	
 	public String getAperteStepEditorUrl();
 	
-	public String getAperteQueueEditorUrl();
-	
 	public String getAperteActionEditorUrl();
 	
 	public String getAperteStepListUrl();

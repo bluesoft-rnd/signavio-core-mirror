@@ -59,15 +59,9 @@ ORYX.I18N.Deploy.deployDesc = "Deploy.desc";
 ORYX.I18N.Deploy.deployAs = "deployAs";
 ORYX.I18N.Deploy.deployDescription = "deploydescription";
 
-if(!ORYX.I18N.QueueEditor) ORYX.I18N.QueueEditor = {};
+if(!ORYX.I18N.ProcessEditor) ORYX.I18N.ProcessEditor = {};
 
-ORYX.I18N.QueueEditor.queueEditor = "Queue Editor";
-ORYX.I18N.QueueEditor.group = "QueueEditor";
-ORYX.I18N.QueueEditor.desc = "Queue Editor";
-
-if(!ORYX.I18N.QueueEditor) ORYX.I18N.QueueEditor = {};
-
-ORYX.I18N.ProcessEditor.queueEditor = "Process Editor";
+ORYX.I18N.ProcessEditor.processEditor = "Process Editor";
 ORYX.I18N.ProcessEditor.group = "ProcessEditor";
 ORYX.I18N.ProcessEditor.desc = "Process Editor";
 
