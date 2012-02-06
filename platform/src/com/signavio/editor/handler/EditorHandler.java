@@ -73,7 +73,7 @@ public class EditorHandler extends BasisHandler {
 	 * Implementation of a GET request
 	 * @param req
 	 * @param res
-	 * @param identifier
+	 * @param token
 	 * @throws Exception
 	 */
 	@Override
@@ -226,10 +226,9 @@ public class EditorHandler extends BasisHandler {
     	
     	String libsUri = Platform.getInstance().getPlatformProperties().getLibsUri();
     	String explorerUri = Platform.getInstance().getPlatformProperties().getExplorerUri();
-        String rootDirectoryPath = Platform.getInstance().getPlatformProperties().getRootDirectoryPath();
     	String languageFiles = "";
 
-    	if(!languageCode.equals("en") && !countryCode.equals("us")) {
+        if(!languageCode.equals("en") && !countryCode.equals("us")) {
 	    	if (new File(this.getServerRootPath() + EDITOR_URL_PREFIX + "i18n/translation_"+languageCode+".js").exists()) {
 	    		// Add regular i18n file for language
 	    		languageFiles += "<script src=\"" + EDITOR_URL_PREFIX 
@@ -289,9 +288,6 @@ public class EditorHandler extends BasisHandler {
       	  	+ languageFiles
       	  	+ "<script src=\"" + libsUri + "/utils.js\" type=\"text/javascript\" />\n"
       	  	+ "<script src=\"" + EDITOR_URL_PREFIX + "oryx.debug.js\" type=\"text/javascript\" />\n"
-
-            // neccesary for aperte process editor, as for now...
-            + "<script>var MODELER_REPO_DIR = '" + rootDirectoryPath + " ';</script>\n"
       	  	
       	  	+ "<!-- erdf schemas -->\n"
       	  	+ "<link rel=\"schema.dc\" href=\"http://purl.org/dc/elements/1.1/\" />\n"

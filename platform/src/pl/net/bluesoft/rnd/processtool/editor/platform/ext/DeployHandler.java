@@ -33,6 +33,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
@@ -169,7 +170,6 @@ public class DeployHandler extends BasisHandler {
             String signavioXMLExtension = SignavioModelType.class.getAnnotation(ModelTypeFileExtension.class).fileExtension();
             String fileName = name + signavioXMLExtension;
             String fileNameWithPath = parent.getPath() + File.separator + fileName;
-            String logoFileNameWithPath = parent.getPath() + File.separator + name + ".processdefinition-logo.png";
             
             byte [] jsonData = ModelTypeManager.getInstance().getModelType(signavioXMLExtension).getRepresentationInfoFromModelFile(RepresentationType.JSON, fileNameWithPath);
             byte [] svgData = ModelTypeManager.getInstance().getModelType(signavioXMLExtension)
@@ -189,7 +189,8 @@ public class DeployHandler extends BasisHandler {
             byte[] png = svg2png(svgData);
 
             // create new temporary JAR
-            File tempJar = File.createTempFile("jar", null, new File(parent.getPath()));
+            File tempJar = File.createTempFile("aw-deploy-", ".tmp");
+            tempJar.deleteOnExit();
             JarOutputStream target = new JarOutputStream(new FileOutputStream(tempJar), mf);
             addPackageDirs(gen.getProcessToolDeployment(), target);
 
@@ -202,17 +203,32 @@ public class DeployHandler extends BasisHandler {
             addEntry(processDir + "queues-config.xml", target, new ByteArrayInputStream(gen.generateQueuesConfig().getBytes("UTF-8")));
 
             // messages are not
-            String msgs = gen.getMessages();
-            if (msgs != null && !msgs.trim().isEmpty()) {
-                mf.getMainAttributes().put(new Attributes.Name("ProcessTool-I18N-Property"), "messages.properties");
-                String decoded = new String(Base64.decodeBase64(msgs), "US-ASCII"); // remember to decode
-                addEntry(processDir + "messages.properties", target, new ByteArrayInputStream(decoded.getBytes("US-ASCII")));
+            Map<String, String> messages = gen.getMessages();
+            if (messages != null && !messages.isEmpty()) {
+                String propertiesFiles = "";
+                for (String langCode : messages.keySet()) {
+                    String propertiesFilename = "messages_" + langCode + ".properties";
+
+                    String messagesContent = messages.get(langCode);
+                    if (messagesContent != null) {
+                        // make sure to decode, ugly place but for now it stays here
+                        messagesContent = new String(Base64.decodeBase64(messagesContent), "US-ASCII");
+                        addEntry(processDir + propertiesFilename, target, new ByteArrayInputStream(messagesContent.getBytes("US-ASCII")));
+                        propertiesFiles += propertiesFilename + ",";
+                    }
+                }
+
+                if (propertiesFiles != null && !propertiesFiles.isEmpty()) {
+                    if (propertiesFiles.endsWith(",")) {
+                        propertiesFiles = propertiesFiles.substring(0, propertiesFiles.length() - 1);
+                    }
+                    mf.getMainAttributes().put(new Attributes.Name("ProcessTool-I18N-Property"), propertiesFiles);
+                }
             }
             
-            // logo may not exist so check
-            File logoFile = new File(logoFileNameWithPath);
-            if (logoFile.exists()) {
-                addEntry(processDir + "processdefinition-logo.png", target, new FileInputStream(logoFile));
+            // logo may not exist so make sure to check
+            if (gen.getProcessIcon() != null) {
+                addEntry(processDir + "processdefinition-logo.png", target, new ByteArrayInputStream(gen.getProcessIcon()));
             }
             
             // close the JAR
@@ -225,7 +241,6 @@ public class DeployHandler extends BasisHandler {
 
             // delete temporary directory
             tempJar.delete();
-		  
 		} catch (JSONException e) {
 			throw new RequestException("JSONException", e);
 		} catch (UnsupportedEncodingException e) {
