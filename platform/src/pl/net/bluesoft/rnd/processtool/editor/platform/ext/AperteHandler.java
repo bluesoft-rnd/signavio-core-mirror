@@ -23,7 +23,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 
-
 @HandlerConfiguration(uri = "/aperte_definitions", rel="aperte")
 public class AperteHandler extends BasisHandler {
 	
@@ -32,8 +31,6 @@ public class AperteHandler extends BasisHandler {
 
 	public AperteHandler(ServletContext servletContext) {
 		super(servletContext);
-		
-
 	}
 
 	/**
@@ -44,9 +41,8 @@ public class AperteHandler extends BasisHandler {
     public <T extends FsSecureBusinessObject> void doGet(HttpServletRequest req, HttpServletResponse res, FsAccessToken token, T sbo) {
   	
   		// Set status code and write the representation
-  			res.setStatus(200);
-  			res.setContentType("application/json");
-
+  		res.setStatus(200);
+  		res.setContentType("application/json");
 
         try {
             JSONObject ret = getStencilExtensionString();
@@ -60,7 +56,6 @@ public class AperteHandler extends BasisHandler {
     }
 
     private JSONObject getStencilExtensionString() throws IOException, JSONException {
-
         JSONObject root = new JSONObject();
 
         setGlobalParams(root);
@@ -94,78 +89,56 @@ public class AperteHandler extends BasisHandler {
         JSONArray o_prop= new JSONArray();
         obj1.put("properties",o_prop);
 
+        o_prop.put(getProcessConf());
         o_prop.put(getProcessFileName());
         o_prop.put(getBundleName());
         o_prop.put(getBundleDescription());
         o_prop.put(getProcessToolDeployment());
-        o_prop.put(getProcessConf());
-        o_prop.put(getMessageProperties());
     }
-
-    private JSONObject getMessageProperties() throws JSONException {
-      	 JSONObject o = new JSONObject();
-           o.put("id","messages-properties");
-   		   o.put("type","String");
-   		   o.put("title","messages.properties");
-   		   o.put("description","messages.properties");
-   		   o.put("readonly",true);
-   		   o.put("optional",true);
-   		   return o;
-   		   
-      }
   
     private JSONObject getProcessFileName() throws JSONException {
-    	 JSONObject o = new JSONObject();
-         o.put("id","aperte-process-filename");
-		   o.put("type","String");
-		   o.put("title","Aperte process filename");
-		   o.put("description","Aperte process filename");
-		   o.put("readonly",false);
-		   o.put("optional",true);
-         return o;
+    	JSONObject o = new JSONObject();
+        o.put("id","aperte-process-filename");
+		o.put("type","String");
+		o.put("title","Aperte process filename");
+		o.put("description","Aperte process filename");
+		o.put("readonly",false);
+		o.put("optional",true);
+        return o;
     }
     
-    
-    
-    
-    
-  
-    
     private JSONObject getBundleName() throws JSONException {
- 	   JSONObject o = new JSONObject();
+ 	    JSONObject o = new JSONObject();
         o.put("id","mf-bundle-name");
-		   o.put("type","String");
-		   o.put("title","Manifest: Bundle-Name");
-		   o.put("description","Manifest: Bundle-Name");
-		   o.put("readonly",false);
-		   o.put("optional",true);
-		   
+        o.put("type","String");
+        o.put("title","Manifest: Bundle-Name");
+        o.put("description","Manifest: Bundle-Name");
+        o.put("readonly",false);
+        o.put("optional",true);
         return o;
     }
     
     private JSONObject getBundleDescription() throws JSONException {
-  	   JSONObject o = new JSONObject();
-         o.put("id","mf-bundle-description");
- 		   o.put("type","String");
- 		   o.put("title","Manifest: Bundle-Description");
- 		   o.put("description","Manifest: Bundle-Description");
- 		   o.put("readonly",false);
- 		   o.put("optional",true);
-         return o;
+  	    JSONObject o = new JSONObject();
+        o.put("id","mf-bundle-description");
+ 		o.put("type","String");
+ 		o.put("title","Manifest: Bundle-Description");
+ 		o.put("description","Manifest: Bundle-Description");
+ 		o.put("readonly",false);
+ 		o.put("optional",true);
+        return o;
      }
     
     private JSONObject getProcessToolDeployment() throws JSONException {
-   	   JSONObject o = new JSONObject();
-          o.put("id","mf-processtool-deployment");
-  		   o.put("type","String");
-  		   o.put("title","Manifest: ProcessTool-Process-Deployment");
-  		   o.put("description","Manifest: ProcessTool-Process-Deployment");
-  		   o.put("readonly",false);
-  		   o.put("optional",true);
-          return o;
-      }
-	  
-	  
+   	    JSONObject o = new JSONObject();
+        o.put("id","mf-processtool-deployment");
+  	    o.put("type","String");
+  	    o.put("title","Manifest: ProcessTool-Process-Deployment");
+  		o.put("description","Manifest: ProcessTool-Process-Deployment");
+  		o.put("readonly",false);
+  		o.put("optional",true);
+        return o;
+    }
 
     private void modifyTaskProperties(JSONArray properties) throws IOException,JSONException {
         JSONObject obj1 = new JSONObject();
@@ -210,7 +183,7 @@ public class AperteHandler extends BasisHandler {
 
         JSONArray o_prop= new JSONArray();
         obj1.put("properties",o_prop);
-        
+
         	    
 	    o_prop.put(getAperteButtons());
 	    
@@ -257,22 +230,19 @@ public class AperteHandler extends BasisHandler {
 	    o.put("readonly",true);
 	    o.put("optional",true);
 	    o_prop.put(o);
-
-	    
-	    
     }
 
     private void setGlobalParams(JSONObject root) throws JSONException {
-        root.put( "title", "Aperte Core Elements");
-        root.put( "title_de","Aperte Core Elements");
-        root.put( "namespace","http://oryx-editor.org/stencilsets/extensions/bpmn2.0basicsubset#");
-        root.put( "description","A basic subset of BPMN 2.0 containing only task, sequence flow, start event, end event, parallel gateway and data-based XOR.");
-        root.put( "extends","http://b3mn.org/stencilset/bpmn2.0#");
+        root.put("title", "Aperte Core Elements");
+        root.put("title_de","Aperte Core Elements");
+        root.put("namespace","http://oryx-editor.org/stencilsets/extensions/bpmn2.0basicsubset#");
+        root.put("description","A basic subset of BPMN 2.0 containing only task, sequence flow, start event, end event, parallel gateway and data-based XOR.");
+        root.put("extends","http://b3mn.org/stencilset/bpmn2.0#");
     }
 
     private void addRules(JSONObject root) throws JSONException {
         JSONObject rules = new JSONObject();
-        root.put(  "rules",rules);
+        root.put("rules",rules);
         rules.put("connectionRules", new JSONArray());
         rules.put("cardinalityRules", new JSONArray());
         rules.put("containmentRules", new JSONArray());
@@ -280,7 +250,7 @@ public class AperteHandler extends BasisHandler {
 
     private void removeStencils(JSONObject root) throws JSONException {
         JSONArray removestencils = new JSONArray();
-        root.put(  "removestencils",removestencils);
+        root.put("removestencils",removestencils);
         removestencils.put("ITSystem");
         removestencils.put("EventSubprocess");
         removestencils.put("CollapsedEventSubprocess");
@@ -356,15 +326,14 @@ public class AperteHandler extends BasisHandler {
         }
     }
     
-    
     private JSONObject getAperteConf() throws JSONException {
-            JSONObject o = new JSONObject();
-            o.put("id","aperte-conf");
-		    o.put("type","String");
-		    o.put("title","Aperte Configuration");
-		    o.put("description","Extended configuration for aperte reports");
-		    o.put("readonly",true);
-		    o.put("optional",true);
+        JSONObject o = new JSONObject();
+        o.put("id","aperte-conf");
+        o.put("type","String");
+        o.put("title","Aperte Configuration");
+        o.put("description","Extended configuration for aperte reports");
+        o.put("readonly",true);
+        o.put("optional",true);
         return o;
     }
 	
@@ -380,54 +349,51 @@ public class AperteHandler extends BasisHandler {
         return o;
     }
     
-    
-     private JSONObject getAperteTaskTypes() throws IOException, JSONException {
-            JSONObject o = new JSONObject();
-            o.put("id","tasktype");
-		    o.put("type","Choice");
-			o.put("title","Tasktype");
-			o.put("title_de","Tasktyp");
-			o.put("value","User");
-			o.put("description","Defines the tasks type which is shown in the left upper corner of the task.");
-			o.put("description_de","Definiert den Aufgabentyp, der in der linken oberen Ecke der Task angezeigt wird.");
-			o.put("readonly",false);
-			o.put("optional",false);
-			o.put("refToView","");
-            JSONArray items = new JSONArray();
-            o.put("items" ,items);
+    private JSONObject getAperteTaskTypes() throws IOException, JSONException {
+        JSONObject o = new JSONObject();
+        o.put("id","tasktype");
+        o.put("type","Choice");
+        o.put("title","Tasktype");
+        o.put("title_de","Tasktyp");
+        o.put("value","User");
+        o.put("description","Defines the tasks type which is shown in the left upper corner of the task.");
+        o.put("description_de","Definiert den Aufgabentyp, der in der linken oberen Ecke der Task angezeigt wird.");
+        o.put("readonly",false);
+        o.put("optional",false);
+        o.put("refToView","");
+        JSONArray items = new JSONArray();
+        o.put("items" ,items);
 
-            
+        JSONObject c4 = new JSONObject();
+        items.put(c4);
+        c4.put("id","c4");
+        c4.put("title","User");
+        c4.put("title_de","Benutzer");
+        c4.put("value","User");
+        c4.put("icon" , "activity/list/type.user.png");
+        c4.put("refToView","userTask");
 
-            JSONObject c4 = new JSONObject();
-            items.put(c4);
-            c4.put("id","c4");
-			c4.put("title","User");
-			c4.put("title_de","Benutzer");
-			c4.put("value","User");
-		    c4.put("icon" , "activity/list/type.user.png");
-			c4.put("refToView","userTask");
-			
-			
-	    	String stepListUrl = props.getServerName() + props.getJbpmGuiUrl() + props.getAperteStepListUrl();
-	    	String stepList = getAperteData(stepListUrl);
-	    	
-	    	JSONArray pjo = ((stepList == null) ? null : new JSONArray(stepList));
-			
-            if (pjo != null) { 
-			 for(int i=0;i<pjo.length();i++){
+
+        String stepListUrl = props.getServerName() + props.getJbpmGuiUrl() + props.getAperteStepListUrl();
+        String stepList = getAperteData(stepListUrl);
+
+        JSONArray pjo = ((stepList == null) ? null : new JSONArray(stepList));
+
+        if (pjo != null) {
+            for(int i=0;i<pjo.length();i++){
                 JSONObject oo = (JSONObject) pjo.get(i);
                 String name = oo.get("name").toString();
 
                 JSONObject cc = new JSONObject();
                 items.put(cc);
                 cc.put("id","c"+(10+i));
-			    cc.put("title",name);
-			    cc.put("title_de",name);
-			    cc.put("value",name);
-		        cc.put("icon" , "activity/list/type.service.png");
-			    cc.put("refToView","serviceTask");
-             }
+                cc.put("title",name);
+                cc.put("title_de",name);
+                cc.put("value",name);
+                cc.put("icon" , "activity/list/type.service.png");
+                cc.put("refToView","serviceTask");
             }
+        }
         return o;
     }
      

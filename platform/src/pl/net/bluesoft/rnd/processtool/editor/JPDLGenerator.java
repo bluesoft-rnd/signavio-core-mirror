@@ -1,28 +1,23 @@
 package pl.net.bluesoft.rnd.processtool.editor;
 
-import java.io.IOException;
-import java.util.*;
-
+import com.signavio.platform.exceptions.RequestException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.aperteworkflow.editor.domain.Permission;
 import org.aperteworkflow.editor.domain.ProcessConfig;
 import org.aperteworkflow.editor.domain.Queue;
 import org.aperteworkflow.editor.domain.QueueRolePermission;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
+import org.aperteworkflow.editor.json.ProcessConfigJSONHandler;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.exception.UnsupportedJPDLObjectException;
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.JPDLComponent;
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.JPDLObject;
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.JPDLTransition;
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.JPDLUserTask;
 
-import com.signavio.platform.exceptions.RequestException;
+import java.util.*;
 
 public class JPDLGenerator {
   
@@ -34,7 +29,6 @@ public class JPDLGenerator {
     private ProcessConfig processConfig;
     
 	private final Logger logger = Logger.getLogger(JPDLGenerator.class);
-	private static final ObjectMapper mapper = new ObjectMapper();
 	
 	private String processName;
 	private String processFileName;
@@ -80,7 +74,7 @@ public class JPDLGenerator {
 
             String processConfJson = jsonObj.getJSONObject("properties").optString("process-conf");
             if (processConfJson != null && !processConfJson.trim().isEmpty()) {
-                processConfig = mapper.readValue(processConfJson, ProcessConfig.class);
+                processConfig = ProcessConfigJSONHandler.getInstance().toObject(processConfJson);
             }
 
             JSONArray childShapes = jsonObj.getJSONArray("childShapes");
@@ -100,15 +94,6 @@ public class JPDLGenerator {
 			throw new RequestException("Error while generating JPDL file.", e);
 		} catch (UnsupportedJPDLObjectException e) {
 			logger.error("Error while generating JPDL file.", e);
-			throw new RequestException(e.getMessage());
-		} catch (JsonMappingException e) {
-			logger.error("Error while parsing queues.", e);
-			throw new RequestException(e.getMessage());
-		} catch (JsonParseException e) {
-			logger.error("Error while parsing queues.", e);
-			throw new RequestException(e.getMessage());
-		} catch (IOException e) {
-			logger.error("Error while parsing queues.", e);
 			throw new RequestException(e.getMessage());
 		}
 		
@@ -160,9 +145,14 @@ public class JPDLGenerator {
 	public String generateProcessToolConfig() {
         StringBuffer ptc = new StringBuffer();
         ptc.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        ptc.append(String.format("<config.ProcessDefinitionConfig bpmDefinitionKey=\"%s\" description=\"%s\" processName=\"%s\" comment=\"%s\">\n", processName, processName, processName, processName));
-
+        ptc.append(String.format("<config.ProcessDefinitionConfig bpmDefinitionKey=\"%s\" description=\"%s\" processName=\"%s\">\n", processName, processName, processName));
+        
         if (processConfig != null) {
+
+            if (processConfig.getComment() != null && !processConfig.getComment().isEmpty()) {
+                ptc.append(String.format("<comment>%s</comment>", XmlUtil.wrapCDATA(processConfig.getComment())));
+            }
+            
             if (processConfig.getProcessPermissions() != null && !processConfig.getProcessPermissions().isEmpty()) {
                 ptc.append("<permissions>\n");
 
@@ -172,6 +162,7 @@ public class JPDLGenerator {
 
                 ptc.append("</permissions>\n");
             }
+
         }
 
         ptc.append("<states>\n");
