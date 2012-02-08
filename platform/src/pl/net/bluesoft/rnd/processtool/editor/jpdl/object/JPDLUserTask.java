@@ -62,10 +62,6 @@ public class JPDLUserTask extends JPDLTask {
 	public void fillBasicProperties(JSONObject json) throws JSONException {
 		super.fillBasicProperties(json);
 
-        // Properties from Signavio Core model attributes
-        commentary = json.getJSONObject("properties").getString("documentation");
-        description = json.getJSONObject("properties").getString("description");
-
         // Properties from Step Editor attributes
 		String widgetJson = json.getJSONObject("properties").getString("aperte-conf");
 		if (widgetJson != null && widgetJson.trim().length() != 0) {
@@ -75,6 +71,15 @@ public class JPDLUserTask extends JPDLTask {
             assignee = widgetJsonObj.optString("assignee");
             swimlane = widgetJsonObj.optString("swimlane");
             candidateGroups = widgetJsonObj.optString("candidate_groups");
+
+            commentary = widgetJsonObj.optString("commentary");
+            if (commentary != null) {
+                byte[] bytes = Base64.decodeBase64(commentary.getBytes());
+                commentary = new String(bytes);
+            }
+            
+            description = widgetJsonObj.optString("description");
+
             permissions = generatePermissionsFromJSON(widgetJsonObj.optJSONArray("step-permissions"));
 
             checkAssignee();
@@ -202,7 +207,11 @@ public class JPDLUserTask extends JPDLTask {
 
     public String generateWidgetXML() {
 		StringBuffer sb = new StringBuffer();
-		sb.append(String.format("<config.ProcessStateConfiguration description=\"%s\" name=\"%s\" commentary=\"%s\">\n", description, name, commentary));
+		sb.append(String.format("<config.ProcessStateConfiguration description=\"%s\" name=\"%s\">\n", description, name));
+        if (commentary != null) {
+            sb.append(String.format("<commentary>%s</commentary>", XmlUtil.wrapCDATA(commentary)));
+        }
+
 		sb.append("<widgets>\n");
 		sb.append(generateWidgetPermissionsXML(widget.getPermissions()));
 		sb.append(generateAttributesXML(widget.getAttributesMap()));

@@ -17,7 +17,6 @@ import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.PNGTranscoder;
-import org.apache.commons.codec.binary.Base64;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
@@ -211,8 +210,6 @@ public class DeployHandler extends BasisHandler {
 
                     String messagesContent = messages.get(langCode);
                     if (messagesContent != null) {
-                        // make sure to decode, ugly place but for now it stays here
-                        messagesContent = new String(Base64.decodeBase64(messagesContent), "US-ASCII");
                         addEntry(processDir + propertiesFilename, target, new ByteArrayInputStream(messagesContent.getBytes("US-ASCII")));
                         propertiesFiles += propertiesFilename + ",";
                     }
