@@ -145,7 +145,18 @@ public class JPDLGenerator {
 	public String generateProcessToolConfig() {
         StringBuffer ptc = new StringBuffer();
         ptc.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        ptc.append(String.format("<config.ProcessDefinitionConfig bpmDefinitionKey=\"%s\" description=\"%s\" processName=\"%s\">\n", processName, processName, processName));
+
+        String processDescription = processName;
+        if (processConfig != null && processConfig.getDescription() != null) {
+            processDescription = processConfig.getDescription();
+        }
+
+        ptc.append(String.format(
+                "<config.ProcessDefinitionConfig bpmDefinitionKey=\"%s\" description=\"%s\" processName=\"%s\">\n",
+                processName,
+                processDescription,
+                processName
+        ));
         
         if (processConfig != null) {
 
