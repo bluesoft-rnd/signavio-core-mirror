@@ -1,5 +1,6 @@
 package pl.net.bluesoft.rnd.processtool.editor.jpdl.object;
 
+import org.apache.commons.codec.binary.Base64;
 import org.json.JSONException;
 import org.json.JSONObject;
 import pl.net.bluesoft.rnd.processtool.editor.XmlUtil;
@@ -18,7 +19,7 @@ public class JPDLJavaTask extends JPDLTask {
 	
 	@Override
 	public String toXML() { 
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append(String.format("<java auto-wire=\"true\" cache=\"false\" class=\"pl.net.bluesoft.rnd.pt.ext.jbpm.JbpmStepAction\" " +
                 "g=\"%d,%d,%d,%d\" method=\"invoke\" name=\"%s\" var=\"result\">\n", boundsX, boundsY, width, height,name));
 		sb.append("<field name=\"stepName\">\n");
@@ -33,7 +34,18 @@ public class JPDLJavaTask extends JPDLTask {
 				sb.append(String.format("<string value=\"%s\"/>\n", key));
 				sb.append("</key>\n");
 				sb.append("<value>\n");
-				sb.append(String.format("<string value=\"%s\"/>\n", stepDataMap.get(key)));
+                
+                // decode the base64
+                String value = stepDataMap.get(key);
+                value = new String(Base64.decodeBase64(value));
+
+                // check for the quote symbol, because we don't have specific XML library here
+                if (value.contains("\"")) {
+                    value = value.replaceAll("\"", "'");
+                }
+                
+                sb.append(String.format("<string value=\"%s\"/>\n", value));
+
 				sb.append("</value>\n");
 				sb.append("</entry>\n");
 			}
@@ -51,7 +63,7 @@ public class JPDLJavaTask extends JPDLTask {
 		super.fillBasicProperties(json);
 		String stepDataJson = json.getJSONObject("properties").getString("aperte-conf");
 		if (stepDataJson != null && stepDataJson.trim().length() != 0) {
-		  stepDataJson = XmlUtil.replaceXmlEscapeCharacters(stepDataJson);
+		  stepDataJson = XmlUtil.decodeXmlEscapeCharacters(stepDataJson);
 		  JSONObject stepDataJsonObj = new JSONObject(stepDataJson);
 		  Iterator i = stepDataJsonObj.keys();
 		  while(i.hasNext()) {

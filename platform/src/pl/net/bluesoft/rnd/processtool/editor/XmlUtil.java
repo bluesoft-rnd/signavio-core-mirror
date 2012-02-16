@@ -32,7 +32,14 @@ public class XmlUtil {
         return false;
     }
     
-	public static String replaceXmlEscapeCharacters(String input) {
+    public static String encodeXmlEcscapeCharacters(String input) {
+        for (StringPair sp : XML_SPECIAL_STRINGS) {
+            input = input.replaceAll(sp.getPlain(), sp.getEncoded());
+        }
+        return input;
+    }
+    
+	public static String decodeXmlEscapeCharacters(String input) {
         for (StringPair sp : XML_SPECIAL_STRINGS) {
             input = input.replaceAll(sp.getEncoded(), sp.getPlain());
         }
