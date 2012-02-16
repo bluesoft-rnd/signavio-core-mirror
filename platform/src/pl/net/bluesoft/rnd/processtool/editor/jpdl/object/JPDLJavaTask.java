@@ -34,18 +34,14 @@ public class JPDLJavaTask extends JPDLTask {
 				sb.append(String.format("<string value=\"%s\"/>\n", key));
 				sb.append("</key>\n");
 				sb.append("<value>\n");
-                
-                // decode the base64
-                String value = stepDataMap.get(key);
-                value = new String(Base64.decodeBase64(value));
 
                 // check for the quote symbol, because we don't have specific XML library here
+                String value = stepDataMap.get(key);
                 if (value.contains("\"")) {
                     value = value.replaceAll("\"", "'");
                 }
                 
                 sb.append(String.format("<string value=\"%s\"/>\n", value));
-
 				sb.append("</value>\n");
 				sb.append("</entry>\n");
 			}
@@ -67,11 +63,16 @@ public class JPDLJavaTask extends JPDLTask {
 		  JSONObject stepDataJsonObj = new JSONObject(stepDataJson);
 		  Iterator i = stepDataJsonObj.keys();
 		  while(i.hasNext()) {
-			String key = (String)i.next();
-			String value = stepDataJsonObj.getString(key);
-			stepDataMap.put(key, value);
+			String key = (String)i.next();  
+            Object value = stepDataJsonObj.get(key);  
+            if (value instanceof String) {
+                byte[] bytes = Base64.decodeBase64((String) value);
+                value = new String(bytes);
+            }
+			stepDataMap.put(key, value.toString());
 		  }
 		}
+
 	}
 	
 	@Override
