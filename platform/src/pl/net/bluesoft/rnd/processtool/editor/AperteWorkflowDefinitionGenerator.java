@@ -4,6 +4,10 @@ import com.signavio.platform.core.Platform;
 import com.signavio.platform.core.PlatformProperties;
 import com.signavio.platform.exceptions.RequestException;
 import de.hpi.bpmn2_0.exceptions.BpmnConverterException;
+import de.hpi.bpmn2_0.factory.AbstractBpmnFactory;
+import de.hpi.bpmn2_0.model.Definitions;
+import de.hpi.bpmn2_0.transformation.Bpmn2XmlConverter;
+import de.hpi.bpmn2_0.transformation.Diagram2BpmnConverter;
 import de.hpi.bpmn2_0.transformation.Diagram2XmlConverter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -167,7 +171,6 @@ public class AperteWorkflowDefinitionGenerator {
         try {
 //            PlatformProperties props = Platform.getInstance().getPlatformProperties();
             JSONObject jsonObj = new JSONObject(json);
-            jsonObj.put("resource-id", jsonObj.getJSONObject(""))
             JSONArray childShapes = jsonObj.getJSONArray("childShapes");
             for (int i = 0; i < childShapes.length(); i++) {
                 JSONObject obj = childShapes.getJSONObject(i);
@@ -189,11 +192,17 @@ public class AperteWorkflowDefinitionGenerator {
             }
             String jsonForBpmn20 = jsonObj.toString();
             BasicDiagram diagram = BasicDiagramBuilder.parseJson(jsonForBpmn20);
-            
-            Diagram2XmlConverter converter = new Diagram2XmlConverter(diagram,
-                    Platform.getInstance().getFile("/WEB-INF/xsd/BPMN20.xsd").getAbsolutePath());
 
-            return converter.getXml().toString();
+            Diagram2BpmnConverter converter;
+
+            converter = new Diagram2BpmnConverter(diagram, AbstractBpmnFactory.getFactoryClasses());
+            Definitions bpmnDefinitions = converter.getDefinitionsFromDiagram();
+//            ((de.hpi.bpmn2_0.model.Process)bpmnDefinitions.getRootElement().get(0)).setExecutable(true);
+            bpmnDefinitions.getRootElement().get(0).setId(processName);
+            /* Get BPMN 2.0 XML */
+            Bpmn2XmlConverter xmlConverter = new Bpmn2XmlConverter(bpmnDefinitions,
+                    Platform.getInstance().getFile("/WEB-INF/xsd/BPMN20.xsd").getAbsolutePath());
+            return xmlConverter.getXml().toString();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -205,7 +214,8 @@ public class AperteWorkflowDefinitionGenerator {
 
 
     private void enrichBpmn20AssignmentConfig(JSONObject obj) throws JSONException {
-        JSONObject aperteCfg = new JSONObject(obj.getJSONObject("properties").getString("aperte-conf"));
+        JSONObject propertiesObj = obj.getJSONObject("properties");
+        JSONObject aperteCfg = new JSONObject(propertiesObj.getString("aperte-conf"));
         String assignee = aperteCfg.optString("assignee");
         //It looks like swimlanes are unsupported in Activiti :(
 //        String swimlane = obj.optString("swimlane");
@@ -239,10 +249,11 @@ public class AperteWorkflowDefinitionGenerator {
         resources.put("items", items);
         resources.put("totalCount", items.length());
         if (items.length() != 0) {
-            if (obj.getJSONObject("properties").opt("resources") != null)
-                obj.getJSONObject("properties").remove("resources");
-            obj.getJSONObject("properties").put("resources", resources);//overwrite
+            if (propertiesObj.opt("resources") != null)
+                propertiesObj.remove("resources");
+            propertiesObj.put("resources", resources);//overwrite
         }
+        propertiesObj.put("implementation", "unspecified");
     }
 
     public String generateProcessToolConfig() {

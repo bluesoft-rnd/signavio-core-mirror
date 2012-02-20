@@ -288,20 +288,21 @@ public class TaskFactory extends AbstractActivityFactory {
 
 				if (actResource != null) {
 					/* Set ResourceRef */
-					Resource resourceRef = new Resource(resource
-							.getString("resource"));
-					actResource.setResourceRef(resourceRef);
+                    //TODO tlipski@bluesoft.net.pl - Activiti 5.8 seems to hate this attribute
+//					Resource resourceRef = new Resource(resource
+//							.getString("resource"));
+//					actResource.setResourceRef(resourceRef);
 
 					/* Set Resource Assignment Expression */
 					ResourceAssignmentExpression resAsgExpr = new ResourceAssignmentExpression();
 					FormalExpression fExpr = new FormalExpression(resource.getString("resourceassignmentexpr"));
 					
-					String language = resource.getString("language");
+					String language = resource.optString("language");
 					if(language != null && !(language.length() == 0)) {
 						fExpr.setLanguage(language);
 					}
 					
-					String evaluationType = resource.getString("evaluatestotype");
+					String evaluationType = resource.optString("evaluatestotype");
 					if(evaluationType != null && !(evaluationType.length() == 0)) {
 						fExpr.setEvaluatesToTypeRef(evaluationType);
 					}
@@ -315,6 +316,7 @@ public class TaskFactory extends AbstractActivityFactory {
 
 			}
 		} catch (JSONException e) {
+            throw new RuntimeException(e); //please...
 			// ignore resources property
 		}
 	}
