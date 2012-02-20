@@ -23,7 +23,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import pl.net.bluesoft.rnd.processtool.editor.JPDLGenerator;
+import pl.net.bluesoft.rnd.processtool.editor.AperteWorkflowDefinitionGenerator;
 
 import javax.servlet.ServletContext;
 import javax.xml.parsers.DocumentBuilder;
@@ -178,7 +178,7 @@ public class DeployHandler extends BasisHandler {
             String[] vs = getGraphOffset(svgData);
             int offsetX = Math.round(Float.parseFloat(vs[0]));
             int offsetY = Math.round(Float.parseFloat(vs[1]));
-            JPDLGenerator gen = new JPDLGenerator(offsetX, offsetY);
+            AperteWorkflowDefinitionGenerator gen = new AperteWorkflowDefinitionGenerator(offsetX, offsetY);
             gen.init(jsonRep);
             
             // MANIFEST
@@ -195,9 +195,10 @@ public class DeployHandler extends BasisHandler {
 
             String processDir = gen.getProcessToolDeployment().replace('.','/') + '/';
 
+            String language = gen.getProcessDefinitionLanguage();
             // adding PNG and XML files
             addEntry(processDir + "processdefinition.png", target, new ByteArrayInputStream(png));
-            addEntry(processDir + "processdefinition.jpdl.xml", target, new ByteArrayInputStream(gen.generateJpdl().getBytes("UTF-8")));
+            addEntry(processDir + "processdefinition." + language + ".xml", target, new ByteArrayInputStream(gen.generateDefinition().getBytes("UTF-8")));
             addEntry(processDir + "processtool-config.xml", target, new ByteArrayInputStream(gen.generateProcessToolConfig().getBytes("UTF-8")));
             addEntry(processDir + "queues-config.xml", target, new ByteArrayInputStream(gen.generateQueuesConfig().getBytes("UTF-8")));
 

@@ -52,4 +52,6 @@ public interface PlatformProperties {
 	public String getAperteOsgiPluginsDir();
 	
 	public String getJbpmGuiUrl();
+    
+    public String getAperteConfigurationUrl();
 }

@@ -48,3 +48,6 @@ ORYX.CONFIG.SS_EXTENSIONS_FOLDER =		ORYX.CONFIG.ROOT_PATH + "stencilsets/extensi
 ORYX.CONFIG.SS_EXTENSIONS_CONFIG =		ORYX.CONFIG.SERVER_HANDLER_ROOT + "/editor_ssextensions";	
 ORYX.CONFIG.ORYX_NEW_URL =				"/new";	
 ORYX.CONFIG.BPMN_LAYOUTER =				ORYX.CONFIG.ROOT_PATH + "bpmnlayouter";
+ORYX.CONFIG.SSEXTS = [{
+    namespace : "http://oryx-editor.org/stencilsets/extensions/bpmn2.0basicsubset#"
+}];

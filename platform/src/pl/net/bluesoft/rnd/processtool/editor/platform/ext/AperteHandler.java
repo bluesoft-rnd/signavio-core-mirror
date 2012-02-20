@@ -78,7 +78,7 @@ public class AperteHandler extends BasisHandler {
         modifyBpmnProperties(properties);
     }
 
-    private void modifyBpmnProperties(JSONArray properties) throws JSONException {
+    private void modifyBpmnProperties(JSONArray properties) throws JSONException, IOException {
         JSONObject obj1 = new JSONObject();
         properties.put(obj1);
 
@@ -89,13 +89,47 @@ public class AperteHandler extends BasisHandler {
         JSONArray o_prop= new JSONArray();
         obj1.put("properties",o_prop);
 
+        o_prop.put(getAperteLanguage());
         o_prop.put(getProcessConf());
         o_prop.put(getProcessFileName());
         o_prop.put(getBundleName());
         o_prop.put(getBundleDescription());
         o_prop.put(getProcessToolDeployment());
     }
-  
+
+    private JSONObject getAperteLanguage() throws JSONException, IOException {
+
+        String definitionLanguage = getBpmDefinitionLanguage();
+
+        JSONObject o = new JSONObject();
+        o.put("id", "aperte-language");
+        o.put("type", "String");
+        o.put("title", "BPM language");
+        o.put("value", definitionLanguage);
+        o.put("description", "BPM language");
+        o.put("readonly", true);
+        o.put("optional", false);
+
+//        JSONArray items = new JSONArray();
+//        o.put("items" ,items);
+//
+//        JSONObject cc = new JSONObject();
+//        items.put(cc);
+//        cc.put("id","z1");
+//        cc.put("title",definitionLanguage);
+//        cc.put("value",definitionLanguage);
+        return o;
+
+    }
+
+    private String getBpmDefinitionLanguage() throws IOException, JSONException {
+        String url = props.getServerName() + props.getJbpmGuiUrl() + props.getAperteConfigurationUrl();
+        String config = getAperteData(url);
+
+        JSONObject jsonConfig = ((config == null) ? null : new JSONObject(config));
+        return jsonConfig != null ? (String) jsonConfig.get("definitionLanguage") : "?";
+    }
+
     private JSONObject getProcessFileName() throws JSONException {
     	JSONObject o = new JSONObject();
         o.put("id","aperte-process-filename");
@@ -331,7 +365,7 @@ public class AperteHandler extends BasisHandler {
         o.put("id","aperte-conf");
         o.put("type","String");
         o.put("title","Aperte Configuration");
-        o.put("description","Extended configuration for aperte reports");
+        o.put("description","Extended configuration for aperte workflow");
         o.put("readonly",true);
         o.put("optional",true);
         return o;

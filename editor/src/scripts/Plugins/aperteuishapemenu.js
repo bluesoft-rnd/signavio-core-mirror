@@ -427,7 +427,11 @@ ORYX.Plugins.AperteUiShapeMenuPlugin = ORYX.Plugins.ShapeMenuPlugin.extend({
 		if(elements[0].properties['oryx-button-type'] != null &&
 		   elements[0].properties['oryx-button-type'] != "" &&
 		   elements[0].incoming.length >= 1 &&
-		   elements[0].incoming[0].properties['oryx-tasktype'].toUpperCase() == 'USER'){
+		   elements[0].incoming[0] &&
+		   elements[0].incoming[0].incoming[0] &&
+		   elements[0].incoming[0].incoming[0].incoming[0] &&
+		   elements[0].incoming[0].properties['oryx-gatewaytype'].toUpperCase() == 'XOR' &&
+		   elements[0].incoming[0].incoming[0].incoming[0].properties['oryx-tasktype'].toUpperCase() == 'USER'){
 		    // display this editor button only when its source is a user task
 			this.aperteActionEditorButton.prepareToShow();
 		}

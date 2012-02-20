@@ -56,9 +56,10 @@ public class FsPlatformPropertiesImpl implements PlatformProperties {
     private String aperteProcessEditorUrl;
 	private String aperteOsgiPluginsDir;
 	private String jbpmGuiUrl;
-	
+    private String aperteConfigurationUrl;
 
-	public FsPlatformPropertiesImpl(ServletContext context) {
+
+    public FsPlatformPropertiesImpl(ServletContext context) {
 		supportedBrowserEditor = context.getInitParameter("supportedBrowserEditor");
 		
 		Properties props = new Properties();
@@ -94,6 +95,7 @@ public class FsPlatformPropertiesImpl implements PlatformProperties {
 		aperteStepListUrl = props.getProperty("aperteStepListUrl");
 		aperteButtonListUrl = props.getProperty("aperteButtonListUrl");
         aperteProcessEditorUrl = props.getProperty("aperteProcessEditorUrl");
+        aperteConfigurationUrl = props.getProperty("aperteConfigurationUrl");
 		
 		String tempAperteOsgiPluginsDir = props.getProperty("aperteOsgiPluginsDir");
 		if (tempAperteOsgiPluginsDir != null && !tempAperteOsgiPluginsDir.trim().isEmpty()) {
@@ -193,4 +195,9 @@ public class FsPlatformPropertiesImpl implements PlatformProperties {
 	public String getJbpmGuiUrl() {
 		return jbpmGuiUrl;
 	}
+
+    @Override
+    public String getAperteConfigurationUrl() {
+        return aperteConfigurationUrl;
+    }
 }
