@@ -7,18 +7,19 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import pl.net.bluesoft.rnd.processtool.editor.AperteWorkflowDefinitionGenerator;
 import pl.net.bluesoft.rnd.processtool.editor.XmlUtil;
 
 import com.signavio.platform.exceptions.RequestException;
 
 
 public class JPDLTransition extends JPDLObject {
-  
-	protected JPDLTransition() {
-		
-	}
-	
-	private static final String DEFAULT_BUTTON_NAME = "Default";
+
+    public JPDLTransition(AperteWorkflowDefinitionGenerator generator) {
+        super(generator);
+    }
+
+    private static final String DEFAULT_BUTTON_NAME = "Default";
 	
 	private String target;
     private String targetName;

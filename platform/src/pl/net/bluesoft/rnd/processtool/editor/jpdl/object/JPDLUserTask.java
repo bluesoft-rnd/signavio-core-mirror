@@ -8,6 +8,7 @@ import org.aperteworkflow.editor.domain.Permission;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import pl.net.bluesoft.rnd.processtool.editor.AperteWorkflowDefinitionGenerator;
 import pl.net.bluesoft.rnd.processtool.editor.Widget;
 import pl.net.bluesoft.rnd.processtool.editor.XmlUtil;
 
@@ -18,8 +19,6 @@ import java.util.Map;
 
 public class JPDLUserTask extends JPDLTask {
 
-    private static final Logger logger = Logger.getLogger(JPDLUserTask.class);
-
 	private Widget widget;
 	private String commentary;
 	private String description;
@@ -29,11 +28,11 @@ public class JPDLUserTask extends JPDLTask {
 	private String candidateGroups;
     private List<Permission> permissions;
 
-    protected JPDLUserTask() {
-
+    public JPDLUserTask(AperteWorkflowDefinitionGenerator generator) {
+        super(generator);
     }
 
-	public Widget getWidget() {
+    public Widget getWidget() {
 		return widget;
 	}
 
@@ -50,9 +49,7 @@ public class JPDLUserTask extends JPDLTask {
 		
 		sb.append(String.format("<task %s name=\"%s\" g=\"%d,%d,%d,%d\">\n", taskConf,name,
                 boundsX, boundsY, width, height
-//                x1,y1,x2-x1,y2-y1
         ));
-		//sb.append(String.format("<description>Original ID: '%s'</description>\n", resourceId));
 		sb.append(getTransitionsXML());
 		sb.append("</task>\n");
 		return sb.toString();
@@ -99,7 +96,7 @@ public class JPDLUserTask extends JPDLTask {
 		if (b1 && b2 && b3) {
 			throw new RequestException("Fill in assignee, swimlane or candidateGroups for UserTask '" + name + "'");
 		}
-		if ( (b1 && b2 && !b3) || (b1 && !b2 && b3) || (!b1 && b2 && b3) ) {
+		if ((b1 && b2 && !b3) || (b1 && b3) || (!b1 && b2 && b3)) {
 		} else {
 			throw new RequestException("Only one of fields: assignee, swimlane, candidateGroups can be filled for UserTask '" + name + "'");
 		}
@@ -147,7 +144,7 @@ public class JPDLUserTask extends JPDLTask {
 		    return "";
         }
 		
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		if (withChildrenTag) {
 		    sb.append("<children>\n");
         }
@@ -167,7 +164,7 @@ public class JPDLUserTask extends JPDLTask {
 	private String generateAttributesXML(Map<String,Object> attributesMap) {
 		if (attributesMap.isEmpty())
 			return "";
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("<attributes>\n");
 		for (String key : attributesMap.keySet()) {
 			Object value = attributesMap.get(key);
@@ -194,7 +191,7 @@ public class JPDLUserTask extends JPDLTask {
     private String generatePermissionsXml(List<Permission> permissions, String permissionClass) {
         if (permissions.isEmpty())
             return "";
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("<permissions>\n");
         for (Permission p : permissions) {
             sb.append(String.format("<config." + permissionClass + " privilegeName=\"%s\" roleName=\"%s\"/>",
@@ -206,7 +203,7 @@ public class JPDLUserTask extends JPDLTask {
     }
 
     public String generateWidgetXML() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append(String.format("<config.ProcessStateConfiguration description=\"%s\" name=\"%s\">\n", description, name));
         if (commentary != null) {
             sb.append(String.format("<commentary>%s</commentary>", XmlUtil.wrapCDATA(commentary)));
@@ -218,14 +215,24 @@ public class JPDLUserTask extends JPDLTask {
 		sb.append(generateChildrenXML(widget.getChildrenList(), false));
 		sb.append("</widgets>\n");
 
-		if (!outgoing.isEmpty()) {
-		  sb.append("<actions>\n");
- 		  for (String resId : outgoing.keySet()) {
- 			JPDLTransition trans = outgoing.get(resId);
- 			sb.append(trans.generateStateActionXML());
- 		  }
- 		  sb.append("</actions>\n");
-		}
+        if (!outgoing.isEmpty()) {
+            sb.append("<actions>\n");
+            if (outgoing.values().size() != 1) {
+                throw new RuntimeException("User task: " + name + " has more than one outgoing transition.");
+            }
+            JPDLTransition next = outgoing.values().iterator().next();
+            JPDLComponent component = generator.findComponent(next.getTarget());
+            if (component instanceof JPDLDecision) {
+                for (JPDLTransition trans : component.getOutgoing().values()) {
+                    sb.append(trans.generateStateActionXML());
+                }
+            } else {//normal button,
+                for (JPDLTransition trans : outgoing.values()) {
+                    sb.append(trans.generateStateActionXML());
+                }
+            }
+            sb.append("</actions>\n");
+        }
         sb.append(generateStatePermissionsXML(permissions));
 		sb.append("</config.ProcessStateConfiguration>\n");
 		return sb.toString();

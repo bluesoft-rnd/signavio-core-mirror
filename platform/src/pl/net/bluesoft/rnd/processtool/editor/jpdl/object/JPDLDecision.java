@@ -2,14 +2,15 @@ package pl.net.bluesoft.rnd.processtool.editor.jpdl.object;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import pl.net.bluesoft.rnd.processtool.editor.AperteWorkflowDefinitionGenerator;
 
 public class JPDLDecision extends JPDLComponent {
 
-	
-    protected JPDLDecision() {
-    	
-	}
-	
+
+    public JPDLDecision(AperteWorkflowDefinitionGenerator generator) {
+        super(generator);
+    }
+
     @Override
 	public void fillBasicProperties(JSONObject json) throws JSONException {
 		super.fillBasicProperties(json);

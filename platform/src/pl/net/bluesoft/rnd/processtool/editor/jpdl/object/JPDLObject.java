@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import pl.net.bluesoft.rnd.processtool.editor.AperteWorkflowDefinitionGenerator;
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.exception.UnsupportedJPDLObjectException;
 
 import com.signavio.platform.exceptions.RequestException;
@@ -12,7 +13,13 @@ public abstract class JPDLObject {
 	
 	protected String resourceId;
 	protected String name;
-	
+
+    protected AperteWorkflowDefinitionGenerator generator;
+
+    protected JPDLObject(AperteWorkflowDefinitionGenerator generator) {
+        this.generator = generator;
+    }
+
 	public abstract String getObjectName();
 	
 	public String getResourceId() {
@@ -39,26 +46,27 @@ public abstract class JPDLObject {
 		}
 	}
 	
-    public static JPDLObject getJPDLObject(JSONObject obj) throws JSONException, UnsupportedJPDLObjectException {
+    public static JPDLObject getJPDLObject(JSONObject obj, AperteWorkflowDefinitionGenerator generator)
+            throws JSONException, UnsupportedJPDLObjectException {
 		
 		JPDLObject ret = null;
 
 		String stencilId = obj.getJSONObject("stencil").getString("id");
 		
 		if ("StartNoneEvent".equals(stencilId)) {
-			ret = new JPDLStartEvent();
+			ret = new JPDLStartEvent(generator);
 		} else if ("Task".equals(stencilId)) {
 			String taskType = obj.getJSONObject("properties").getString("tasktype");
 			if ("User".equals(taskType))
-			  ret = new JPDLUserTask();
+			  ret = new JPDLUserTask(generator);
 			else
-			  ret = new JPDLJavaTask();
+			  ret = new JPDLJavaTask(generator);
 		} else if ("SequenceFlow".equals(stencilId)) {
-			ret = new JPDLTransition();
+			ret = new JPDLTransition(generator);
 		} else if ("EndNoneEvent".equals(stencilId)) {
-			ret = new JPDLEndEvent();
+			ret = new JPDLEndEvent(generator);
 		} else if ("Exclusive_Databased_Gateway".equals(stencilId)) {
-			ret = new JPDLDecision();
+			ret = new JPDLDecision(generator);
 		} else {
 		  throw new UnsupportedJPDLObjectException("Object named '" + stencilId + "' is not supported.");
 		}
@@ -71,5 +79,8 @@ public abstract class JPDLObject {
     	Float f = Float.parseFloat(s);
     	return Math.round(f);
     }
-    
+
+    public AperteWorkflowDefinitionGenerator getGenerator() {
+        return generator;
+    }
 }

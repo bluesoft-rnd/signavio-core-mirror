@@ -95,7 +95,7 @@ public class AperteWorkflowDefinitionGenerator {
             JSONArray childShapes = jsonObj.getJSONArray("childShapes");
             for (int i = 0; i < childShapes.length(); i++) {
                 JSONObject obj = childShapes.getJSONObject(i);
-                JPDLObject jpdlObject = JPDLObject.getJPDLObject(obj);
+                JPDLObject jpdlObject = JPDLObject.getJPDLObject(obj, this);
                 jpdlObject.fillBasicProperties(obj);
                 if (jpdlObject instanceof JPDLComponent) {
                     ((JPDLComponent) jpdlObject).applyOffset(offsetX, offsetY);
@@ -170,7 +170,6 @@ public class AperteWorkflowDefinitionGenerator {
     public String generateBpmn20() {
 
         try {
-//            PlatformProperties props = Platform.getInstance().getPlatformProperties();
             JSONObject jsonObj = new JSONObject(json);
             JSONArray childShapes = jsonObj.getJSONArray("childShapes");
             for (int i = 0; i < childShapes.length(); i++) {
@@ -198,9 +197,8 @@ public class AperteWorkflowDefinitionGenerator {
 
             converter = new Diagram2BpmnConverter(diagram, AbstractBpmnFactory.getFactoryClasses());
             Definitions bpmnDefinitions = converter.getDefinitionsFromDiagram();
-//            ((de.hpi.bpmn2_0.model.Process)bpmnDefinitions.getRootElement().get(0)).setExecutable(true);
+            ((de.hpi.bpmn2_0.model.Process)bpmnDefinitions.getRootElement().get(0)).setExecutable(true);
             bpmnDefinitions.getRootElement().get(0).setId(processName);
-            /* Get BPMN 2.0 XML */
             Bpmn2XmlConverter xmlConverter = new Bpmn2XmlConverter(bpmnDefinitions,
                     Platform.getInstance().getFile("/WEB-INF/xsd/BPMN20.xsd").getAbsolutePath());
             return xmlConverter.getXml().toString();
@@ -214,7 +212,6 @@ public class AperteWorkflowDefinitionGenerator {
         JSONObject aperteCfg = new JSONObject(propertiesObj.getString("aperte-conf"));
 
         String stepName = propertiesObj.getString("tasktype");
-        //activiti_class
         propertiesObj.put("tasktype", "Service");
         propertiesObj.put("activiti_class", "org.aperteworkflow.ext.activiti.ActivitiStepAction");
 
@@ -263,17 +260,6 @@ public class AperteWorkflowDefinitionGenerator {
         //It looks like swimlanes are unsupported in Activiti :(
 //        String swimlane = obj.optString("swimlane");
         String candidateGroups = aperteCfg.optString("candidate_groups");
-        /*
-        resources: {
-            items: [{
-                resource_type: "humanperformer",
-                resourceassignmentexpr: "#{creator}"
-            }, {
-                resource_type: "potentialowner",
-                resourceassignmentexpr: "TESTQ"
-            },]
-        }
-         */
         //resources/items[0]/resource_type
         JSONObject resources = new JSONObject();
         JSONArray items = new JSONArray();
@@ -338,6 +324,10 @@ public class AperteWorkflowDefinitionGenerator {
         ptc.append("</states>\n");
         ptc.append("</config.ProcessDefinitionConfig>\n");
         return ptc.toString();
+    }
+
+    public JPDLComponent findComponent(String key) {
+        return componentMap.get(key);
     }
 
     public String generateQueuesConfig() {

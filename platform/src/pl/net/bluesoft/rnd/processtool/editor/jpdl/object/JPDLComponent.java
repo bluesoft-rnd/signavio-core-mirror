@@ -6,6 +6,7 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import pl.net.bluesoft.rnd.processtool.editor.AperteWorkflowDefinitionGenerator;
 
 public abstract class JPDLComponent extends JPDLObject {
 
@@ -14,6 +15,9 @@ public abstract class JPDLComponent extends JPDLObject {
     protected int boundsX, boundsY, width, height;
     protected int offsetX, offsetY;
 
+    protected JPDLComponent(AperteWorkflowDefinitionGenerator generator) {
+        super(generator);
+    }
 
     public void applyOffset(int offsetX, int offsetY) {
         boundsX = boundsX + offsetX;
@@ -75,4 +79,5 @@ public abstract class JPDLComponent extends JPDLObject {
 		
 		return sb.toString();
 	}
+
 }

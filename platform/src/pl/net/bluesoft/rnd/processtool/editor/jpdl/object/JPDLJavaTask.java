@@ -2,6 +2,7 @@ package pl.net.bluesoft.rnd.processtool.editor.jpdl.object;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import pl.net.bluesoft.rnd.processtool.editor.AperteWorkflowDefinitionGenerator;
 import pl.net.bluesoft.rnd.processtool.editor.XmlUtil;
 
 import java.util.HashMap;
@@ -11,12 +12,12 @@ import java.util.Map;
 public class JPDLJavaTask extends JPDLTask {
 	
 	private Map<String,String> stepDataMap = new HashMap<String,String>();
-	
-	protected JPDLJavaTask() {
-		
-	}
-	
-	@Override
+
+    public JPDLJavaTask(AperteWorkflowDefinitionGenerator generator) {
+        super(generator);
+    }
+
+    @Override
 	public String toXML() { 
 		StringBuffer sb = new StringBuffer();
 		sb.append(String.format("<java auto-wire=\"true\" cache=\"false\" class=\"pl.net.bluesoft.rnd.pt.ext.jbpm.JbpmStepAction\" " +

@@ -2,12 +2,17 @@ package pl.net.bluesoft.rnd.processtool.editor.jpdl.object;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import pl.net.bluesoft.rnd.processtool.editor.AperteWorkflowDefinitionGenerator;
 
 public abstract class JPDLTask extends JPDLComponent {
   
 	protected String taskType;
-	
-	public String getTaskType() {
+
+    protected JPDLTask(AperteWorkflowDefinitionGenerator generator) {
+        super(generator);
+    }
+
+    public String getTaskType() {
 		return taskType;
 	}
 
