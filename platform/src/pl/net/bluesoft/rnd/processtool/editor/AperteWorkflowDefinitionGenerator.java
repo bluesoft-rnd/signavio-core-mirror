@@ -239,7 +239,7 @@ public class AperteWorkflowDefinitionGenerator {
                 }
                 sb.append(String.format("<%s>%s</%s>",
                         key,
-                        XmlUtil.replaceXmlEscapeCharacters(value), //todo use XStream
+                        XmlUtil.encodeXmlEcscapeCharacters(value), //todo use XStream
                         key));
             }
         }

@@ -63,7 +63,7 @@ public class JPDLUserTask extends JPDLTask {
 		String widgetJson = json.getJSONObject("properties").getString("aperte-conf");
 		if (widgetJson != null && widgetJson.trim().length() != 0) {
             widget = new Widget();
-            widgetJson = XmlUtil.replaceXmlEscapeCharacters(widgetJson);
+            widgetJson = XmlUtil.decodeXmlEscapeCharacters(widgetJson);
             JSONObject widgetJsonObj = new JSONObject(widgetJson);
             assignee = widgetJsonObj.optString("assignee");
             swimlane = widgetJsonObj.optString("swimlane");

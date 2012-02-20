@@ -428,16 +428,21 @@ ORYX.Plugins.AperteUiShapeMenuPlugin = ORYX.Plugins.ShapeMenuPlugin.extend({
 		   elements[0].properties['oryx-button-type'] != "" &&
 		   elements[0].incoming.length >= 1 &&
 		   elements[0].incoming[0] &&
-		   (
-		   //link coming out of XOR gateway coming out of user
-		   (elements[0].incoming[0].incoming[0] &&
+		   elements[0].incoming[0].properties['oryx-gatewaytype'] &&
+	       elements[0].incoming[0].properties['oryx-gatewaytype'].toUpperCase() == 'XOR' &&
+		   elements[0].incoming[0].incoming[0] &&
 		   elements[0].incoming[0].incoming[0].incoming[0] &&
-		   elements[0].incoming[0].properties['oryx-gatewaytype'].toUpperCase() == 'XOR' &&
-		   elements[0].incoming[0].incoming[0].incoming[0].properties['oryx-tasktype'].toUpperCase() == 'USER') ||
-
-		   //link between User task and not XOR task
-		   (elements[0].incoming[0].properties['oryx-tasktype'].toUpperCase() == 'USER' &&
-		    elements[0].outgoing[0].properties['oryx-gatewaytype'].toUpperCase() != 'XOR'))){
+		   elements[0].incoming[0].incoming[0].incoming[0].properties['oryx-tasktype'] &&
+		   elements[0].incoming[0].incoming[0].incoming[0].properties['oryx-tasktype'].toUpperCase() == 'USER') {
+		    this.aperteActionEditorButton.prepareToShow();
+		 } else if (elements[0].properties['oryx-button-type'] != null &&
+             	    elements[0].properties['oryx-button-type'] != "" &&
+             	    elements[0].incoming.length >= 1 &&
+             	    elements[0].incoming[0] &&
+                    elements[0].incoming[0].properties['oryx-tasktype'] &&
+                    elements[0].incoming[0].properties['oryx-tasktype'].toUpperCase() == 'USER' &&
+                    elements[0].outgoing[0] &&
+                    elements[0].outgoing[0].properties['oryx-gatewaytype'] != 'XOR'){
 		    // display this editor button only when its source is a user task
 			this.aperteActionEditorButton.prepareToShow();
 		}

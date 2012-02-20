@@ -45,6 +45,7 @@
 			aperteStepListUrl = ${aperteStepListUrl}
 			aperteOsgiPluginsDir = ${aperteOsgiPluginsDir}
 			aperteButtonListUrl = ${aperteButtonListUrl}
+			aperteConfigurationUrl = ${aperteConfigurationUrl}
             jbpmGuiUrl = ${jbpmGuiUrl}
 		</echo>
 	</target>

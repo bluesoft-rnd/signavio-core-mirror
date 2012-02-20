@@ -1,7 +1,6 @@
 package pl.net.bluesoft.rnd.processtool.editor.jpdl.object;
 
-import java.util.*;
-
+import com.signavio.platform.exceptions.RequestException;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -10,7 +9,7 @@ import org.json.JSONObject;
 import pl.net.bluesoft.rnd.processtool.editor.AperteWorkflowDefinitionGenerator;
 import pl.net.bluesoft.rnd.processtool.editor.XmlUtil;
 
-import com.signavio.platform.exceptions.RequestException;
+import java.util.*;
 
 
 public class JPDLTransition extends JPDLObject {
@@ -155,7 +154,7 @@ public class JPDLTransition extends JPDLObject {
 		}
 		String autowiredProps = json.getJSONObject("properties").optString("action-properties");
 		if (!StringUtils.isEmpty(autowiredProps)) {
-			JSONObject jsonObj = new JSONObject(XmlUtil.replaceXmlEscapeCharacters(autowiredProps));
+			JSONObject jsonObj = new JSONObject(XmlUtil.decodeXmlEscapeCharacters(autowiredProps));
 			Iterator i = jsonObj.keys();
 		    while (i.hasNext()) {
 		    	String key = (String)i.next();
