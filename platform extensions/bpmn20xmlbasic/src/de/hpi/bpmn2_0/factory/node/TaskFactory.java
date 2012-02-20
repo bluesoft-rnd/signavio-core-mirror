@@ -25,6 +25,8 @@ package de.hpi.bpmn2_0.factory.node;
 
 import javax.xml.namespace.QName;
 
+import de.hpi.bpmn2_0.model.extension.ExtensionElements;
+import de.hpi.bpmn2_0.model.extension.activiti.ActivitiField;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -246,8 +248,37 @@ public class TaskFactory extends AbstractActivityFactory {
 			operation.setId(operationString);
 			task.setOperationRef(new QName(operationString));
 		}
+        String activitiServiceClassName = shape.getProperty("activiti_class");
+        if (activitiServiceClassName != null && !(activitiServiceClassName.length() == 0)) {
+            task.setClassName(activitiServiceClassName);
+        }
 
-		return task;
+        try {
+            JSONArray activitiFields = shape.getPropertyJsonArray("activiti_fields");
+            if (activitiFields != null && activitiFields.length() != 0) {
+                for (int i=0; i < activitiFields.length(); i++) {
+                    JSONObject field = activitiFields.getJSONObject(i);
+                    String name = field.getString("name");
+                    String stringValue = field.optString("string_value");
+                    String expression = field.optString("expression");
+
+                    ActivitiField af = new ActivitiField();
+                    af.setName(name);
+                    if (stringValue != null && !stringValue.trim().isEmpty())
+                        af.setStringValue(stringValue);
+                    if (expression != null && !expression.trim().isEmpty())
+                        af.setExpression(expression);
+                    if (task.getExtensionElements() == null) {
+                        task.setExtensionElements(new ExtensionElements());
+                    }
+                    task.getExtensionElements().add(af);
+                    
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return task;
 	}
 
 	@Property(name = "tasktype", value = "Manual")

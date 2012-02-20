@@ -4,6 +4,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
+import de.hpi.bpmn2_0.model.extension.activiti.ActivitiField;
 import de.hpi.bpmn2_0.model.extension.signavio.SignavioLabel;
 import de.hpi.bpmn2_0.model.extension.signavio.SignavioMessageName;
 import de.hpi.bpmn2_0.model.extension.signavio.SignavioMetaData;
@@ -19,7 +20,8 @@ import de.hpi.bpmn2_0.model.extension.signavio.SignavioType;
 	SignavioMetaData.class,
 	SignavioType.class,
 	SignavioLabel.class,
-	SignavioMessageName.class
+	SignavioMessageName.class,
+	ActivitiField.class
 })
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class AbstractExtensionElement {

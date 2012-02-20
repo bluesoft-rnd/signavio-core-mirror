@@ -82,6 +82,9 @@ public class ServiceTask
     @XmlAttribute
     protected QName operationRef;
     
+    @XmlAttribute(namespace = "http://activiti.org/bpmn", name = "class")
+    protected String className;
+    
 	public void acceptVisitor(Visitor v){
 		v.visitServiceTask(this);
 	}
@@ -126,4 +129,11 @@ public class ServiceTask
         this.operationRef = value;
     }
 
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
 }

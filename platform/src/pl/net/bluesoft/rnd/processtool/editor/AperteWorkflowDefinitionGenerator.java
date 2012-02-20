@@ -9,6 +9,7 @@ import de.hpi.bpmn2_0.model.Definitions;
 import de.hpi.bpmn2_0.transformation.Bpmn2XmlConverter;
 import de.hpi.bpmn2_0.transformation.Diagram2BpmnConverter;
 import de.hpi.bpmn2_0.transformation.Diagram2XmlConverter;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.aperteworkflow.editor.domain.Permission;
@@ -208,9 +209,51 @@ public class AperteWorkflowDefinitionGenerator {
         }
     }
 
-    private void enrichBpmn20JavaTask(JSONObject obj) {
+    private void enrichBpmn20JavaTask(JSONObject obj) throws JSONException {
+        JSONObject propertiesObj = obj.getJSONObject("properties");
+        JSONObject aperteCfg = new JSONObject(propertiesObj.getString("aperte-conf"));
 
+        String stepName = propertiesObj.getString("tasktype");
+        //activiti_class
+        propertiesObj.put("tasktype", "Service");
+        propertiesObj.put("activiti_class", "org.aperteworkflow.ext.activiti.ActivitiStepAction");
+
+        JSONArray fields = new JSONArray();
+        JSONObject nameField = new JSONObject();
+        nameField.put("name", "stepName");
+        nameField.put("string_value", stepName);
+        fields.put(nameField);
+        JSONObject paramsField = new JSONObject();
+        paramsField.put("name", "params");
+
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append("<map>\n");
+        Iterator i = aperteCfg.keys();
+        while (i.hasNext()) {
+            String key = (String) i.next();
+            String value = aperteCfg.getString(key);
+            if (value != null && !value.trim().isEmpty()) {
+                try {
+                    byte[] bytes = Base64.decodeBase64(value.getBytes());
+                    value = new String(bytes);
+                } catch (Exception e) {
+                    //TODO nothing, as some properties are base64, and some are not
+                }
+                sb.append(String.format("<%s>%s</%s>",
+                        key,
+                        XmlUtil.replaceXmlEscapeCharacters(value), //todo use XStream
+                        key));
+            }
+        }
+        sb.append("</map>\n");
+
+        paramsField.put("expression", sb.toString());
+        fields.put(paramsField);
+
+        propertiesObj.put("activiti_fields", fields);
     }
+
 
 
     private void enrichBpmn20AssignmentConfig(JSONObject obj) throws JSONException {
