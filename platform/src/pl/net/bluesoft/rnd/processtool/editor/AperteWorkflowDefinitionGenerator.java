@@ -172,20 +172,32 @@ public class AperteWorkflowDefinitionGenerator {
         try {
             JSONObject jsonObj = new JSONObject(json);
             JSONArray childShapes = jsonObj.getJSONArray("childShapes");
+            Map<String,JSONObject> outgoingMap = new HashMap<String, JSONObject>();
+            Map<String,JSONObject> resourceIdMap = new HashMap<String, JSONObject>();
             for (int i = 0; i < childShapes.length(); i++) {
                 JSONObject obj = childShapes.getJSONObject(i);
-                //update user step with assignment data
+                resourceIdMap.put(obj.getString("resourceId"), obj);
+                if (obj.has("outgoing")) {
+                    JSONArray outgoing = obj.getJSONArray("outgoing");
+                    for (int j=0; j <  outgoing.length(); j++) {
+                        JSONObject outobj = outgoing.getJSONObject(j);
+                        outgoingMap.put(outobj.getString("resourceId"), obj);
+                    }
+                }
+            }                //update user step with assignment data
+            for (int i = 0; i < childShapes.length(); i++) {
+                JSONObject obj = childShapes.getJSONObject(i);
                 String stencilId = obj.getJSONObject("stencil").getString("id");
 
                 if ("Task".equals(stencilId)) {
                     String taskType = obj.getJSONObject("properties").getString("tasktype");
                     if ("User".equals(taskType)) {
-                        enrichBpmn20AssignmentConfig(obj);
+                        enrichBpmn20AssignmentConfig(obj, resourceIdMap);
                     } else {
-                        enrichBpmn20JavaTask(obj);
+                        enrichBpmn20JavaTask(obj, resourceIdMap);
                     }
                 } else if ("SequenceFlow".equals(stencilId)) {
-
+                    enrichBpmn20SequenceFlow(obj, outgoingMap, resourceIdMap);
                 } else if ("Exclusive_Databased_Gateway".equals(stencilId)) {
 
                 }
@@ -207,7 +219,21 @@ public class AperteWorkflowDefinitionGenerator {
         }
     }
 
-    private void enrichBpmn20JavaTask(JSONObject obj) throws JSONException {
+    private void enrichBpmn20SequenceFlow(JSONObject obj,
+                                          Map<String,JSONObject> outgoingMap,
+                                          Map<String,JSONObject> resourceIdMap) throws JSONException {
+//        String targetId = obj.getJSONObject("target").getString("resourceId");
+//        JSONObject source = outgoingMap.get(obj.getString("resourceId"));
+
+
+//        JSONArray incoming = obj.getJSONArray("incoming");
+//        JSONArray outgoing = obj.getJSONArray("outgoing");
+//        JSONObject incomingNode = incoming.getJSONObject(0);
+//        JSONObject outgoingNode = outgoing.getJSONObject(0);
+
+    }
+
+    private void enrichBpmn20JavaTask(JSONObject obj, Map<String,JSONObject> resourceIdMap) throws JSONException {
         JSONObject propertiesObj = obj.getJSONObject("properties");
         JSONObject aperteCfg = new JSONObject(propertiesObj.getString("aperte-conf"));
 
@@ -226,9 +252,9 @@ public class AperteWorkflowDefinitionGenerator {
         
         StringBuilder sb = new StringBuilder();
         sb.append("<map>\n");
-        Iterator i = aperteCfg.keys();
-        while (i.hasNext()) {
-            String key = (String) i.next();
+        Iterator iterator = aperteCfg.keys();
+        while (iterator.hasNext()) {
+            String key = (String) iterator.next();
             String value = aperteCfg.getString(key);
             if (value != null && !value.trim().isEmpty()) {
                 try {
@@ -249,11 +275,54 @@ public class AperteWorkflowDefinitionGenerator {
         fields.put(paramsField);
 
         propertiesObj.put("activiti_fields", fields);
+
+        processOutgoingConditions(obj, resourceIdMap, propertiesObj, "RESULT");
+    }
+
+    private void processOutgoingConditions(JSONObject obj, Map<String, JSONObject> resourceIdMap, JSONObject propertiesObj, String varName) throws JSONException {
+        //find outgoing transition to XOR gateway. There should be only one outgoing transition and without a condition
+        // If it indeed is a XOR gateway and transition conditions are not specified - fill them with defaults
+        JSONArray outgoing = obj.getJSONArray("outgoing");
+        if (outgoing.length() > 1) {
+            throw new RuntimeException("Java task: " + propertiesObj.optString("name") + " has more than one outgoing transition.");
+        }
+        for (int i=0; i < outgoing.length(); i++) {
+            JSONObject transition = resourceIdMap.get(outgoing.getJSONObject(i).getString("resourceId"));
+            JSONObject properties = transition.getJSONObject("properties");
+            if (properties.has("conditionexpression")) {
+                properties.remove("conditionexpression");
+            }
+            properties.put("conditiontype", "Default");
+            
+            String targetId = transition.getJSONObject("target").getString("resourceId");
+            JSONObject nextNode = resourceIdMap.get(targetId);
+            String stencilId = nextNode.getJSONObject("stencil").getString("id");
+            if ("Exclusive_Databased_Gateway".equals(stencilId)) {
+                JSONArray xorOutgoing = nextNode.getJSONArray("outgoing");
+                for (int j=0; j < xorOutgoing.length(); j++) {
+                    JSONObject xorTransition = resourceIdMap.get(xorOutgoing.getJSONObject(j).getString("resourceId"));
+                    JSONObject subProperties = xorTransition.getJSONObject("properties");
+                    if (xorOutgoing.length() == 1) { //only one outgoing, remove condition and set condition type to default
+                        if (subProperties.has("conditionexpression")) {
+                            subProperties.remove("conditionexpression");
+                        }
+                        subProperties.put("conditiontype", "Default");
+                    } else {
+                        String condition = subProperties.optString("conditionexpression");
+                        String conditionType = subProperties.optString("conditiontype");
+                        if (!"Default".equals(conditionType) && (condition == null || condition.trim().isEmpty())) {
+                            subProperties.put("conditionexpression", String.format("${%s=='%s'}", varName, subProperties.optString("name")));
+                            subProperties.put("conditiontype", "Expression");
+                        }
+                    }
+                }
+            }
+            
+        }
     }
 
 
-
-    private void enrichBpmn20AssignmentConfig(JSONObject obj) throws JSONException {
+    private void enrichBpmn20AssignmentConfig(JSONObject obj, Map<String,JSONObject> resourceIdMap) throws JSONException {
         JSONObject propertiesObj = obj.getJSONObject("properties");
         JSONObject aperteCfg = new JSONObject(propertiesObj.getString("aperte-conf"));
         String assignee = aperteCfg.optString("assignee");
@@ -283,6 +352,8 @@ public class AperteWorkflowDefinitionGenerator {
             propertiesObj.put("resources", resources);//overwrite
         }
         propertiesObj.put("implementation", "unspecified");
+        processOutgoingConditions(obj, resourceIdMap, propertiesObj, "ACTION");
+        
     }
 
     public String generateProcessToolConfig() {
