@@ -65,7 +65,7 @@ public abstract class JPDLComponent extends JPDLObject {
 	}
 	
 	protected String getTransitionsXML() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		
 		for (String targetResourceId : outgoing.keySet()) {
 			JPDLTransition transition = outgoing.get(targetResourceId);

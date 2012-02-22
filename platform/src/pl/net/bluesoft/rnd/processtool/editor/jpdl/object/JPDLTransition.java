@@ -124,19 +124,20 @@ public class JPDLTransition extends JPDLObject {
 		
 		
 		if (json.optJSONObject("target") != null) {
-		  target = json.getJSONObject("target").getString("resourceId");
+		  target = json.getJSONObject("target").optString("resourceId");
 		} else {
 		  throw new RequestException("Transition '" + name + "' has no target.");
 		}
-		buttonName = json.getJSONObject("properties").getString("button-type");
-		condition = json.getJSONObject("properties").getString("conditionexpression");
-		if (!StringUtils.isEmpty(condition) && !condition.startsWith("#{")) {
-			condition = "#{" + condition + "}";
-		}
+        JSONObject properties = json.getJSONObject("properties");
+        buttonName = properties.optString("button-type");
+		condition = properties.optString("conditionexpression");
+//		if (!StringUtils.isEmpty(condition) && !condition.startsWith("#{")) {
+//			condition = "#{" + condition + "}";
+//		}
 		
 		if (StringUtils.isEmpty(buttonName)) buttonName = DEFAULT_BUTTON_NAME;
 		
-		JSONObject permissions = json.getJSONObject("properties").optJSONObject("action-permissions");
+		JSONObject permissions = properties.optJSONObject("action-permissions");
 		if (permissions != null) {
 			 JSONArray permissionsItems = permissions.optJSONArray("items");
 			 for (int i = 0; i < permissionsItems.length(); i++) {
@@ -144,7 +145,7 @@ public class JPDLTransition extends JPDLObject {
 				 actionPermissions.add(obj.optString("rolename"));
 			 }
 		}
-		JSONObject attributes = json.getJSONObject("properties").optJSONObject("action-attributes");
+		JSONObject attributes = properties.optJSONObject("action-attributes");
 		if (attributes != null) {
 			 JSONArray attributesItems = attributes.optJSONArray("items");
 			 for (int i = 0; i < attributesItems.length(); i++) {
@@ -152,7 +153,7 @@ public class JPDLTransition extends JPDLObject {
 				 actionAttributes.put(obj.optString("attributename"), obj.optString("attributevalue"));
 			 }
 		}
-		String autowiredProps = json.getJSONObject("properties").optString("action-properties");
+		String autowiredProps = properties.optString("action-properties");
 		if (!StringUtils.isEmpty(autowiredProps)) {
 			JSONObject jsonObj = new JSONObject(XmlUtil.decodeXmlEscapeCharacters(autowiredProps));
 			Iterator i = jsonObj.keys();

@@ -62,14 +62,17 @@ public class AperteWorkflowDefinitionGenerator {
     public void init(String json) {
         try {
             this.json = json;
-            JSONObject jsonObj = new JSONObject(json);
-
+            JSONObject jsonObj = enrichModelerDataForBpmn20();
+//            JSONObject jsonObj = new JSONObject(json);
             processName = jsonObj.getJSONObject("properties").getString("name");
             processFileName = jsonObj.getJSONObject("properties").optString("aperte-process-filename");
             bundleDesc = jsonObj.getJSONObject("properties").optString("mf-bundle-description");
             bundleName = jsonObj.getJSONObject("properties").optString("mf-bundle-name");
             processToolDeployment = jsonObj.getJSONObject("properties").optString("mf-processtool-deployment");
             processDefinitionLanguage = jsonObj.getJSONObject("properties").optString("aperte-language");
+            if ("".equals(processDefinitionLanguage)) {
+                processDefinitionLanguage = "jpdl";//for old process definitions
+            }
             if (StringUtils.isEmpty(processName)) {
                 throw new RequestException("Process name is empty.");
             }
@@ -151,9 +154,7 @@ public class AperteWorkflowDefinitionGenerator {
             }
         }
 
-        Iterator<String> i = swimlanes.iterator();
-        while (i.hasNext()) {
-            String sl = i.next();
+        for (String sl : swimlanes) {
             jpdl.append(String.format("<swimlane candidate-groups=\"%s\" name=\"%s\"/>\n", sl, sl));
         }
 
@@ -170,38 +171,7 @@ public class AperteWorkflowDefinitionGenerator {
     public String generateBpmn20() {
 
         try {
-            JSONObject jsonObj = new JSONObject(json);
-            JSONArray childShapes = jsonObj.getJSONArray("childShapes");
-            Map<String,JSONObject> outgoingMap = new HashMap<String, JSONObject>();
-            Map<String,JSONObject> resourceIdMap = new HashMap<String, JSONObject>();
-            for (int i = 0; i < childShapes.length(); i++) {
-                JSONObject obj = childShapes.getJSONObject(i);
-                resourceIdMap.put(obj.getString("resourceId"), obj);
-                if (obj.has("outgoing")) {
-                    JSONArray outgoing = obj.getJSONArray("outgoing");
-                    for (int j=0; j <  outgoing.length(); j++) {
-                        JSONObject outobj = outgoing.getJSONObject(j);
-                        outgoingMap.put(outobj.getString("resourceId"), obj);
-                    }
-                }
-            }                //update user step with assignment data
-            for (int i = 0; i < childShapes.length(); i++) {
-                JSONObject obj = childShapes.getJSONObject(i);
-                String stencilId = obj.getJSONObject("stencil").getString("id");
-
-                if ("Task".equals(stencilId)) {
-                    String taskType = obj.getJSONObject("properties").getString("tasktype");
-                    if ("User".equals(taskType)) {
-                        enrichBpmn20AssignmentConfig(obj, resourceIdMap);
-                    } else {
-                        enrichBpmn20JavaTask(obj, resourceIdMap);
-                    }
-                } else if ("SequenceFlow".equals(stencilId)) {
-                    enrichBpmn20SequenceFlow(obj, outgoingMap, resourceIdMap);
-                } else if ("Exclusive_Databased_Gateway".equals(stencilId)) {
-
-                }
-            }
+            JSONObject jsonObj = enrichModelerDataForBpmn20();
             String jsonForBpmn20 = jsonObj.toString();
             BasicDiagram diagram = BasicDiagramBuilder.parseJson(jsonForBpmn20);
 
@@ -217,6 +187,42 @@ public class AperteWorkflowDefinitionGenerator {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private JSONObject enrichModelerDataForBpmn20() throws JSONException {
+        JSONObject jsonObj = new JSONObject(json);
+        JSONArray childShapes = jsonObj.getJSONArray("childShapes");
+        Map<String,JSONObject> outgoingMap = new HashMap<String, JSONObject>();
+        Map<String,JSONObject> resourceIdMap = new HashMap<String, JSONObject>();
+        for (int i = 0; i < childShapes.length(); i++) {
+            JSONObject obj = childShapes.getJSONObject(i);
+            resourceIdMap.put(obj.getString("resourceId"), obj);
+            if (obj.has("outgoing")) {
+                JSONArray outgoing = obj.getJSONArray("outgoing");
+                for (int j=0; j <  outgoing.length(); j++) {
+                    JSONObject outobj = outgoing.getJSONObject(j);
+                    outgoingMap.put(outobj.getString("resourceId"), obj);
+                }
+            }
+        }                //update user step with assignment data
+        for (int i = 0; i < childShapes.length(); i++) {
+            JSONObject obj = childShapes.getJSONObject(i);
+            String stencilId = obj.getJSONObject("stencil").getString("id");
+
+            if ("Task".equals(stencilId)) {
+                String taskType = obj.getJSONObject("properties").getString("tasktype");
+                if ("User".equals(taskType)) {
+                    enrichBpmn20AssignmentConfig(obj, resourceIdMap);
+                } else {
+                    enrichBpmn20JavaTask(obj, resourceIdMap);
+                }
+            } else if ("SequenceFlow".equals(stencilId)) {
+                enrichBpmn20SequenceFlow(obj, outgoingMap, resourceIdMap);
+            } else if ("Exclusive_Databased_Gateway".equals(stencilId)) {
+
+            }
+        }
+        return jsonObj;
     }
 
     private void enrichBpmn20SequenceFlow(JSONObject obj,
@@ -238,7 +244,8 @@ public class AperteWorkflowDefinitionGenerator {
         JSONObject aperteCfg = new JSONObject(propertiesObj.getString("aperte-conf"));
 
         String stepName = propertiesObj.getString("tasktype");
-        propertiesObj.put("tasktype", "Service");
+        if ("bpmn20".equals(processDefinitionLanguage))
+            propertiesObj.put("tasktype", "Service");
         propertiesObj.put("activiti_class", "org.aperteworkflow.ext.activiti.ActivitiStepAction");
 
         JSONArray fields = new JSONArray();

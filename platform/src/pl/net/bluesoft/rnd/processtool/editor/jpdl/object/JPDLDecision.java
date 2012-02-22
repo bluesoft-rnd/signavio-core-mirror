@@ -19,8 +19,8 @@ public class JPDLDecision extends JPDLComponent {
     
     @Override
 	public String toXML() { 
-    	StringBuffer sb = new StringBuffer();
-    	sb.append(String.format("<decision name=\"%s\" g=\"%d,%d,%d,%d\">\n", name,
+    	StringBuilder sb = new StringBuilder();
+    	sb.append(String.format("<decision name=\"%s\" g=\"%d,%d,%d,%d\" >\n", name,
                 boundsX, boundsY, width, height
                 ));
 		sb.append(getTransitionsXML());

@@ -22,7 +22,7 @@ public class JPDLJavaTask extends JPDLTask {
 	public String toXML() { 
 		StringBuilder sb = new StringBuilder();
 		sb.append(String.format("<java auto-wire=\"true\" cache=\"false\" class=\"pl.net.bluesoft.rnd.pt.ext.jbpm.JbpmStepAction\" " +
-                "g=\"%d,%d,%d,%d\" method=\"invoke\" name=\"%s\" var=\"result\">\n", boundsX, boundsY, width, height,name));
+                "g=\"%d,%d,%d,%d\" method=\"invoke\" name=\"%s\" var=\"RESULT\">\n", boundsX, boundsY, width, height,name));
 		sb.append("<field name=\"stepName\">\n");
 		sb.append(String.format("<string value=\"%s\"/>\n",taskType));
 		sb.append("</field>\n");
@@ -67,7 +67,7 @@ public class JPDLJavaTask extends JPDLTask {
 			String key = (String)i.next();  
             Object value = stepDataJsonObj.get(key);  
             if (value instanceof String) {
-                byte[] bytes = Base64.decodeBase64((String) value);
+                byte[] bytes = Base64.decodeBase64(((String) value).getBytes());
                 value = new String(bytes);
             }
 			stepDataMap.put(key, value.toString());
