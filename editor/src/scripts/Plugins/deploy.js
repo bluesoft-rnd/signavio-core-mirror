@@ -22,7 +22,7 @@ ORYX.Plugins.Deploy = Clazz.extend({
 	},
 	
     processDeploy: function(modelInfo){
-		
+
 		if (!modelInfo) {
 			return;
 		}
@@ -33,7 +33,11 @@ ORYX.Plugins.Deploy = Clazz.extend({
 		   delete this.deploying;
 		   return;
 		}
-		
+
+		Ext.Msg.alert("TITLE", "Deployment feature has been disabled for demoing purposes. Please download your own Aperte Workflow installation from www.aperteworkflow.org or use Download button to fetch your process definition file.")
+                    .setIcon(Ext.Msg.WARNING).getDialog().setWidth(260).center().syncSize();
+        return;
+
         var params = {
        		name: modelInfo.name,
 			parent: modelInfo.parent

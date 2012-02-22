@@ -38,7 +38,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
-@HandlerConfiguration(uri = "/deploy", rel="deploy")
+//@HandlerConfiguration(uri = "/deploy", rel="deploy")
 public class DeployHandler extends BasisHandler {
 
 	public DeployHandler(ServletContext servletContext) {
