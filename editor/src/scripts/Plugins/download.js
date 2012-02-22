@@ -8,11 +8,11 @@ ORYX.Plugins.Download = Clazz.extend({
 	construct: function(facade){
 		this.facade = facade;
 		this.facade.offer({
-			'name': ORYX.I18N.Deploy.deploy,
+			'name': 'Download',
             'functionality': this.download.bind(this),
             'group': ORYX.I18N.Deploy.group,
             'icon': ORYX.PATH + "images/download.png",
-            'description': ORYX.I18N.Deploy.deployDesc,
+            'description': 'Download process definition bundle',
 			'index': 2,
 			'minShape': 0,
 			'maxShape': 0
