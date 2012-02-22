@@ -116,7 +116,7 @@ public class DeployHandler extends BasisHandler {
         return new String[]{"0", "0"};
     }
 
-    private void addPackageDirs(String packageName, JarOutputStream target) throws IOException {
+    protected void addPackageDirs(String packageName, JarOutputStream target) throws IOException {
 		String[] packageElems = packageName.split("\\.");
 		String[] dirNames = new String[packageElems.length];
 		for (int i = 0; i < packageElems.length; i++) {
@@ -133,7 +133,7 @@ public class DeployHandler extends BasisHandler {
 		}
 	}
 	
-	private void addEntry(String entryName, JarOutputStream target, InputStream in) throws IOException {
+	protected void addEntry(String entryName, JarOutputStream target, InputStream in) throws IOException {
 		BufferedInputStream bin = null;
 		try {  
             JarEntry entry = new JarEntry(entryName);
@@ -160,84 +160,15 @@ public class DeployHandler extends BasisHandler {
 	@HandlerMethodActivation
 	public Object postRepresentation(Object params, FsAccessToken token) {
 		JSONObject jsonParams = (JSONObject) params;
-		
+        File tempJar = null;
 		try {
-            String name = jsonParams.getString("name");
-            String parentId = jsonParams.getString("parent");
-            parentId = parentId.replace("/directory/", "");
-            FsDirectory parent = FsSecurityManager.getInstance().loadObject(FsDirectory.class, parentId, token);
-            String signavioXMLExtension = SignavioModelType.class.getAnnotation(ModelTypeFileExtension.class).fileExtension();
-            String fileName = name + signavioXMLExtension;
-            String fileNameWithPath = parent.getPath() + File.separator + fileName;
-            
-            byte [] jsonData = ModelTypeManager.getInstance().getModelType(signavioXMLExtension).getRepresentationInfoFromModelFile(RepresentationType.JSON, fileNameWithPath);
-            byte [] svgData = ModelTypeManager.getInstance().getModelType(signavioXMLExtension)
-                    .getRepresentationInfoFromModelFile(RepresentationType.SVG, fileNameWithPath);
-            String jsonRep = new String(jsonData, "utf-8");
-
-            String[] vs = getGraphOffset(svgData);
-            int offsetX = Math.round(Float.parseFloat(vs[0]));
-            int offsetY = Math.round(Float.parseFloat(vs[1]));
-            JPDLGenerator gen = new JPDLGenerator(offsetX, offsetY);
-            gen.init(jsonRep);
-            
-            // MANIFEST
-            Manifest mf = getManifest(gen.getBundleName(), gen.getBundleDesc(), gen.getProcessToolDeployment());
-
-            // convert SVG to PNG format
-            byte[] png = svg2png(svgData);
-
-            // create new temporary JAR
-            File tempJar = File.createTempFile("aw-deploy-", ".tmp");
-            tempJar.deleteOnExit();
-            JarOutputStream target = new JarOutputStream(new FileOutputStream(tempJar), mf);
-            addPackageDirs(gen.getProcessToolDeployment(), target);
-
-            String processDir = gen.getProcessToolDeployment().replace('.','/') + '/';
-
-            // adding PNG and XML files
-            addEntry(processDir + "processdefinition.png", target, new ByteArrayInputStream(png));
-            addEntry(processDir + "processdefinition.jpdl.xml", target, new ByteArrayInputStream(gen.generateJpdl().getBytes("UTF-8")));
-            addEntry(processDir + "processtool-config.xml", target, new ByteArrayInputStream(gen.generateProcessToolConfig().getBytes("UTF-8")));
-            addEntry(processDir + "queues-config.xml", target, new ByteArrayInputStream(gen.generateQueuesConfig().getBytes("UTF-8")));
-
-            // messages are not
-            Map<String, String> messages = gen.getMessages();
-            if (messages != null && !messages.isEmpty()) {
-                String propertiesFiles = "";
-                for (String langCode : messages.keySet()) {
-                    String propertiesFilename = "messages_" + langCode + ".properties";
-
-                    String messagesContent = messages.get(langCode);
-                    if (messagesContent != null) {
-                        addEntry(processDir + propertiesFilename, target, new ByteArrayInputStream(messagesContent.getBytes("US-ASCII")));
-                        propertiesFiles += propertiesFilename + ",";
-                    }
-                }
-
-                if (propertiesFiles != null && !propertiesFiles.isEmpty()) {
-                    if (propertiesFiles.endsWith(",")) {
-                        propertiesFiles = propertiesFiles.substring(0, propertiesFiles.length() - 1);
-                    }
-                    mf.getMainAttributes().put(new Attributes.Name("ProcessTool-I18N-Property"), propertiesFiles);
-                }
-            }
-            
-            // logo may not exist so make sure to check
-            if (gen.getProcessIcon() != null) {
-                addEntry(processDir + "processdefinition-logo.png", target, new ByteArrayInputStream(gen.getProcessIcon()));
-            }
-            
-            // close the JAR
-            target.close();
-
+            tempJar = File.createTempFile("aw-deploy-", ".tmp");
+            JPDLGenerator gen = fillProcessDeploymentBundle(token, jsonParams, tempJar);
             // copy to osgi-plugins
             PlatformProperties props =  Platform.getInstance().getPlatformProperties();
             String osgiPluginsDir = props.getAperteOsgiPluginsDir();
             copy(tempJar, new File(osgiPluginsDir + File.separator + gen.getProcessFileName() + ".jar"));
 
-            // delete temporary directory
-            tempJar.delete();
 		} catch (JSONException e) {
 			throw new RequestException("JSONException", e);
 		} catch (UnsupportedEncodingException e) {
@@ -246,13 +177,91 @@ public class DeployHandler extends BasisHandler {
 			throw new RequestException("Error while creating PNG file", e);
 		} catch (IOException e) {
 			throw new RequestException("Error while creating JAR file", e);
-		}
+		} finally {
+            if (tempJar != null) tempJar.delete();
+        }
 
 		return "OK";
 	}
-	
-    
-    private void copy(File src, File dst) throws IOException {
+
+    protected JPDLGenerator fillProcessDeploymentBundle(FsAccessToken token, JSONObject jsonParams, File tempJar) throws JSONException, TranscoderException, IOException {
+        String name = jsonParams.getString("name");
+        String parentId = jsonParams.getString("parent");
+        parentId = parentId.replace("/directory/", "");
+        return fillProcessDeploymentBundle(token, tempJar, name, parentId);
+    }
+
+    protected JPDLGenerator fillProcessDeploymentBundle(FsAccessToken token, File tempJar,
+                                                        String name, String parentId) throws TranscoderException, IOException {
+        FsDirectory parent = FsSecurityManager.getInstance().loadObject(FsDirectory.class, parentId, token);
+        String signavioXMLExtension = SignavioModelType.class.getAnnotation(ModelTypeFileExtension.class).fileExtension();
+        String fileName = name + signavioXMLExtension;
+        String fileNameWithPath = parent.getPath() + File.separator + fileName;
+
+        byte [] jsonData = ModelTypeManager.getInstance().getModelType(signavioXMLExtension).getRepresentationInfoFromModelFile(RepresentationType.JSON, fileNameWithPath);
+        byte [] svgData = ModelTypeManager.getInstance().getModelType(signavioXMLExtension)
+                .getRepresentationInfoFromModelFile(RepresentationType.SVG, fileNameWithPath);
+        String jsonRep = new String(jsonData, "utf-8");
+
+        String[] vs = getGraphOffset(svgData);
+        int offsetX = Math.round(Float.parseFloat(vs[0]));
+        int offsetY = Math.round(Float.parseFloat(vs[1]));
+        JPDLGenerator gen = new JPDLGenerator(offsetX, offsetY);
+        gen.init(jsonRep);
+
+        // MANIFEST
+        Manifest mf = getManifest(gen.getBundleName(), gen.getBundleDesc(), gen.getProcessToolDeployment());
+
+        // convert SVG to PNG format
+        byte[] png = svg2png(svgData);
+
+        // create new temporary JAR
+        tempJar.deleteOnExit();
+        JarOutputStream target = new JarOutputStream(new FileOutputStream(tempJar), mf);
+        addPackageDirs(gen.getProcessToolDeployment(), target);
+
+        String processDir = gen.getProcessToolDeployment().replace('.','/') + '/';
+
+        // adding PNG and XML files
+        addEntry(processDir + "processdefinition.png", target, new ByteArrayInputStream(png));
+        addEntry(processDir + "processdefinition.jpdl.xml", target, new ByteArrayInputStream(gen.generateJpdl().getBytes("UTF-8")));
+        addEntry(processDir + "processtool-config.xml", target, new ByteArrayInputStream(gen.generateProcessToolConfig().getBytes("UTF-8")));
+        addEntry(processDir + "queues-config.xml", target, new ByteArrayInputStream(gen.generateQueuesConfig().getBytes("UTF-8")));
+
+        // messages are not
+        Map<String, String> messages = gen.getMessages();
+        if (messages != null && !messages.isEmpty()) {
+        String propertiesFiles = "";
+        for (String langCode : messages.keySet()) {
+            String propertiesFilename = "messages_" + langCode + ".properties";
+
+            String messagesContent = messages.get(langCode);
+            if (messagesContent != null) {
+                addEntry(processDir + propertiesFilename, target, new ByteArrayInputStream(messagesContent.getBytes("US-ASCII")));
+                propertiesFiles += propertiesFilename + ",";
+            }
+        }
+
+        if (propertiesFiles != null && !propertiesFiles.isEmpty()) {
+            if (propertiesFiles.endsWith(",")) {
+                propertiesFiles = propertiesFiles.substring(0, propertiesFiles.length() - 1);
+            }
+            mf.getMainAttributes().put(new Attributes.Name("ProcessTool-I18N-Property"), propertiesFiles);
+        }
+    }
+
+        // logo may not exist so make sure to check
+        if (gen.getProcessIcon() != null) {
+        addEntry(processDir + "processdefinition-logo.png", target, new ByteArrayInputStream(gen.getProcessIcon()));
+    }
+
+        // close the JAR
+        target.close();
+        return gen;
+    }
+
+
+    protected void copy(File src, File dst) throws IOException {
 	    InputStream in = new FileInputStream(src);
 	    OutputStream out = new FileOutputStream(dst);
 
