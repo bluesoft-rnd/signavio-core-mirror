@@ -49,6 +49,7 @@
 		<plugin source="aperteuifile.js" name="ORYX.Plugins.AperteUiSave" />
 		
 		<plugin source="deploy.js" name="ORYX.Plugins.Deploy"/>
+		<plugin source="download.js" name="ORYX.Plugins.Download"/>
         <plugin source="processeditor.js" name="ORYX.Plugins.ProcessEditor"/>
 		<plugin source="view.js" name="ORYX.Plugins.View" />
 		<plugin source="dragdropresize.js" name="ORYX.Plugins.DragDropResize" />
