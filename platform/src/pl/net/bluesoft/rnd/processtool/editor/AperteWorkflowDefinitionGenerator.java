@@ -196,6 +196,8 @@ public class AperteWorkflowDefinitionGenerator {
         Map<String,JSONObject> resourceIdMap = new HashMap<String, JSONObject>();
         for (int i = 0; i < childShapes.length(); i++) {
             JSONObject obj = childShapes.getJSONObject(i);
+            fixBounds(obj);
+            fixDockers(obj);
             resourceIdMap.put(obj.getString("resourceId"), obj);
             if (obj.has("outgoing")) {
                 JSONArray outgoing = obj.getJSONArray("outgoing");
@@ -223,6 +225,30 @@ public class AperteWorkflowDefinitionGenerator {
             }
         }
         return jsonObj;
+    }
+
+    private void fixDockers(JSONObject obj) throws JSONException {
+        JSONArray dockers = obj.optJSONArray("dockers");
+        if (dockers == null) return;
+        for (int i=0; i < dockers.length(); i++) {
+            fixOffset(dockers.getJSONObject(i));
+        }
+    }
+
+    private void fixBounds(JSONObject obj) throws JSONException {
+        JSONObject bounds = obj.optJSONObject("bounds");
+        if (bounds == null) return;
+        JSONObject lowerRight = bounds.getJSONObject("lowerRight");
+        JSONObject upperLeft = bounds.getJSONObject("upperLeft");
+        fixOffset(lowerRight);
+        fixOffset(upperLeft);
+    }
+
+    private void fixOffset(JSONObject point) throws JSONException {
+        int x = point.getInt("x");
+        int y = point.getInt("y");
+        point.put("x", x + offsetX);
+        point.put("y", y + offsetY);
     }
 
     private void enrichBpmn20SequenceFlow(JSONObject obj,
