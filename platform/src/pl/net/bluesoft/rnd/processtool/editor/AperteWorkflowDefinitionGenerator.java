@@ -29,7 +29,12 @@ import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.*;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.*;
 
 public class AperteWorkflowDefinitionGenerator {
@@ -69,8 +74,11 @@ public class AperteWorkflowDefinitionGenerator {
             bundleDesc = jsonObj.getJSONObject("properties").optString("mf-bundle-description");
             bundleName = jsonObj.getJSONObject("properties").optString("mf-bundle-name");
             processToolDeployment = jsonObj.getJSONObject("properties").optString("mf-processtool-deployment");
-            processDefinitionLanguage = jsonObj.getJSONObject("properties").optString("aperte-language");
-            if ("".equals(processDefinitionLanguage)) {
+            PlatformProperties props = Platform.getInstance().getPlatformProperties();
+            String aperteData = getAperteData(props.getServerName() + props.getJbpmGuiUrl() + props.getAperteConfigurationUrl());
+            processDefinitionLanguage = new JSONObject(aperteData).optString("definitionLanguage");
+            //processDefinitionLanguage = jsonObj.getJSONObject("properties").optString("aperte-language");
+            if (processDefinitionLanguage == null || "".equals(processDefinitionLanguage)) {
                 processDefinitionLanguage = "jpdl";//for old process definitions
             }
             if (StringUtils.isEmpty(processName)) {
@@ -513,6 +521,24 @@ public class AperteWorkflowDefinitionGenerator {
         return processConfig.getProcessIcon();
     }
 
+
+    private String getAperteData(String aperteUrl)  {
+        try {
+            URL url = new URL(aperteUrl);
+            URLConnection conn = url.openConnection();
+            BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            StringBuffer sb = new StringBuffer();
+            String line;
+            while ((line = rd.readLine()) != null) {
+                sb.append(line);
+            }
+            rd.close();
+            return sb.toString();
+        } catch (IOException e) {
+            logger.error("Error reading data from " + aperteUrl, e);
+            throw new RuntimeException(e);
+        }
+    }
 
 }
 
