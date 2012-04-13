@@ -109,7 +109,8 @@ public class AperteWorkflowDefinitionGenerator {
                 JPDLObject jpdlObject = JPDLObject.getJPDLObject(obj, this);
                 jpdlObject.fillBasicProperties(obj);
                 if (jpdlObject instanceof JPDLComponent) {
-                    ((JPDLComponent) jpdlObject).applyOffset(offsetX, offsetY);
+                        //not needed anymore
+//                    ((JPDLComponent) jpdlObject).applyOffset(offsetX, offsetY);
                     componentMap.put(jpdlObject.getResourceId(), (JPDLComponent) jpdlObject);
                 } else if (jpdlObject instanceof JPDLTransition) {
                     transitionMap.put(jpdlObject.getResourceId(), (JPDLTransition) jpdlObject);
