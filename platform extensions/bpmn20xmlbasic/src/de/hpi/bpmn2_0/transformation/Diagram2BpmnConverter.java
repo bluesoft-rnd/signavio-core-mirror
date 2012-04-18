@@ -1,17 +1,17 @@
 /**
  * Copyright (c) 2009
  * Philipp Giese, Sven Wagner-Boysen
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -107,10 +107,10 @@ import de.hpi.diagram.SignavioUUID;
 
 /**
  * Converter class for Diagram to BPMN 2.0 transformation.
- * 
+ *
  * @author Philipp Giese
  * @author Sven Wagner-Boysen
- * 
+ *
  */
 public class Diagram2BpmnConverter {
 	/* Hash map of factories for BPMN 2.0 element to enable lazy initialization */
@@ -119,14 +119,14 @@ public class Diagram2BpmnConverter {
 	private GenericDiagram<?,?> diagram;
 	private List<BPMNElement> diagramChilds;
 	private List<Process> processes;
-	
+
 	private static Constants constants;
-	
-	/* Processes just used to identify all processes in the diagram (used i.e. 
+
+	/* Processes just used to identify all processes in the diagram (used i.e.
 	 * for CallActivities). They are removed afterwards, to avoid duplicates.
 	 */
 	private List<Process> tmpProcesses;
-	
+
 	private Definitions definitions;
 	private Configuration configuration;
 	private String editorVersion;
@@ -162,10 +162,10 @@ public class Diagram2BpmnConverter {
 		this.factoryClasses = factoryClasses;
 		this.configuration = new Configuration();
 	}
-	
+
 	/**
 	 * Also sets the configuration on reformation the element IDs.
-	 * 
+	 *
 	 * @param diagram
 	 * @param factoryClasses
 	 */
@@ -178,7 +178,7 @@ public class Diagram2BpmnConverter {
 	/**
 	 * Constructor receiving an additional configuration map. This map can
 	 * contain linked diagram or the current editor version.
-	 * 
+	 *
 	 * @param diagram2
 	 * @param factoryClasses2
 	 * @param configuration
@@ -216,7 +216,7 @@ public class Diagram2BpmnConverter {
 
 	/**
 	 * Retrieves the stencil id related hashed factory.
-	 * 
+	 *
 	 * @param stencilId
 	 *            The stencil id
 	 * @return The related factory
@@ -237,14 +237,14 @@ public class Diagram2BpmnConverter {
 
 	/**
 	 * Creates a new factory instance for a stencil id.
-	 * 
+	 *
 	 * @param stencilId
 	 *            The stencil id
 	 * @return The created factory
 	 * @throws ClassNotFoundException
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
-	 * 
+	 *
 	 */
 	private AbstractBpmnFactory createFactoryForStencilId(String stencilId)
 			throws ClassNotFoundException, InstantiationException,
@@ -304,7 +304,7 @@ public class Diagram2BpmnConverter {
 
 	/**
 	 * Secures uniqueness of an BPMN Element.
-	 * 
+	 *
 	 * @param el
 	 * @throws InvalidKeyException
 	 */
@@ -319,12 +319,12 @@ public class Diagram2BpmnConverter {
 
 	/**
 	 * Creates the BPMN 2.0 elements for the parent's child shapes recursively.
-	 * 
+	 *
 	 * @param childShapes
 	 *            The list of parent's child shapes
 	 * @param parent
 	 *            The parent {@link BPMNElement}
-	 * 
+	 *
 	 * @throws ClassNotFoundException
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
@@ -362,17 +362,17 @@ public class Diagram2BpmnConverter {
 		} else {
 			bpmnElement = factory.createBpmnElement(shape, this.configuration);
 		}
-		
+
 		if(bpmnElement != null) {
 			/* Add element to flat list of all elements of the diagram */
 			this.addBpmnElement(bpmnElement);
-	
+
 			/* Add childs to current BPMN element */
 			for (BPMNElement child : childElements) {
 				bpmnElement.addChild(child);
 			}
 		}
-		
+
 		return bpmnElement;
 
 	}
@@ -562,7 +562,7 @@ public class Diagram2BpmnConverter {
 
 	/**
 	 * Method to handle sub processes
-	 * 
+	 *
 	 * @param subProcess
 	 */
 	private void handleSubProcess(SubProcess subProcess) {
@@ -579,18 +579,18 @@ public class Diagram2BpmnConverter {
 			}
 		}
 	}
-	
+
 	/**
-	 * In case the {@link CallActivity} calls an expanded subprocess, a new 
-	 * process is created that includes all referenced {@link FlowElement} by 
+	 * In case the {@link CallActivity} calls an expanded subprocess, a new
+	 * process is created that includes all referenced {@link FlowElement} by
 	 * the {@link CallActivity}
-	 * 
+	 *
 	 * @param callAct
 	 */
 	private void handleCallActivities(CallActivity callAct) {
 		Process p = new Process();
 		p.setId("");
-		
+
 		for(FlowElement fe : callAct._getFlowElementsOfTheGlobalProcess()) {
 			p.getFlowElement().add(fe);
 			if(fe instanceof CallActivity) {
@@ -599,16 +599,17 @@ public class Diagram2BpmnConverter {
 				handleSubProcess((SubProcess) fe);
 			}
 		}
-		
-		// Apply id for BPMN 2.0 XML round trip if applicable 
+
+		// Apply id for BPMN 2.0 XML round trip if applicable
 		if(!p.hasId() && callAct.hasValidRoundTripProcessId()) {
 			p.setId(callAct.getProcessid());
 		} else if (!p.hasId()) {
 			p.setId(SignavioUUID.generate());
 		}
-		
+
 		if(p.getFlowElement().size() > 0) {
-			callAct.setCalledElement(p);
+			callAct.setCalledElementNotSupported(p);
+			callAct.setCalledElement(p.getName());
 			this.processes.add(p);
 			this.tmpProcesses.add(p);
 		}
@@ -720,10 +721,10 @@ public class Diagram2BpmnConverter {
 
 	/**
 	 * Retrieves all data related elements.
-	 * 
+	 *
 	 * @param elements
 	 *            The list of {@link BPMNElement}.
-	 * 
+	 *
 	 * @param dataObjects
 	 *            The resulting list of {@link AbstractDataObject}
 	 */
@@ -743,7 +744,7 @@ public class Diagram2BpmnConverter {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return All {@link Artifact} contained in the diagram.
 	 */
 	private List<Artifact> getAllArtifacts() {
@@ -799,11 +800,11 @@ public class Diagram2BpmnConverter {
 
 				Process process = new Process();
 				process.setId("");
-				
+
 				// Retrieve process id from pool element to keep the process id
 				// in a BPMN 2.0 XML round trip scenario.
 				if(participant.hasValidRoundTripProcessId()) {
-					process.setId(participant.getProcessid()); 
+					process.setId(participant.getProcessid());
 				} else {
 					process.setId(SignavioUUID.generate());
 				}
@@ -831,7 +832,7 @@ public class Diagram2BpmnConverter {
 
 				process.getLaneSet().add(laneSet);
 				participant.setProcessRef(process);
-				
+
 				/* Copy name attribute of participant */
 				process.setName(participant.getName());
 
@@ -846,18 +847,18 @@ public class Diagram2BpmnConverter {
 		while (allNodes.size() > 0) {
 			Process currentProcess = new Process();
 			currentProcess.setId("");
-			
-			if(this.definitions.getName() != null 
+
+			if(this.definitions.getName() != null
 					&& this.definitions.getName().length() > 0) {
 				currentProcess.setName(this.definitions.getName());
 			}
 			this.processes.add(currentProcess);
 
-			
-			
+
+
 			addNode(currentProcess,
 					this.getBpmnElementForNode(allNodes.get(0)), allNodes);
-			
+
 			// Generate Process Id if necessary
 			if(!currentProcess.hasId()) {
 				currentProcess.setId(SignavioUUID.generate());
@@ -872,7 +873,7 @@ public class Diagram2BpmnConverter {
 				el.setProcess(p);
 			}
 		}
-		
+
 		/* Remove temporary processes from the list */
 		this.processes.removeAll(this.tmpProcesses);
 //		this.tmpProcesses = null;
@@ -896,7 +897,7 @@ public class Diagram2BpmnConverter {
 
 	/**
 	 * Finds the process for an {@link Edge}
-	 * 
+	 *
 	 * @param edge
 	 */
 	private List<FlowElement> findProcessFlowElementListForEdge(Edge edge) {
@@ -909,7 +910,7 @@ public class Diagram2BpmnConverter {
 
 			if (flowElements.contains(edge.getSourceRef())
 					|| flowElements.contains(edge.getTargetRef())
-					|| artifacts.contains(edge.getSourceRef()) 
+					|| artifacts.contains(edge.getSourceRef())
 					|| artifacts.contains(edge.getTargetRef())) {
 				edge.setProcess(process);
 				return flowElements;
@@ -1000,7 +1001,7 @@ public class Diagram2BpmnConverter {
 	/**
 	 * Helper method to get the {@link BPMNElement} for the given
 	 * {@link FlowNode} from the list of BPMN elements.
-	 * 
+	 *
 	 * @param node
 	 *            The concerning {@link FlowNode}
 	 * @return The related {@link BPMNElement}
@@ -1011,7 +1012,7 @@ public class Diagram2BpmnConverter {
 
 	/**
 	 * Adds the node to the connected set of nodes.
-	 * 
+	 *
 	 * @param process
 	 * @param element
 	 * @param allNodes
@@ -1022,8 +1023,8 @@ public class Diagram2BpmnConverter {
 				|| !allNodes.contains(element.getNode())) {
 			return;
 		}
-		
-		
+
+
 		FlowNode node = (FlowNode) element.getNode();
 
 		// Set id of process if there is one applied for round-tripping scenarios
@@ -1086,7 +1087,7 @@ public class Diagram2BpmnConverter {
 	/**
 	 * Retrieves all nodes included into the diagram and stop recursion at
 	 * subprocesses.
-	 * 
+	 *
 	 * @param elements
 	 *            The child elements of a parent BPMN element
 	 * @param allNodes
@@ -1115,7 +1116,7 @@ public class Diagram2BpmnConverter {
 	/**
 	 * Retrieve the child elements of a BPMN element from within all BPMN
 	 * elements in the diagram.
-	 * 
+	 *
 	 * @param element
 	 *            The parent BPMN Element
 	 * @return
@@ -1136,7 +1137,7 @@ public class Diagram2BpmnConverter {
 
 	/**
 	 * Inserts the shapes of nodes as children of the {@link BPMNPlane}.
-	 * 
+	 *
 	 * @param subProcess
 	 */
 	private void insertSubprocessShapes(SubProcess subProcess) {
@@ -1152,19 +1153,19 @@ public class Diagram2BpmnConverter {
 				insertSubprocessShapes((SubProcess) flowEle);
 			}
 		}
-		
+
 		for (Artifact a : subProcess.getArtifact()) {
 			if(this.bpmnElements.get(a.getId()) != null) {
 				this.definitions.getFirstPlane().getDiagramElement().add(
-						this.bpmnElements.get(a.getId()).getShape());				
+						this.bpmnElements.get(a.getId()).getShape());
 			}
 		}
 	}
-	
+
 	/**
 	 * Places the shapes of the elements referenced by the process at diagram's
 	 * shape list.
-	 * 
+	 *
 	 * @param process
 	 */
 	private boolean insertProcessShapes(Process process) {
@@ -1196,20 +1197,20 @@ public class Diagram2BpmnConverter {
 			this.definitions.getFirstPlane().getDiagramElement().add(
 					this.bpmnElements.get(a.getId()).getShape());
 		}
-		
+
 		/* Insert Data Objects form IOSpecifications */
 		if(process.getIoSpecification() != null) {
 			for(DataInput dataInput : process.getIoSpecification().getDataInput()) {
 				this.definitions.getFirstPlane().getDiagramElement().add(
 						this.bpmnElements.get(dataInput.getId()).getShape());
 			}
-			
+
 			for(DataOutput dataOutput : process.getIoSpecification().getDataOutput()) {
 				this.definitions.getFirstPlane().getDiagramElement().add(
 						this.bpmnElements.get(dataOutput.getId()).getShape());
 			}
 		}
-		
+
 		return true;
 	}
 
@@ -1246,24 +1247,24 @@ public class Diagram2BpmnConverter {
 //				this.definitions.getFirstPlane().getDiagramElement().add(
 //						this.bpmnElements.get(a.getId()).getShape());
 //			}
-//			
+//
 //			/* Insert Data Objects form IOSpecifications */
 //			if(process.getIoSpecification() != null) {
 //				for(DataInput dataInput : process.getIoSpecification().getDataInput()) {
 //					this.definitions.getFirstPlane().getDiagramElement().add(
 //							this.bpmnElements.get(dataInput.getId()).getShape());
 //				}
-//				
+//
 //				for(DataOutput dataOutput : process.getIoSpecification().getDataOutput()) {
 //					this.definitions.getFirstPlane().getDiagramElement().add(
 //							this.bpmnElements.get(dataOutput.getId()).getShape());
 //				}
 //			}
-		
+
 			if(!this.insertProcessShapes(process)) {
 				continue;
 			}
-			
+
 			/* Insert process into document */
 			this.definitions.getRootElement().add(process);
 
@@ -1275,11 +1276,11 @@ public class Diagram2BpmnConverter {
 					&& !(this.definitions.getFirstPlane().getBpmnElement() instanceof Choreography)) {
 				this.definitions.getFirstPlane().setBpmnElement(process);
 			}
-			
+
 			/*
 			 * Insert just the shapes of the temporary processes, because
-			 * their process elements are already connected to and so inserted 
-			 * in the definitions 
+			 * their process elements are already connected to and so inserted
+			 * in the definitions
 			 */
 			for(Process p : this.tmpProcesses) {
 				this.insertProcessShapes(p);
@@ -1414,7 +1415,7 @@ public class Diagram2BpmnConverter {
 
 	/**
 	 * Sets the message is visible flag to the first participant
-	 * 
+	 *
 	 * @param association
 	 */
 	public void handleMessageAssociationOnChoreographyActivity(
@@ -1432,7 +1433,7 @@ public class Diagram2BpmnConverter {
 			message = (Message) association.getSourceRef();
 		}
 
-		if (choreoActivity != null 
+		if (choreoActivity != null
 				&& message != null
 				&& choreoActivity.getParticipantRef().size() > 0) {
 			/* Take first participant and set the flag on its shape element */
@@ -1473,10 +1474,10 @@ public class Diagram2BpmnConverter {
 		removeBpmnElement(association);
 		return;
 	}
-	
+
 	/**
-	 * 
-	 * 
+	 *
+	 *
 	 * @param choreoActivity
 	 * @return
 	 */
@@ -1484,11 +1485,11 @@ public class Diagram2BpmnConverter {
 		if(choreoActivity.getParticipantRef().isEmpty()) {
 			return null;
 		}
-		
+
 		BPMNShape messageShape = (BPMNShape) bpmnElements.get(m.getId()).getShape();
 		double minDistance = -1.0;
 		Participant returnParticipant = null;
-		
+
 		for(Participant p : choreoActivity.getParticipantRef()) {
 			BPMNShape participantShape = (BPMNShape) bpmnElements.get(p.getId()).getShape();
 			double distance = DiagramHelper.calculateCenterDistance(messageShape.getBounds(), participantShape.getBounds());
@@ -1497,14 +1498,14 @@ public class Diagram2BpmnConverter {
 				returnParticipant = p;
 			}
 		}
-		
+
 		return returnParticipant;
 	}
-	
+
 	/**
 	 * Makes the participant's message visible and stores the name attribute of
 	 * a message as a {@link SignavioMessageName} extension element.
-	 * 
+	 *
 	 * @param p
 	 * @param m
 	 */
@@ -1512,13 +1513,13 @@ public class Diagram2BpmnConverter {
 		BPMNShape pShape = (BPMNShape) bpmnElements.get(p.getId())
 				.getShape();
 		pShape.setIsMessageVisible(Boolean.TRUE);
-		
+
 		/* Store name of message element */
 		if(m.getName() != null && m.getName().length() > 0) {
 			ExtensionElements extEle = p.getOrCreateExtensionElements();
 			extEle.add(new SignavioMessageName(m.getName()));
 		}
-		
+
 		/* Set ref to message for later processing */
 		p._msgRef = m;
 	}
@@ -1594,7 +1595,7 @@ public class Diagram2BpmnConverter {
 
 					/* Insert a message flow from first to last participant */
 					choreoAct.createMessageFlows(choreo);
-					
+
 					/* Insert the message objects */
 					insertMessageElements(choreoAct);
 
@@ -1615,10 +1616,10 @@ public class Diagram2BpmnConverter {
 					/* Insert child shape element of a sub choreography */
 					List<String> idList = ((SubChoreography) flowEle)
 							.getIdsOfDiagramElements();
-					
+
 					for (String id : idList) {
 						BPMNElement bpmnEl = this.bpmnElements.get(id);
-						
+
 						if(bpmnEl != null) {
 							this.definitions.getFirstPlane().getDiagramElement()
 								.add(bpmnEl.getShape());
@@ -1669,7 +1670,7 @@ public class Diagram2BpmnConverter {
 			this.definitions.getRootElement().addAll(this.choreography);
 		}
 	}
-	
+
 	/**
 	 * Inserts the {@link Message} object related to that choreography task
 	 * @param ct
@@ -1691,7 +1692,7 @@ public class Diagram2BpmnConverter {
 		if (targetnamespace == null)
 			targetnamespace = "http://www.signavio.com/bpmn20";
 		this.definitions.setTargetNamespace(targetnamespace);
-		
+
 		/* Set Name attribute */
 		String name = diagram.getProperty("name");
 		if(name != null && name.length() > 0) {
@@ -1725,7 +1726,7 @@ public class Diagram2BpmnConverter {
 		} catch (NullPointerException np) {
 
 		}
-		
+
 		/* Expression Language */
 		String exprLanguage = diagram.getProperty("expressionlanguage");
 		if (exprLanguage != null && !(exprLanguage.length() == 0))
@@ -1735,13 +1736,13 @@ public class Diagram2BpmnConverter {
 		String typeLanguage = diagram.getProperty("typelanguage");
 		if (typeLanguage != null && !(typeLanguage.length() == 0))
 			this.definitions.setTypeLanguage(typeLanguage);
-		
+
 		/* Other attributes */
 		String otherAttrStr = diagram.getProperty("otherattributes");
 		if(otherAttrStr == null || otherAttrStr.length() == 0) {
 			return;
 		}
-		
+
 		// process as json array containing json objects
 		try {
 			JSONArray a = new JSONArray(otherAttrStr);
@@ -1751,13 +1752,13 @@ public class Diagram2BpmnConverter {
 				String ns = o.optString("ns");
 				String prefix = o.optString("prefix");
 				String value = o.optString("value");
-				
+
 				if((localpart != null || ns != null || prefix != null)
 						&& value != null) {
 					this.definitions.getOtherAttributes().put(new QName((ns != null ? ns : ""), (localpart != null ? localpart : ""), (prefix != null ? prefix : "")), value);
 				}
 			}
-			
+
 		} catch (JSONException e) {
 		}
 	}
@@ -1776,7 +1777,7 @@ public class Diagram2BpmnConverter {
 	 * field of the {@link Definitions} element.
 	 */
 	private void putGlobalElementsIntoDefinitions() {
-		
+
 		for (BPMNElement element : this.bpmnElements.values()) {
 			/* Signals */
 			if (element.getNode() instanceof Event
@@ -1787,8 +1788,8 @@ public class Diagram2BpmnConverter {
 				sigEvDev.insertSignalIntoDefinitions(definitions);
 			}
 		}
-		
-		
+
+
 		/* Messages */
 		this.retrieveAndInsertMessages();
 	}
@@ -1809,12 +1810,12 @@ public class Diagram2BpmnConverter {
 					definitions.getFirstPlane().getDiagramElement().add(
 							element.getShape());
 				}
-				
+
 				/* Data Associations */
 				if (element.getNode() instanceof DataAssociation) {
 					DataAssociation dataAsso = (DataAssociation) element.getNode();
-					if(dataAsso.getSourceRef() != null && dataAsso.getTargetRef() != null 
-						&& (dataAsso.getSourceRef() instanceof Activity 
+					if(dataAsso.getSourceRef() != null && dataAsso.getTargetRef() != null
+						&& (dataAsso.getSourceRef() instanceof Activity
 							|| dataAsso.getTargetRef() instanceof Activity)) {
 						definitions.getFirstPlane().getDiagramElement().add(
 								element.getShape());
@@ -1860,7 +1861,7 @@ public class Diagram2BpmnConverter {
 
 	/**
 	 * Retrieves a BPMN 2.0 diagram and transforms it into the BPMN 2.0 model.
-	 * 
+	 *
 	 * @param diagram
 	 *            The BPMN 2.0 {@link GenericDiagram} based on the ORYX JSON.
 	 * @return The definitions root element of the BPMN 2.0 model.
@@ -1902,11 +1903,11 @@ public class Diagram2BpmnConverter {
 		this.addAssociationsToConversation();
 		this.createProcessIOSpec();
 		this.processChoreographies();
-		
+
 		/* Globally defined elements */
 		this.putGlobalElementsIntoDefinitions();
 		this.putCalledElementsIntoDefinitions();
-		
+
 		/* Insert elements into diagram */
 
 		this.insertCollaborationElements();
@@ -1922,16 +1923,16 @@ public class Diagram2BpmnConverter {
 		this.insertDiagramsForLinkedSubprocesses();
 
 		this.determineUnusedNamespaceDeclarations();
-		
+
 		this.collectExternalNamespaces();
-		
+
 		this.ensureSignavioUUIDStyle();
-		
+
 		this.checkUniquenessOfProcessIDs();
-		
+
 		return definitions;
 	}
-	
+
 	/**
 	 * Encapsulates methods for process task related to the export of
 	 * choreography elements.
@@ -1960,7 +1961,7 @@ public class Diagram2BpmnConverter {
 				}
 			}
 		}
-		
+
 	}
 
 	/**
@@ -1974,7 +1975,7 @@ public class Diagram2BpmnConverter {
 					 * Generate and set new ID
 					 */
 					String newId = SignavioUUID.generate();
-					
+
 					bpmnEl.setId(newId);
 					bpmnEl.getNode().setId(newId);
 					bpmnEl.getShape().setId(newId + "_gui");
@@ -1982,9 +1983,9 @@ public class Diagram2BpmnConverter {
 			}
 //		}
 	}
-	
+
 	/**
-	 * Retrieves the called elements and puts them into the root elements section 
+	 * Retrieves the called elements and puts them into the root elements section
 	 * as global defined elements.
 	 */
 	private void putCalledElementsIntoDefinitions() {
@@ -1994,14 +1995,14 @@ public class Diagram2BpmnConverter {
 			}
 		}
 	}
-	
+
 	/**
 	 * Creates the {@link InputOutputSpecification} for each process element.
 	 * Every data input and output element is moved to the {@link InputOutputSpecification}
 	 * and an additional data input/output reference is created.
 	 */
 	private void createProcessIOSpec() {
-		
+
 		for(Process p : this.processes) {
 			InputOutputSpecification ioSpec = new InputOutputSpecification();
 			OutputSet outputSet = new OutputSet();
@@ -2009,35 +2010,35 @@ public class Diagram2BpmnConverter {
 			ioSpec.getOutputSet().add(outputSet);
 			ioSpec.getInputSet().add(inputSet);
 			List<FlowElement> elementsToBeRemoved = new ArrayList<FlowElement>();
-			
+
 			for(FlowElement flowEl : p.getFlowElement()) {
 				if (flowEl instanceof DataInput) {
 					ioSpec.getDataInput().add((DataInput) flowEl);
 					inputSet.getDataInputRefs().add((DataInput) flowEl);
 					elementsToBeRemoved.add(flowEl);
 				}
-				
+
 				else if (flowEl instanceof DataOutput) {
 					ioSpec.getDataOutput().add((DataOutput) flowEl);
 					outputSet.getDataOutputRefs().add((DataOutput) flowEl);
 					elementsToBeRemoved.add(flowEl);
 				}
 			}
-			
+
 			p.getFlowElement().removeAll(elementsToBeRemoved);
-			
+
 			/* Insert specification */
 			if(ioSpec.getDataInput().size() > 0 || ioSpec.getDataOutput().size() > 0) {
 				p.setIoSpecification(ioSpec);
 			}
 		}
-		
-		
+
+
 	}
 
 	/**
-	 * Collects all {@link Message}s referenced by {@link MessageFlow}s and 
-	 * inserts them as global defined elements. 
+	 * Collects all {@link Message}s referenced by {@link MessageFlow}s and
+	 * inserts them as global defined elements.
 	 */
 	private void retrieveAndInsertMessages() {
 		for (BPMNElement bpmnElement : bpmnElements.values()) {
@@ -2047,8 +2048,8 @@ public class Diagram2BpmnConverter {
 				if(msgFlow.getMessageRef() != null) {
 					this.definitions.getRootElement().add(msgFlow.getMessageRef());
 				}
-			} 
-			
+			}
+
 			/* Ignore messages on the canvas */
 			else if(bpmnElement.getNode() instanceof Message) {
 				Message m = (Message) bpmnElement.getNode();
@@ -2069,38 +2070,38 @@ public class Diagram2BpmnConverter {
 			if (bpmnel.getNode() instanceof ContainerElement) {
 				List<BPMNDiagram> diagramList = createBPMNDiagramForContainerElement((ContainerElement) bpmnel.getNode());
 				this.definitions.getDiagram().addAll(diagramList);
-			} 
-			
+			}
+
 			/*
 			 * Insert choreography element referenced by call choreography
 			 */
 			if(bpmnel.getNode() instanceof CallChoreography) {
 				CallChoreography callChoreo = (CallChoreography) bpmnel.getNode();
-				
+
 				if(callChoreo.getCalledChoreographyRef() != null
 					&& !(callChoreo.getCalledChoreographyRef() instanceof GlobalChoreographyTask)) {
 					this.definitions.getRootElement().add(callChoreo.getCalledChoreographyRef());
 				}
 			}
-			
+
 			/*
 			 * Insert elements referenced by a collapsed call activity sub process
 			 */
-			if(bpmnel.getNode() instanceof CallActivity 
+			if(bpmnel.getNode() instanceof CallActivity
 					&& ((CallActivity) bpmnel.getNode())._diagramElement != null) {
 				this.definitions.getDiagram().add(((CallActivity) bpmnel.getNode())._diagramElement);
 			}
 		}
 	}
-	
-	
+
+
 
 	/**
-	 * Creates the {@link BPMNDiagram}s for a collapsed sub process and 
+	 * Creates the {@link BPMNDiagram}s for a collapsed sub process and
 	 * choreography .
-	 * 
+	 *
 	 * @param container
-	 * 
+	 *
 	 * @return
 	 */
 	private List<BPMNDiagram> createBPMNDiagramForContainerElement(
@@ -2169,7 +2170,7 @@ public class Diagram2BpmnConverter {
 	/**
 	 * Removes the {@link BPMNElement} identified by the contained
 	 * {@link BaseElement} from the list of all BPMNElements.
-	 * 
+	 *
 	 * @param node
 	 */
 	private void removeBpmnElement(BaseElement node) {
@@ -2205,24 +2206,24 @@ public class Diagram2BpmnConverter {
 
 		this.definitions.unusedNamespaceDeclarations = unusedNamespacePrefixes;
 	}
-	
+
 	/**
 	 * Collects the namespace definitions provided by xml elements from
 	 * external sources like Activiti
 	 */
 	private void collectExternalNamespaces() {
 		Map<String, String> nsDefs = new HashMap<String, String>();
-		
+
 		for(BPMNElement el : this.bpmnElements.values()) {
 			nsDefs.putAll(el.getExternalNamespaceDefinitions());
 			nsDefs.putAll(el.getNode().getExternalNamespaceDefinitions());
 		}
-		
+
 		this.definitions.externalNSDefs = nsDefs;
 	}
-	
+
 	/**
-	 * Checks if all process IDs are valid and generates new ones in case of 
+	 * Checks if all process IDs are valid and generates new ones in case of
 	 * a negative check.
 	 */
 	private void checkUniquenessOfProcessIDs() {
@@ -2232,7 +2233,7 @@ public class Diagram2BpmnConverter {
 				p.setId(SignavioUUID.generate());
 				pIDs.add(p.getId());
 			}
-			
+
 			pIDs.add(p.getId());
 		}
 	}
