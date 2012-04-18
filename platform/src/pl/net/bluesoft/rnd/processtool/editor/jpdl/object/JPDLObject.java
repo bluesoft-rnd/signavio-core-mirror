@@ -10,7 +10,7 @@ import pl.net.bluesoft.rnd.processtool.editor.jpdl.exception.UnsupportedJPDLObje
 import com.signavio.platform.exceptions.RequestException;
 
 public abstract class JPDLObject {
-	
+
 	protected String resourceId;
 	protected String name;
 
@@ -21,7 +21,7 @@ public abstract class JPDLObject {
     }
 
 	public abstract String getObjectName();
-	
+
 	public String getResourceId() {
 		return resourceId;
 	}
@@ -37,7 +37,7 @@ public abstract class JPDLObject {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public void fillBasicProperties(JSONObject json) throws JSONException {
 		resourceId = json.getString("resourceId");
 		name = json.getJSONObject("properties").getString("name");
@@ -45,14 +45,14 @@ public abstract class JPDLObject {
 			throw new RequestException("Object '" + getObjectName() + "' has no name.");
 		}
 	}
-	
+
     public static JPDLObject getJPDLObject(JSONObject obj, AperteWorkflowDefinitionGenerator generator)
             throws JSONException, UnsupportedJPDLObjectException {
-		
+
 		JPDLObject ret = null;
 
 		String stencilId = obj.getJSONObject("stencil").getString("id");
-		
+
 		if ("StartNoneEvent".equals(stencilId)) {
 			ret = new JPDLStartEvent(generator);
 		} else if ("Task".equals(stencilId)) {
@@ -63,6 +63,8 @@ public abstract class JPDLObject {
 			  ret = new JPDLJavaTask(generator);
 		} else if ("SequenceFlow".equals(stencilId)) {
 			ret = new JPDLTransition(generator);
+		} else if ("CollapsedSubprocess".equals(stencilId)) {
+			ret = new JPDLCollapsedSubprocess(generator);
 		} else if ("EndNoneEvent".equals(stencilId)) {
 			ret = new JPDLEndEvent(generator);
 		} else if ("Exclusive_Databased_Gateway".equals(stencilId)) {
@@ -72,7 +74,7 @@ public abstract class JPDLObject {
 		}
 		return ret;
 	}
-    
+
     protected static int round(String s) {
     	if (s == null)
     		return 0;
