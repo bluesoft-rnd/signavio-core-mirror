@@ -5,6 +5,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
 import de.hpi.bpmn2_0.model.extension.activiti.ActivitiField;
+import de.hpi.bpmn2_0.model.extension.activiti.ActivitiIn;
+import de.hpi.bpmn2_0.model.extension.activiti.ActivitiOut;
 import de.hpi.bpmn2_0.model.extension.signavio.SignavioLabel;
 import de.hpi.bpmn2_0.model.extension.signavio.SignavioMessageName;
 import de.hpi.bpmn2_0.model.extension.signavio.SignavioMetaData;
@@ -12,7 +14,7 @@ import de.hpi.bpmn2_0.model.extension.signavio.SignavioType;
 
 /**
  * Abstract BPMN 2.0 extension element
- * 
+ *
  * @author Sven Wagner-Boysen
  *
  */
@@ -21,9 +23,11 @@ import de.hpi.bpmn2_0.model.extension.signavio.SignavioType;
 	SignavioType.class,
 	SignavioLabel.class,
 	SignavioMessageName.class,
-	ActivitiField.class
+	ActivitiField.class,
+	ActivitiIn.class,
+	ActivitiOut.class
 })
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class AbstractExtensionElement {
-	
+
 }

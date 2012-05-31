@@ -335,7 +335,7 @@ public class AperteHandler extends BasisHandler {
         removestencils.put("Association_Undirected");
         removestencils.put("Association_Unidirectional");
         removestencils.put("Association_Bidirectional");
-        removestencils.put("CollapsedSubprocess");
+        //removestencils.put("CollapsedSubprocess");
         removestencils.put("StartTimerEvent");
         removestencils.put("MessageFlow");
         removestencils.put("StartMessageEvent");

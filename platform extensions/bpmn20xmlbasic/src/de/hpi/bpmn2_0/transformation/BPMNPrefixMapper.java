@@ -1,17 +1,17 @@
 /**
  * Copyright (c) 2009
  * Philipp Giese, Sven Wagner-Boysen
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,15 +31,15 @@ import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 /**
  * The namespace prefix mapper is responsible for the creation of user friendly
- * namespace prefixes in the BPMN 2.0 XML document. 
- * 
+ * namespace prefixes in the BPMN 2.0 XML document.
+ *
  * @author Sven Wagner-Boysen
  *
  */
 public class BPMNPrefixMapper extends NamespacePrefixMapper {
-	
+
 	private Map<String,String> nsDefs;
-	
+
 	private static Map<String, String> customExtensions = new HashMap<String, String>();
 
 	/* (non-Javadoc)
@@ -47,9 +47,9 @@ public class BPMNPrefixMapper extends NamespacePrefixMapper {
 	 */
 	// @Override
 	public String getPreferredPrefix(String namespace, String suggestion, boolean isRequired) {
-		
+
 		/* BPMN 2.0 Standard Namespaces */
-		if(namespace.equals("http://www.omg.org/spec/BPMN/20100524/MODEL")) 
+		if(namespace.equals("http://www.omg.org/spec/BPMN/20100524/MODEL"))
 			return "";
 		else if(namespace.equals("http://www.omg.org/spec/BPMN/20100524/DI"))
 			return "bpmndi";
@@ -59,44 +59,47 @@ public class BPMNPrefixMapper extends NamespacePrefixMapper {
 			return "omgdi";
 		else if(namespace.equals("http://www.omg.org/spec/DD/20100524/DC"))
 			return "omgdc";
-		
+
 		/* Signavio */
 		else if(namespace.equals("http://www.signavio.com"))
 			return "signavio";
-		
+
+		else if(namespace.equals("http://activiti.org/bpmn"))
+			return "activiti";
+
 		/* Check custom extension */
 		else if(getCustomExtensions().get(namespace) != null) {
 			return getCustomExtensions().get(namespace);
 		}
-		
+
 		/* Check namespace definitions from external XML elements */
 		return getNsDefs().get(namespace);
-		
+
 	}
-	
+
 	public String[] getPreDeclaredNamespaceUris() {
 		super.getPreDeclaredNamespaceUris();
 		String[] s = {};
 		return this.getNsDefs().keySet().toArray(s);
 	}
-	
+
 	public static Map<String, String> getCustomExtensions() {
-		
+
 		Constants c = Diagram2BpmnConverter.getConstants();
 		if(c == null) {
 			return new HashMap<String, String>();
 		}
-		
+
 		return new HashMap<String, String>(c.getCustomNamespacePrefixMappings());
 	}
 
 	/* Getter & Setter */
-	
+
 	public Map<String, String> getNsDefs() {
 		if(nsDefs == null) {
 			nsDefs = new HashMap<String, String>();
 		}
-		
+
 		return nsDefs;
 	}
 
