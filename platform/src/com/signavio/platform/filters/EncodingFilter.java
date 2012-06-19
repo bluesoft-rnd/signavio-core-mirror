@@ -40,7 +40,7 @@ import org.apache.log4j.Logger;
  * Encoding filter sets the character encoding of the request and the response
  * to the encoding specified as init-param "encoding" in the web.xml file.
  * 
- * @author Nicolas Peters
+ * @author kkolodziej@bluesoft.net.pl
  * 
  */
 public class EncodingFilter implements Filter {
@@ -49,7 +49,6 @@ public class EncodingFilter implements Filter {
 
 	private String encoding = null;
 
-	/** PUBLIC METHODS */
 
 	public void destroy() {
 		logger.info("EncodingFilter destroyed...");
@@ -64,7 +63,9 @@ public class EncodingFilter implements Filter {
 		String encoding = getEncoding();
 		
 		if (encoding != null) {
-			//request.setCharacterEncoding(encoding);
+			
+			
+			request.setCharacterEncoding(encoding);
 			response.setCharacterEncoding(encoding);
 		}
 
@@ -81,7 +82,7 @@ public class EncodingFilter implements Filter {
 		logger.info("Using encoding: " + this.encoding);
 	}
 
-	/** PROTECTED METHODS */
+
 	protected String getEncoding() {
 		return (this.encoding);
 	}
