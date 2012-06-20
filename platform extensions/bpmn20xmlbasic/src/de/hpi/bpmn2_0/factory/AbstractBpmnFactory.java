@@ -254,11 +254,11 @@ public abstract class AbstractBpmnFactory {
 
 	protected BaseElement invokeCreatorMethodAfterProperty(GenericShape shape)
 			throws BpmnConverterException, IllegalArgumentException,
-			IllegalAccessException, InvocationTargetException, NoSuchMethodException, SecurityException {
-		Property property=null;
+			IllegalAccessException, InvocationTargetException {
+
 		for (Method method : Arrays
 				.asList(this.getClass().getMethods())) {
-			 property = method.getAnnotation(Property.class);
+			Property property = method.getAnnotation(Property.class);
 
 			if (property != null
 					&& Arrays.asList(property.value()).contains(
@@ -272,24 +272,6 @@ public abstract class AbstractBpmnFactory {
 				
 				return createdElement;
 			}
-		}
-		/* TODO:
-		 * Bypass for not working syntax check, 
-		 * the error is a result of unknown task types, 
-		 * added in aperte like Mulestep, mailstep etc. 
-		 * One solution is to add all new steps too Taskfactor, 
-		 * or as its presented, add default checker for steps that are not known to signavio.
-		 * Its a temporary solution further forks are required.
-		*/
-		if(shape!=null && shape.getProperty("tasktype") != null){
-			
-			/* Create element */
-			BaseElement createdElement = (BaseElement) this.getClass().getMethod("createTask", GenericShape.class).invoke(this,
-					shape);
-			/* Invoke generalized method to set common element attributes */
-			this.setCommonAttributes(createdElement, shape);
-			
-			return createdElement;
 		}
 
 		throw new BpmnConverterException("Creator method for shape with id "
