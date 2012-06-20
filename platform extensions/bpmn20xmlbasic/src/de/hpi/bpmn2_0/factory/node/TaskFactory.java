@@ -106,6 +106,12 @@ public class TaskFactory extends AbstractActivityFactory {
 
 		return task;
 	}
+	
+	@Property(name = "tasktype", value = "MuleStep")
+	public Task creteMuleTask(GenericShape shape){
+		return createTask(shape);
+		
+	}
 
 	@Property(name = "tasktype", value = "User")
 	public UserTask createUserTask(GenericShape shape) {
@@ -123,7 +129,8 @@ public class TaskFactory extends AbstractActivityFactory {
 
 		/* Set ActivityResources */
 		String resourcesProperty = shape.getProperty("resources");
-		if (resourcesProperty != null) {
+		boolean isNotEmpty = !resourcesProperty.isEmpty();
+		if ((resourcesProperty != null) && isNotEmpty) {
 			this.setActivityResources(task, resourcesProperty);
 		}
 
