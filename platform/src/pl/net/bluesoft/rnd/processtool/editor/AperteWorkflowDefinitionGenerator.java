@@ -514,6 +514,13 @@ public class AperteWorkflowDefinitionGenerator {
         }
         return processConfig.getMessages();
     }
+    
+    public String getDictionary() {
+        if (processConfig == null) {
+            return null;
+        }
+        return processConfig.getDictionary();
+    }
 
     public byte[] getProcessIcon() {
         if (processConfig == null) {

@@ -252,6 +252,16 @@ public class DeployHandler extends BasisHandler {
             }
         }
         
+        
+     // dictionary is not
+        String dictionary = gen.getDictionary();
+        if (dictionary != null && !dictionary.isEmpty()) {
+            String propertiesFiles = "";
+                String propertiesFilename = "dictionary.xml";
+                    addEntry(processDir + propertiesFilename, target, new ByteArrayInputStream(dictionary.getBytes()));
+                mf.getMainAttributes().put(new Attributes.Name("ProcessTool-I18N-Dictionary"), propertiesFilename);           
+        }
+        
         // logo may not exist so make sure to check
         if (gen.getProcessIcon() != null) {
             addEntry(processDir + "processdefinition-logo.png", target, new ByteArrayInputStream(gen.getProcessIcon()));
