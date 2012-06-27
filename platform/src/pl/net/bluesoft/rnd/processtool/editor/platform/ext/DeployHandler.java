@@ -257,7 +257,7 @@ public class DeployHandler extends BasisHandler {
         String dictionary = gen.getDictionary();
         if (dictionary != null && !dictionary.isEmpty()) {
             String propertiesFiles = "";
-                String propertiesFilename = "dictionary.xml";
+                String propertiesFilename = "process-dictionaries.xml";
                     addEntry(processDir + propertiesFilename, target, new ByteArrayInputStream(dictionary.getBytes()));
                 mf.getMainAttributes().put(new Attributes.Name("ProcessTool-I18N-Dictionary"), propertiesFilename);           
         }
