@@ -96,6 +96,9 @@ public class AperteWorkflowDefinitionGenerator {
             if (StringUtils.isEmpty(processToolDeployment)) {
                 throw new RequestException("Manifest: ProcessTool-Process-Deployment is empty.");
             }
+            if (StringUtils.contains(processToolDeployment,' ')) {
+                throw new RequestException("Manifest: ProcessTool-Process-Deployment cannot have spaces in name.");
+            }
 
 
             String processConfJson = jsonObj.getJSONObject("properties").optString("process-conf");
