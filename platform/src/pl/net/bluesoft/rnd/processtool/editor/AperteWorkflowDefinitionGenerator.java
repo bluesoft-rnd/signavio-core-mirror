@@ -401,7 +401,7 @@ public class AperteWorkflowDefinitionGenerator {
     public String generateProcessToolConfig() {
         StringBuffer ptc = new StringBuffer();
         ptc.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        ptc.append(String.format("<config.ProcessDefinitionConfig bpmDefinitionKey=\"%s\" description=\"%s\" processName=\"%s\">\n", processName, processName, processName));
+        ptc.append(String.format("<config.ProcessDefinitionConfig bpmDefinitionKey=\"%s\" description=\"%s\" processName=\"%s\"  taskItemClass=\"%s\">\n", processName, processName, processName, processConfig.getTaskItemClass()));
 
         if (processConfig != null) {
 
