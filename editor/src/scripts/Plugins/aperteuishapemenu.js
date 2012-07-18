@@ -419,6 +419,10 @@ ORYX.Plugins.AperteUiShapeMenuPlugin = ORYX.Plugins.ShapeMenuPlugin.extend({
 		if(elements[0].properties['oryx-tasktype'] != null && elements[0].properties['oryx-tasktype'] != ""){
 			this.aperteStepEditorButton.prepareToShow();
 		}
+		//testing if element i EndNoneEvent
+		if(elements[0].properties['oryx-endnoneevent'] != null && elements[0].properties['oryx-endnoneevent'] != ""){
+		this.aperteStepEditorButton.prepareToShow();
+		}
 		
 	},
 	
@@ -479,7 +483,6 @@ ORYX.Plugins.AperteUiShapeMenuPlugin = ORYX.Plugins.ShapeMenuPlugin.extend({
 			
 			window.clearTimeout(this.timer);
 			this.timer = null;
-			
 			// Show the ShapeMenu
 			this.shapeMenu.show(this.currentShapes);
 			

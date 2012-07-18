@@ -432,6 +432,14 @@ public class AperteWorkflowDefinitionGenerator {
                     ptc.append(task.generateWidgetXML());
                 }
             }
+            if (cmp instanceof JPDLEndEvent) {
+            	JPDLEndEvent task = (JPDLEndEvent) cmp;
+                if (task.getWidget() != null) {
+                    ptc.append(task.generateWidgetXML());
+                }
+            }
+            
+            
         }
 
         ptc.append("</states>\n");
