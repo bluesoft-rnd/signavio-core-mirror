@@ -429,20 +429,12 @@ public class AperteWorkflowDefinitionGenerator {
         //processtool-config.xml generation
         for (String key : componentMap.keySet()) {
             JPDLComponent cmp = componentMap.get(key);
-            if (cmp instanceof JPDLUserTask) {
-                JPDLUserTask task = (JPDLUserTask) cmp;
+            if (cmp instanceof JDPLStepEditorNode) {
+            	JDPLStepEditorNode task = (JDPLStepEditorNode) cmp;
                 if (task.getWidget() != null) {
                     ptc.append(task.generateWidgetXML());
                 }
             }
-            if (cmp instanceof JPDLEndEvent) {
-            	JPDLEndEvent task = (JPDLEndEvent) cmp;
-                if (task.getWidget() != null) {
-                    ptc.append(task.generateWidgetXML());
-                }
-            }
-            
-            
         }
 
         ptc.append("</states>\n");
