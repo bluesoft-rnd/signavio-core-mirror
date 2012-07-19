@@ -404,7 +404,7 @@ public class AperteWorkflowDefinitionGenerator {
     public String generateProcessToolConfig() {
         StringBuffer ptc = new StringBuffer();
         ptc.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        ptc.append(String.format("<config.ProcessDefinitionConfig bpmDefinitionKey=\"%s\" description=\"%s\" processName=\"%s\">\n", processName, processName, processName));
+        ptc.append(String.format("<config.ProcessDefinitionConfig bpmDefinitionKey=\"%s\" description=\"%s\" processName=\"%s\"  taskItemClass=\"%s\">\n", processName, processName, processName, processConfig.getTaskItemClass()));
 
         if (processConfig != null) {
 
@@ -435,6 +435,14 @@ public class AperteWorkflowDefinitionGenerator {
                     ptc.append(task.generateWidgetXML());
                 }
             }
+            if (cmp instanceof JPDLEndEvent) {
+            	JPDLEndEvent task = (JPDLEndEvent) cmp;
+                if (task.getWidget() != null) {
+                    ptc.append(task.generateWidgetXML());
+                }
+            }
+            
+            
         }
 
         ptc.append("</states>\n");

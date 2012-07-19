@@ -74,6 +74,7 @@ public class AperteHandler extends BasisHandler {
         root.put( "properties", properties);
 
         modifyTaskProperties(properties);
+        modifyEndProperties(properties);
         modifySequenceFlowProperties(properties);
         modifyBpmnProperties(properties);
     }
@@ -205,6 +206,45 @@ public class AperteHandler extends BasisHandler {
 	    o_prop.put(o);
 
         o_prop.put(getAperteTaskTypes());
+    }
+    
+    private void modifyEndProperties(JSONArray properties) throws IOException,JSONException {
+        JSONObject obj1 = new JSONObject();
+        properties.put(obj1);
+
+        JSONArray o_roles= new JSONArray();
+        o_roles.put("EndNoneEvent");
+        obj1.put("roles",o_roles);
+
+        JSONArray o_prop= new JSONArray();
+        obj1.put("properties",o_prop);
+
+        o_prop.put(getAperteConf());
+        
+        JSONObject o = new JSONObject();
+        o.put("id","EndNoneEvent");
+	    o.put("type","String");
+	    o.put("title","EndNoneEvent");
+	    o.put("value","EndNoneEvent");
+	    o.put("description","EndNoneEvent description");
+	    o.put("readonly",false);
+	    o.put("optional",true);
+	    o.put("refToView","");
+	    o_prop.put(o);
+	    
+	     o = new JSONObject();
+        o.put("id","tasktype");
+        o.put("type","String");
+        o.put("title","Tasktype");
+        o.put("title_de","Tasktyp");
+        o.put("value","User");
+        o.put("description","Defines the tasks type which is shown in the left upper corner of the task.");
+        o.put("description_de","Definiert den Aufgabentyp, der in der linken oberen Ecke der Task angezeigt wird.");
+        o.put("readonly",false);
+        o.put("optional",false);
+        o.put("refToView","");
+
+        o_prop.put(o);
     }
     
     private void modifySequenceFlowProperties(JSONArray properties) throws IOException,JSONException {
