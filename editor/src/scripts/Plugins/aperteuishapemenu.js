@@ -159,8 +159,8 @@ ORYX.Plugins.AperteUiShapeMenuPlugin = ORYX.Plugins.ShapeMenuPlugin.extend({
 		var back_url = base_editor_url+"aperte_post";
 		
 		win = new Ext.Window({
-			width:900,
-			height:500,
+			width:1100,
+			height:700,
 			autoScroll:false,
 			html:'',
 			modal:true,
