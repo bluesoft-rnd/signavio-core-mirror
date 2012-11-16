@@ -10,6 +10,8 @@ import pl.net.bluesoft.rnd.processtool.editor.AperteWorkflowDefinitionGenerator;
 import pl.net.bluesoft.rnd.processtool.editor.XmlUtil;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class JPDLTransition extends JPDLObject {
@@ -105,9 +107,18 @@ public class JPDLTransition extends JPDLObject {
 	    sb.append("</config.ProcessStateAction>\n");
 	    return sb.toString();
 	}
- 
+  
 	public void fillBasicProperties(JSONObject json) throws JSONException {
 		super.fillBasicProperties(json);
+		 
+		JSONObject jsonObject = json.getJSONObject("properties");
+		String ap = (String) jsonObject.get("action-properties");
+		
+		if(!isPriorityisFilledCorrect(ap)){
+			throw new JSONException("Priority field must be filled with number.");
+			
+		}
+		
 		
 		JSONArray dockerArray = json.getJSONArray("dockers");
 		
@@ -162,6 +173,16 @@ public class JPDLTransition extends JPDLObject {
 		    	actionAutowiredProperties.put(key, jsonObj.get(key));
 		    }
 		}
+		
+	}
+	
+	private boolean isPriorityisFilledCorrect(String actionProperties){
+		if (actionProperties!=null && !actionProperties.isEmpty()) {
+		Pattern patern = Pattern.compile("\"priority\":\"\\d*\"");
+		Matcher matcher = patern.matcher(actionProperties);
+		return matcher.find();
+		}
+		return true;
 		
 	}
 	

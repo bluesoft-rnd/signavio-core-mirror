@@ -116,7 +116,8 @@ public class AperteWorkflowDefinitionGenerator {
 //                    ((JPDLComponent) jpdlObject).applyOffset(offsetX, offsetY);
                     componentMap.put(jpdlObject.getResourceId(), (JPDLComponent) jpdlObject);
                 } else if (jpdlObject instanceof JPDLTransition) {
-                    transitionMap.put(jpdlObject.getResourceId(), (JPDLTransition) jpdlObject);
+                	JPDLTransition transition =(JPDLTransition) jpdlObject;
+                    transitionMap.put(jpdlObject.getResourceId(), transition);
                 }
             }
         } catch (JSONException e) {
@@ -133,8 +134,13 @@ public class AperteWorkflowDefinitionGenerator {
             for (String resourceId : cmp.getOutgoing().keySet()) {
                 JPDLTransition transition = transitionMap.get(resourceId);
                 transition.setTargetName(componentMap.get(transition.getTarget()).getName());
+                
+                JPDLComponent jpdlComponent = componentMap.get(transition.getTarget());
+                 
                 cmp.putTransition(resourceId, transition);
+                jpdlComponent.putIncomingTransition(resourceId, transition); 
             }
+            
         }
 
     }
