@@ -113,7 +113,7 @@ public class AperteWorkflowDefinitionGenerator {
                 JSONObject obj = childShapes.getJSONObject(i);
                 JPDLObject jpdlObject = JPDLObject.getJPDLObject(obj, this);
                 jpdlObject.fillBasicProperties(obj);
-                checkIfTheNamesAreRepeated(componentMap, jpdlObject.getName());
+                checkIfTheNamesAreRepeated(componentMap, jpdlObject);
                 
                 
                 if (jpdlObject instanceof JPDLComponent) {
@@ -150,21 +150,22 @@ public class AperteWorkflowDefinitionGenerator {
         }
 
     }
-    
-	private void checkIfTheNamesAreRepeated(Map componentMap, final String names) {
+       
+	private void checkIfTheNamesAreRepeated(Map componentMap, final JPDLObject obj) {
 		JPDLTask jtask;
+		if (obj instanceof JPDLTask && !(obj instanceof JPDLEndEvent)){
 		Collection values = componentMap.values();
 		for (Object object : values) {
 			if (object instanceof JPDLTask && !(object instanceof JPDLEndEvent)) {
 				jtask = (JPDLTask) object;
-				if (jtask.getName().equals(names)) {
-					throw new RequestException("Name: '" + names
+				if (jtask.getName().equals(obj.getName())) {
+					throw new RequestException("Name: '" + obj.getName()
 							+ "' is duplicated. Change name it.");
 
-				}
+				} 
 			}
 		}
-
+		}
     } 
 
     public String generateDefinition() {
