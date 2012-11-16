@@ -3,6 +3,8 @@ package pl.net.bluesoft.rnd.processtool.editor;
 import com.signavio.platform.core.Platform;
 import com.signavio.platform.core.PlatformProperties;
 import com.signavio.platform.exceptions.RequestException;
+import com.sun.msv.datatype.xsd.Comparator;
+
 import de.hpi.bpmn2_0.exceptions.BpmnConverterException;
 import de.hpi.bpmn2_0.factory.AbstractBpmnFactory;
 import de.hpi.bpmn2_0.model.Definitions;
@@ -111,6 +113,9 @@ public class AperteWorkflowDefinitionGenerator {
                 JSONObject obj = childShapes.getJSONObject(i);
                 JPDLObject jpdlObject = JPDLObject.getJPDLObject(obj, this);
                 jpdlObject.fillBasicProperties(obj);
+                checkIfTheNamesAreRepeated(componentMap, jpdlObject.getName());
+                
+                
                 if (jpdlObject instanceof JPDLComponent) {
                         //not needed anymore
 //                    ((JPDLComponent) jpdlObject).applyOffset(offsetX, offsetY);
@@ -120,6 +125,7 @@ public class AperteWorkflowDefinitionGenerator {
                     transitionMap.put(jpdlObject.getResourceId(), transition);
                 }
             }
+            
         } catch (JSONException e) {
             logger.error("Error while generating JPDL file.", e);
             throw new RequestException("Error while generating JPDL file.", e);
@@ -144,6 +150,22 @@ public class AperteWorkflowDefinitionGenerator {
         }
 
     }
+    
+	private void checkIfTheNamesAreRepeated(Map componentMap, final String names) {
+		JPDLTask jtask;
+		Collection values = componentMap.values();
+		for (Object object : values) {
+			if (object instanceof JPDLTask && !(object instanceof JPDLEndEvent)) {
+				jtask = (JPDLTask) object;
+				if (jtask.getName().equals(names)) {
+					throw new RequestException("Name: '" + names
+							+ "' is duplicated. Change name it.");
+
+				}
+			}
+		}
+
+    } 
 
     public String generateDefinition() {
         if ("jpdl".equals(processDefinitionLanguage)) {

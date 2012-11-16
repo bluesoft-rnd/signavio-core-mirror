@@ -47,7 +47,7 @@ public class JPDLUserTask extends JDPLStepEditorNode {
 	
 
 
-	
+	 
 	@Override
 	public String getObjectName() {
 		return "User task";
