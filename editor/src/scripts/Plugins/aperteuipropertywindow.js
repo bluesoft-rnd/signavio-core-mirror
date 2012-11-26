@@ -44,6 +44,8 @@ ORYX.Plugins.AperteUiPropertyWindow = ORYX.Plugins.PropertyWindow.extend({
 				this.selectedElements.each(function(shape){
 					if(!shape.getStencil().property(this.key).readonly()) {
 						shape.setProperty(this.key, this.newValue);
+						if (this.key=="oryx-name")
+							shape.setProperty("oryx-name", this.newValue.replace(/\s/g,"_"));
 						if (this.key == "oryx-tasktype")
 						  shape.setProperty("oryx-aperte-conf", "");
 						if (this.key == "oryx-button-type")
