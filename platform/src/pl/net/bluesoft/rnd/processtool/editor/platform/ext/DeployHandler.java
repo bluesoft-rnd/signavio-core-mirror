@@ -243,6 +243,18 @@ public class DeployHandler extends BasisHandler {
                     propertiesFiles += propertiesFilename + ",";
                 }
             }
+			// f-guly copy of code above. temporary variables obstruct refactoring
+			{
+				String propertiesFilename = "messages.properties";
+
+				if (gen.getDefaultLanguage() != null) {
+					String messagesContent = messages.get(gen.getDefaultLanguage());
+					if (messagesContent != null) {
+						addEntry(processDir + propertiesFilename, target, new ByteArrayInputStream(messagesContent.getBytes("US-ASCII")));
+						propertiesFiles += propertiesFilename + ",";
+					}
+				}
+			}
 
             if (propertiesFiles != null && !propertiesFiles.isEmpty()) {
                 if (propertiesFiles.endsWith(",")) {
