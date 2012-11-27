@@ -29,10 +29,7 @@ import javax.servlet.ServletContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
@@ -231,13 +228,13 @@ public class DeployHandler extends BasisHandler {
         addEntry(processDir + "queues-config.xml", target, new ByteArrayInputStream(gen.generateQueuesConfig().getBytes("UTF-8")));
 
         // messages are not
-        Map<String, String> messages = gen.getMessages();
-        if (messages != null && !messages.isEmpty()) {
+        if (hasLocalizedMessages(gen)) {
             String propertiesFiles = "";
-            for (String langCode : messages.keySet()) {
-                String propertiesFilename = "messages_" + langCode + ".properties";
 
-                String messagesContent = messages.get(langCode);
+            for (String langCode : getLangCodes(gen)) {
+                String propertiesFilename = getMessageFileName(langCode);
+                String messagesContent = getMessageContent(gen, langCode);
+
                 if (messagesContent != null) {
                     addEntry(processDir + propertiesFilename, target, new ByteArrayInputStream(messagesContent.getBytes("US-ASCII")));
                     propertiesFiles += propertiesFilename + ",";
@@ -273,8 +270,31 @@ public class DeployHandler extends BasisHandler {
         return gen;
     }
 
+	private boolean hasLocalizedMessages(AperteWorkflowDefinitionGenerator gen) {
+		return gen.getMessages() != null && !gen.getMessages().isEmpty();
+	}
 
-    protected void copy(File src, File dst) throws IOException {
+	private String getMessageContent(AperteWorkflowDefinitionGenerator gen, String langCode) {
+		return gen.getMessages().get(langCode != null ? langCode : gen.getDefaultLanguage());
+	}
+
+	private Collection<String> getLangCodes(AperteWorkflowDefinitionGenerator gen) {
+		List<String> langCodes = new ArrayList<String>(gen.getMessages().keySet());
+		if (gen.getDefaultLanguage() != null) {
+			langCodes.add(null);
+		}
+		return langCodes;
+	}
+
+	private String getMessageFileName(String langCode) {
+		if (langCode != null) {
+			return "messages_" + langCode + ".properties";
+		}
+		return "messages.properties";
+	}
+
+
+	protected void copy(File src, File dst) throws IOException {
 	    InputStream in = new FileInputStream(src);
 	    OutputStream out = new FileOutputStream(dst);
 

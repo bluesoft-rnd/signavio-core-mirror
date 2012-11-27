@@ -530,6 +530,10 @@ public class AperteWorkflowDefinitionGenerator {
         return processConfig.getDictionary();
     }
 
+	public String getDefaultLanguage() {
+		return processConfig.getDefaultLanguage();
+	}
+
     public byte[] getProcessIcon() {
         if (processConfig == null) {
             return null;
