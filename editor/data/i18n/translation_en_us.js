@@ -12,6 +12,7 @@ ORYX.I18N.Language = "en_us"; //Pattern <ISO language code>_<ISO country code> i
 
 if(!ORYX.I18N.Oryx) ORYX.I18N.Oryx = {};
 
+	
 ORYX.I18N.Oryx.title		= "Oryx";
 ORYX.I18N.Oryx.noBackendDefined	= "Caution! \nNo Backend defined.\n The requested model cannot be loaded. Try to load a configuration with a save plugin.";
 ORYX.I18N.Oryx.pleaseWait 	= "Please wait while loading...";
@@ -219,6 +220,18 @@ ORYX.I18N.Undo.undo = "Undo";
 ORYX.I18N.Undo.undoDesc = "Undo the last action";
 ORYX.I18N.Undo.redo = "Redo";
 ORYX.I18N.Undo.redoDesc = "Redo the last undone action";
+
+if(!ORYX.I18N.Import) ORYX.I18N.Import = {};
+ORYX.I18N.Import.name = "Import Test";
+	ORYX.I18N.Import.group = "Imports";
+	ORYX.I18N.Import.Description = "Import Description";
+	ORYX.I18N.Import.impFailed = "Import Failed";
+	ORYX.I18N.Import.selectFile = "Select File";
+	ORYX.I18N.Import.file = "File";
+	ORYX.I18N.Import.impTitle = "Import Title";
+	ORYX.I18N.Import.impButton = "Import";
+	ORYX.I18N.Import.impProgress = "Progress";
+	ORYX.I18N.Import.close = "Close";
 
 if(!ORYX.I18N.View) ORYX.I18N.View = {};
 

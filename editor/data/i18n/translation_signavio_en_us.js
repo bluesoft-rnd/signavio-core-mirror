@@ -3,6 +3,16 @@ ORYX.I18N.PropertyWindow.dateFormat = "d/m/y";
 ORYX.I18N.View.East = "Attributes";
 ORYX.I18N.View.West = "Modeling Elements";
 
+ORYX.I18N.Import.name = "Import Test"
+	ORYX.I18N.Import.group = "Imports"
+	ORYX.I18N.Import.Description = "Import Description"
+	ORYX.I18N.Import.impFailed = "Import Failed"
+	ORYX.I18N.Import.selectFile = "Select File"
+	ORYX.I18N.Import.file = "File"
+	ORYX.I18N.Import.impTitle = "Import Title"
+	ORYX.I18N.Import.impButton = "Import"
+	ORYX.I18N.Import.impProgress = "Progress"
+	ORYX.I18N.Import.close = "Close"
 ORYX.I18N.Oryx.title	= "Signavio";
 ORYX.I18N.Oryx.pleaseWait = "Please wait while the Signavio Process Editor is loading...";
 ORYX.I18N.Edit.cutDesc = "Cuts the selection into the clipboard";

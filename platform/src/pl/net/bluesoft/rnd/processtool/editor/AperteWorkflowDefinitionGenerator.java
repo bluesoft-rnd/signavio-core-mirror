@@ -3,6 +3,8 @@ package pl.net.bluesoft.rnd.processtool.editor;
 import com.signavio.platform.core.Platform;
 import com.signavio.platform.core.PlatformProperties;
 import com.signavio.platform.exceptions.RequestException;
+import com.sun.msv.datatype.xsd.Comparator;
+
 import de.hpi.bpmn2_0.exceptions.BpmnConverterException;
 import de.hpi.bpmn2_0.factory.AbstractBpmnFactory;
 import de.hpi.bpmn2_0.model.Definitions;
@@ -96,6 +98,9 @@ public class AperteWorkflowDefinitionGenerator {
             if (StringUtils.isEmpty(processToolDeployment)) {
                 throw new RequestException("Manifest: ProcessTool-Process-Deployment is empty.");
             }
+            if (StringUtils.contains(processToolDeployment,' ')) {
+                throw new RequestException("Manifest: ProcessTool-Process-Deployment cannot have spaces in name.");
+            }
 
 
             String processConfJson = jsonObj.getJSONObject("properties").optString("process-conf");
@@ -108,14 +113,19 @@ public class AperteWorkflowDefinitionGenerator {
                 JSONObject obj = childShapes.getJSONObject(i);
                 JPDLObject jpdlObject = JPDLObject.getJPDLObject(obj, this);
                 jpdlObject.fillBasicProperties(obj);
+                checkIfTheNamesAreRepeated(componentMap, jpdlObject);
+                
+                
                 if (jpdlObject instanceof JPDLComponent) {
                         //not needed anymore
 //                    ((JPDLComponent) jpdlObject).applyOffset(offsetX, offsetY);
                     componentMap.put(jpdlObject.getResourceId(), (JPDLComponent) jpdlObject);
                 } else if (jpdlObject instanceof JPDLTransition) {
-                    transitionMap.put(jpdlObject.getResourceId(), (JPDLTransition) jpdlObject);
+                	JPDLTransition transition =(JPDLTransition) jpdlObject;
+                    transitionMap.put(jpdlObject.getResourceId(), transition);
                 }
             }
+            
         } catch (JSONException e) {
             logger.error("Error while generating JPDL file.", e);
             throw new RequestException("Error while generating JPDL file.", e);
@@ -130,11 +140,33 @@ public class AperteWorkflowDefinitionGenerator {
             for (String resourceId : cmp.getOutgoing().keySet()) {
                 JPDLTransition transition = transitionMap.get(resourceId);
                 transition.setTargetName(componentMap.get(transition.getTarget()).getName());
+                
+                JPDLComponent jpdlComponent = componentMap.get(transition.getTarget());
+                 
                 cmp.putTransition(resourceId, transition);
+                jpdlComponent.putIncomingTransition(resourceId, transition); 
             }
+            
         }
 
     }
+       
+	private void checkIfTheNamesAreRepeated(Map componentMap, final JPDLObject obj) {
+		JPDLTask jtask;
+		if (obj instanceof JPDLTask && !(obj instanceof JPDLEndEvent)){
+		Collection values = componentMap.values();
+		for (Object object : values) {
+			if (object instanceof JPDLTask && !(object instanceof JPDLEndEvent)) {
+				jtask = (JPDLTask) object;
+				if (jtask.getName().equals(obj.getName())) {
+					throw new RequestException("Name: '" + obj.getName()
+							+ "' is duplicated. Change name it.");
+
+				} 
+			}
+		}
+		}
+    } 
 
     public String generateDefinition() {
         if ("jpdl".equals(processDefinitionLanguage)) {
@@ -426,20 +458,12 @@ public class AperteWorkflowDefinitionGenerator {
         //processtool-config.xml generation
         for (String key : componentMap.keySet()) {
             JPDLComponent cmp = componentMap.get(key);
-            if (cmp instanceof JPDLUserTask) {
-                JPDLUserTask task = (JPDLUserTask) cmp;
+            if (cmp instanceof JDPLStepEditorNode) {
+            	JDPLStepEditorNode task = (JDPLStepEditorNode) cmp;
                 if (task.getWidget() != null) {
                     ptc.append(task.generateWidgetXML());
                 }
             }
-            if (cmp instanceof JPDLEndEvent) {
-            	JPDLEndEvent task = (JPDLEndEvent) cmp;
-                if (task.getWidget() != null) {
-                    ptc.append(task.generateWidgetXML());
-                }
-            }
-            
-            
         }
 
         ptc.append("</states>\n");

@@ -34,6 +34,7 @@
 		
 		<plugin source="renameShapes.js" name="ORYX.Plugins.RenameShapes" />
 		<plugin source="undo.js" name="ORYX.Plugins.Undo" />
+		<plugin source="import.js" name="ORYX.Plugins.ImportDiagram" />
 		<plugin source="processLink.js" name="ORYX.Plugins.ProcessLink">
 			<requires namespace="http://b3mn.org/stencilset/epc#"/>	
 			<requires namespace="http://b3mn.org/stencilset/bpmn1.1#"/>	
