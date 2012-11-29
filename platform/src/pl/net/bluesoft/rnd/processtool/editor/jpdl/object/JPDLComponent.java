@@ -11,6 +11,7 @@ import pl.net.bluesoft.rnd.processtool.editor.AperteWorkflowDefinitionGenerator;
 public abstract class JPDLComponent extends JPDLObject {
 
 	protected Map<String, JPDLTransition> outgoing = new HashMap<String, JPDLTransition>();
+	protected Map<String, JPDLTransition> incoming = new HashMap<String, JPDLTransition>();
 
     protected int boundsX, boundsY, width, height;
     protected int offsetX, offsetY;
@@ -28,9 +29,15 @@ public abstract class JPDLComponent extends JPDLObject {
     public Map<String, JPDLTransition> getOutgoing() {
 		return outgoing;
 	}
+    public Map<String, JPDLTransition> getIncoming() {
+		return incoming;
+	}
 
 	public void setOutgoing(Map<String, JPDLTransition> outgoing) {
 		this.outgoing = outgoing;
+	}
+	public void setIncoming(Map<String, JPDLTransition> incoming) {
+		this.incoming = incoming;
 	}
 	
 	public JPDLTransition getTransition(String resourceId) {
@@ -39,6 +46,14 @@ public abstract class JPDLComponent extends JPDLObject {
 	
 	public void putTransition(String resourceId, JPDLTransition transition) {
 		outgoing.put(resourceId, transition);
+	}
+	
+	public JPDLTransition getIncomingTransition(String resourceId) {
+		return incoming.get(resourceId);
+	}
+	
+	public void putIncomingTransition(String resourceId, JPDLTransition transition) {
+		incoming.put(resourceId, transition);
 	}
 	
 	public abstract String toXML();

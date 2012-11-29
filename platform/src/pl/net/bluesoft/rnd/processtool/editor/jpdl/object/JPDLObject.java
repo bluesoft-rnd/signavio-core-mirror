@@ -69,6 +69,8 @@ public abstract class JPDLObject {
 			ret = new JPDLEndEvent(generator);
 		} else if ("Exclusive_Databased_Gateway".equals(stencilId)) {
 			ret = new JPDLDecision(generator);
+		} else if ("ParallelGateway".equals(stencilId)) {
+			ret = new JPDLParallelGateWay(generator);
 		} else {
 		  throw new UnsupportedJPDLObjectException("Object named '" + stencilId + "' is not supported.");
 		}
