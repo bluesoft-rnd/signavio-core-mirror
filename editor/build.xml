@@ -9,6 +9,7 @@
 	<property name="build" value="${buildroot}/editor" />
 	<property name="jsdoc-toolkit" value="jsdoc-toolkit" />
 	<property name="target" value="target" />
+	<property name="charset" value="utf-8"/>
 
 	<!-- parses plugin xml-->
 	<xmlproperty file="${src}/scripts/Plugins/plugins.xml" collapseAttributes="true" />

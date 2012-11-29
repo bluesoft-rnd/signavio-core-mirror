@@ -15,6 +15,7 @@ var APERTE_ACTION_EDITOR_URL = "${jbpmGuiUrl}${aperteActionEditorUrl}";
 var APERTE_PROCESS_EDITOR_URL = "${jbpmGuiUrl}${aperteProcessEditorUrl}";
 var APERTE_DEPLOY_URL = "/${war}/p/deploy";
 var APERTE_DOWNLOAD_URL = "/${war}/p/save";
+var APERTE_IMPORT_URL = "/${war}/p/import";
 		</echo>
 	</target>
 
