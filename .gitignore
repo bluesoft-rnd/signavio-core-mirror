@@ -8,6 +8,7 @@
 target
 bin
 build
+build.properties
 
 # Little things that ant creates in strange places
 explorer/src/css/custom-style.css
