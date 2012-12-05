@@ -38,6 +38,8 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class AperteWorkflowDefinitionGenerator {
 
@@ -551,8 +553,23 @@ public class AperteWorkflowDefinitionGenerator {
         if (processConfig == null) {
             return null;
         }
-        return processConfig.getDictionary();
+        return insertProcessName(processConfig.getDictionary());
     }
+
+	private String insertProcessName(String dict) {
+		if (dict != null) {
+			Pattern pattern = Pattern.compile("<process-dictionaries([^>]*)>");
+			Matcher m = pattern.matcher(dict);
+
+			if (m.find()) {
+				String toInsert = " processBpmDefinitionKey=\"" + processName + "\"" + m.group(1);
+
+				return dict.substring(0, m.start(1)) + toInsert + dict.substring(m.end(1));
+			}
+			return dict;
+		}
+		return null;
+	}
 
 	public String getDefaultLanguage() {
 		return processConfig.getDefaultLanguage();
