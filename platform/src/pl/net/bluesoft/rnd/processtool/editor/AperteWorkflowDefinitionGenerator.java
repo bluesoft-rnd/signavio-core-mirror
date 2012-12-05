@@ -433,9 +433,11 @@ public class AperteWorkflowDefinitionGenerator {
     public String generateProcessToolConfig() {
         StringBuffer ptc = new StringBuffer();
         ptc.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        ptc.append(String.format("<config.ProcessDefinitionConfig bpmDefinitionKey=\"%s\" description=\"%s\" processName=\"%s\"  taskItemClass=\"%s\">\n", processName, processName, processName, processConfig.getTaskItemClass()));
+        ptc.append(String.format("<config.ProcessDefinitionConfig bpmDefinitionKey=\"%s\" description=\"%s\" processName=\"%s\"", processName, processName, processName));
 
         if (processConfig != null) {
+        	
+        	ptc.append(String.format(" taskItemClass=\"%s\">\n",processConfig.getTaskItemClass()));
 
             if (processConfig.getComment() != null && !processConfig.getComment().isEmpty()) {
                 ptc.append(String.format("<comment>%s</comment>", XmlUtil.wrapCDATA(processConfig.getComment())));
@@ -451,6 +453,8 @@ public class AperteWorkflowDefinitionGenerator {
                 ptc.append("</permissions>\n");
             }
 
+        }else{
+        	ptc.append(String.format(">\n"));
         }
 
         ptc.append("<states>\n");
