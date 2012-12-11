@@ -566,14 +566,35 @@ public class AperteWorkflowDefinitionGenerator {
 			Matcher m = pattern.matcher(dict);
 
 			if (m.find()) {
-				String toInsert = " processBpmDefinitionKey=\"" + processName + "\"" + m.group(1);
 
-				return dict.substring(0, m.start(1)) + toInsert + dict.substring(m.end(1));
+				String group = m.group(1);
+				String toInsert = " processBpmDefinitionKey=\"" + processName
+						+ "\"";
+				if (group.contains("processBpmDefinitionKey=")) {
+
+					toInsert = replaceProcessNameIfExists(group, toInsert);
+				} else {
+					toInsert += group;
+
+				}
+
+				return dict.substring(0, m.start(1)) + toInsert
+						+ dict.substring(m.end(1));
 			}
 			return dict;
 		}
 		return null;
 	}
+	
+private String	replaceProcessNameIfExists(String group,String newProcessName){
+	Pattern pattern = Pattern.compile("processBpmDefinitionKey=\"[A-Za-z]*\"");
+	Matcher mSmall = pattern.matcher(group);
+	if(mSmall.find()){
+	return	mSmall.replaceAll(newProcessName);
+	}
+	return newProcessName;
+	}
+	
 
 	public String getDefaultLanguage() {
 		return processConfig.getDefaultLanguage();

@@ -266,7 +266,14 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 	 * @param value {Object} Can be of type String or Number according to property type.
 	 */
 	setProperty: function(key, value, force) {
+		
 		var oldValue = this.properties[key];
+		if (key=="oryx-name"){
+			 value= value.replace(/\n/g,"").replace(/\s/g,"_").replace(/[!@#$%^*&]/g,"");
+			      
+		    
+		   }
+		
 		if(oldValue !== value || force === true) {
 			this.properties[key] = value;
 			this.propertiesChanged[key] = true;
