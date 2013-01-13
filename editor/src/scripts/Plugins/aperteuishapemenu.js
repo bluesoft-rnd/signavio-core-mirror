@@ -96,6 +96,8 @@ function editorSetActionData(retString) {
 	var taskNameNewValue = retString.buttonType;
 	var oldAC = lastEditedObjecyt.properties['oryx-action-properties'];
 	var newAC = Ext.encode(retString.items);
+	var oldAA = lastEditedObjecyt.properties['oryx-action-attributes'];
+	var newAA = Ext.encode(retString.attributes);
 
     var commandClass = ORYX.Core.Command.extend({
 			construct: function(){
@@ -104,13 +106,17 @@ function editorSetActionData(retString) {
 				this.newTaskType         = taskNameNewValue;
 				this.oldAperteConf		 = oldAC;
 				this.newAperteConf		 = newAC;
-			},			
+				this.oldActionAttr		 = oldAA;
+				this.newActionAttr		 = newAA;
+			},
 			execute: function(){
 				this.lastEditedObj.properties['oryx-action-properties'] = this.newAperteConf;
+				lastEditedObjecyt.properties['oryx-action-attributes'] = this.newActionAttr;
 				this.lastEditedObj.properties['oryx-button-type'] = this.newTaskType;
 			},
 			rollback: function(){
 				this.lastEditedObj.properties['oryx-action-properties'] = this.oldAperteConf;
+				lastEditedObjecyt.properties['oryx-action-attributes'] = this.oldActionAttr;
 				this.lastEditedObj.properties['oryx-button-type'] = this.oldTaskType;
 			}
 		});

@@ -29,7 +29,7 @@ public class JPDLTransition extends JPDLObject {
     //action properties
     private String buttonName;
     private List<String> actionPermissions = new ArrayList<String>();
-    private Map<String,String> actionAttributes = new HashMap<String,String>();
+    private Map<String,Object> actionAttributes = new HashMap<String,Object>();
     private Map<String,Object> actionAutowiredProperties = new HashMap<String,Object>();
     
     //for 'decision'
@@ -84,13 +84,13 @@ public class JPDLTransition extends JPDLObject {
 	private String generateActionAttributesXML() {
 		StringBuffer sb = new StringBuffer();
 		if (!actionAttributes.isEmpty()) {
-		  sb.append("<attributes>\n");
-		}
-		for (String name : actionAttributes.keySet()) {
-			sb.append(String.format("<config.ProcessStateActionAttribute name=\"%s\" value=\"%s\" />\n", name, actionAttributes.get(name)));
-		}
-		if (!actionAttributes.isEmpty()) {
-		  sb.append("</attributes>\n");
+			sb.append("<attributes>\n");
+
+			for (String name : actionAttributes.keySet()) {
+				sb.append(String.format("<config.ProcessStateActionAttribute name=\"%s\" value=\"%s\" />\n", name, actionAttributes.get(name)));
+			}
+
+			sb.append("</attributes>\n");
 		}
 		return sb.toString();
 	}
@@ -156,26 +156,23 @@ public class JPDLTransition extends JPDLObject {
 				 actionPermissions.add(obj.optString("rolename"));
 			 }
 		}
-		JSONObject attributes = properties.optJSONObject("action-attributes");
-		if (attributes != null) {
-			 JSONArray attributesItems = attributes.optJSONArray("items");
-			 for (int i = 0; i < attributesItems.length(); i++) {
-				 JSONObject obj = attributesItems.getJSONObject(i);
-				 actionAttributes.put(obj.optString("attributename"), obj.optString("attributevalue"));
-			 }
-		}
-		String autowiredProps = properties.optString("action-properties");
+
+		loadAttributeMap(properties, "action-properties", actionAutowiredProperties);
+		loadAttributeMap(properties, "action-attributes", actionAttributes);
+	}
+
+	private void loadAttributeMap(JSONObject properties, String propertyName, Map<String, Object> targetMap) throws JSONException {
+		String autowiredProps = properties.optString(propertyName);
 		if (!StringUtils.isEmpty(autowiredProps)) {
 			JSONObject jsonObj = new JSONObject(XmlUtil.decodeXmlEscapeCharacters(autowiredProps));
 			Iterator i = jsonObj.keys();
 		    while (i.hasNext()) {
 		    	String key = (String)i.next();
-		    	actionAutowiredProperties.put(key, jsonObj.get(key));
+				targetMap.put(key, jsonObj.get(key));
 		    }
 		}
-		
 	}
-	
+
 	private boolean isPriorityisFilledCorrect(String actionProperties){
 		if (actionProperties!=null && !actionProperties.isEmpty()) {
 		Pattern patern = Pattern.compile("\"priority\":\"\\d*\"");
