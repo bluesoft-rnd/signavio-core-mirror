@@ -152,7 +152,8 @@ ORYX.Plugins.AperteUiShapeMenuPlugin = ORYX.Plugins.ShapeMenuPlugin.extend({
 		var type =  props['oryx-button-type'];
 		var name = props['oryx-name'];
 		var data =  props['oryx-action-properties'];
-        this.openActionEditorWindow(name, type, data);
+		var actionAttributes =  props['oryx-action-attributes'];
+        this.openActionEditorWindow(name, type, data,actionAttributes);
 	},
 	
     //Opens new popup window
@@ -259,7 +260,7 @@ ORYX.Plugins.AperteUiShapeMenuPlugin = ORYX.Plugins.ShapeMenuPlugin.extend({
 		form.getForm().submit();
     },
 	
-	openActionEditorWindow: function (buttonName, buttonType, actionParameters){
+	openActionEditorWindow: function (buttonName, buttonType, actionParameters,actionAttributes){
 		var iframeName = "ifname";
 		var props = lastEditedObjecyt.properties;
 
@@ -327,6 +328,13 @@ ORYX.Plugins.AperteUiShapeMenuPlugin = ORYX.Plugins.ShapeMenuPlugin.extend({
 						inputType:'text',
 						fieldLabel:'actionParameters',
 						value: actionParameters
+					}),
+					 new Ext.form.TextField({
+			            id:'actionAttributes',
+						name:'actionAttributes',
+						inputType:'text',
+						fieldLabel:'actionAttributes',
+						value: actionAttributes
 					}),
 					new Ext.form.TextField({
 					    id:'fre',
