@@ -56,34 +56,41 @@ public class JPDLCollapsedSubprocess extends JPDLComponent {
 	@Override
 	public void fillBasicProperties(JSONObject json) throws JSONException {
 		super.fillBasicProperties(json);
+		
+		subprocess = json.getJSONObject("properties").getString("entry");
+		
 		if (subprocess == null || subprocess.equals("")) {
 			throw new RequestException("Subprocess references cannot be empty.");
 
 		}
-		subprocess = json.getJSONObject("properties").getString("entry");
+		
+		input = jsonStringToMap(json.getJSONObject("properties")
+				.getString("inputmaps"));
+		
+		String inputString = json.getJSONObject("properties").getString("inputmaps");
 
-		if (input == null || input.isEmpty()) {
+		if (inputString == null || inputString.isEmpty()) {
 			throw new RequestException("Input maps cannot be empty.");
 
-		} else {
-			try {
-				input = jsonStringToMap(json.getJSONObject("properties")
-						.getString("inputmaps"));
-			} catch (JSONException e) {
-				throw new RequestException(
-						"Error while parsing input maps: "
-								+ e.getLocalizedMessage()
-								+ "\n Parsing map shoud look like this, example: \"initiator:initiator\" ");
-			}
+		} 
+		try {
+			input = jsonStringToMap(inputString);
+		} catch (JSONException e) {
+			throw new RequestException(
+					"Error while parsing input maps: "
+							+ e.getLocalizedMessage()
+							+ "\n Parsing map shoud look like this, example: \"initiator:initiator\" ");
 		}
+		
+		String outputString = json.getJSONObject("properties").getString("outputmaps");
+		
 
-		if (output == null || input.isEmpty()) {
+		if (outputString == null || outputString.isEmpty()) {
 			throw new RequestException("Output maps cannot be empty.");
 
 		} else {
 			try {
-				output = jsonStringToMap(json.getJSONObject("properties")
-						.getString("outputmaps"));
+				output = jsonStringToMap(outputString);
 			} catch (JSONException e) {
 				throw new RequestException(
 						"Error while parsing output maps: "
