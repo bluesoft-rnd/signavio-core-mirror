@@ -113,9 +113,10 @@ public class JPDLTransition extends JPDLObject {
 		 
 		JSONObject jsonObject = json.getJSONObject("properties");
 		String ap = (String) jsonObject.get("action-properties");
+		String name = (String) jsonObject.get("name");
 		
 		if(!isPriorityisFilledCorrect(ap)){
-			throw new JSONException("Priority field must be filled with number.");
+			throw new JSONException("Priority field in:  '" + name + "' transition must be filled with number!");
 			
 		}
 		
