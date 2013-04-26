@@ -1,4 +1,4 @@
-package pl.net.bluesoft.rnd.processtool.editor.imports;
+package test.pl.net.bluesoft.rnd.processtool.editor.imports;
 
 import static org.junit.Assert.*;
 
