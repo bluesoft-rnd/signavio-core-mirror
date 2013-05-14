@@ -73,6 +73,16 @@ public class JpdlModelType implements ModelType {
 	public boolean storeTypeStringToModelFile(String typeString, String path) {
 		return true;
 	}
+	
+	@Override
+	public boolean storeVersionToModelFile(String version, String path) {
+		return FileSystemUtil.writeXmlNodeAttributeToFile("process", "version", version, path);
+	}
+
+	@Override
+	public String getVersionFromModelFile(String path) {
+		return FileSystemUtil.readXmlNodeChildFromFile("/process/@version", path, null);
+	}
 
 	public byte[] getRepresentationInfoFromModelFile(RepresentationType type, String path) {
 		if (RepresentationType.JSON == type){
@@ -107,7 +117,7 @@ public class JpdlModelType implements ModelType {
 			String name = f.getName();
 			name = name.substring(0, name.length() - this.getClass().getAnnotation(ModelTypeFileExtension.class).fileExtension().length());
 			try {
-				String result = getNewModelString(new String(content, "utf-8"), name, getDescriptionFromModelFile(path));
+				String result = getNewModelString(new String(content, "utf-8"), name, getDescriptionFromModelFile(path), getVersionFromModelFile(path));
   			
   				// Write to file
   				FileWriter fw = new FileWriter(f);
@@ -137,16 +147,19 @@ public class JpdlModelType implements ModelType {
 		//System.out.println("Could not store SVG data");
 	}
 
-	private String getInitialModelString(String id, String name, String description, String type, String jsonRep, String svgRep) {
-		return getNewModelString(jsonRep, name, description);
+	private String getInitialModelString(String id, String name, String description, String type, String version, String jsonRep, String svgRep) {
+		return getNewModelString(jsonRep, name, description, version);
 	}
 	
 	
-	private String getNewModelString(String json, String processName, String description) {		
+	private String getNewModelString(String json, String processName, String description, String version) {		
 		try {
 			JSONObject jsonObj = new JSONObject(json);
 			if (description != null && !(description.length() == 0)){
 				jsonObj.getJSONObject("properties").put("documentation", description);
+			}
+			if (version != null && !(version.length() == 0)){
+				jsonObj.getJSONObject("properties").put("version", version);
 			}
 			if (processName != null && !(processName.length() == 0)){
 				jsonObj.getJSONObject("properties").put("name", processName);
@@ -173,9 +186,9 @@ public class JpdlModelType implements ModelType {
 
 //	@Override
 	public File storeModel(String path, String id, String name,
-			String description, String type, String jsonRep, String svgRep) {
+			String description, String type, String version, String jsonRep, String svgRep) {
 		File modelFile;
-		if ((modelFile = FileSystemUtil.createFile(path, this.getInitialModelString(id, name, description, type, jsonRep, svgRep)))
+		if ((modelFile = FileSystemUtil.createFile(path, this.getInitialModelString(id, name, description, type, version, jsonRep, svgRep)))
 				!= null) {
 			return modelFile;
 		} else {
@@ -195,4 +208,6 @@ public class JpdlModelType implements ModelType {
 	public void deleteFile(String parentPath, String name) {
 		FileSystemUtil.deleteFileOrDirectory(parentPath + File.separator + name + getFileExtension());
 	}
+
+
 }

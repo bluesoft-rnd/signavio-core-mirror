@@ -45,6 +45,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -221,11 +222,19 @@ public class FileSystemUtil {
 					if (nodeName.contains(":")) {
 						nodeName = nodeName.substring(nodeName.lastIndexOf(':')+1);
 					}
+					
 					NodeList nodelist = doc.getElementsByTagName(nodeName);
-					if (nodelist.getLength() != 1) {
-						return false;
+					Node node;
+					if (nodelist.getLength() != 1)
+					{
+						Element elem = doc.createElement(nodeName);
+						node = doc.getChildNodes().item(0).appendChild(elem);
 					}
-					Node node = nodelist.item(0);
+					else
+						node = nodelist.item(0);
+					
+					if(node == null)
+						return false;
 					
 					
 					if (handleAttribute) {

@@ -179,11 +179,11 @@ public class FsDirectory extends FsSecureBusinessObject {
 		model.moveTo(this);
 	}
 
-	public FsModel createModel(String name, String description, String type, String jsonRep, String svgRep, String comment) {
-		return createModel(UUID.getUUID().toString(), name, description, type, jsonRep, svgRep, comment);
+	public FsModel createModel(String name, String description, String type, String jsonRep, String svgRep, String comment, String version) {
+		return createModel(UUID.getUUID().toString(), name, description, type, jsonRep, svgRep, comment, version);
 	}
 
-	public FsModel createModel(String id, String name, String description, String type, String jsonRep, String svgRep, String comment) {
+	public FsModel createModel(String id, String name, String description, String type, String jsonRep, String svgRep, String comment, String version) {
 		
 		name = FileSystemUtil.getCleanFileName(name);
 		
@@ -204,7 +204,7 @@ public class FsDirectory extends FsSecureBusinessObject {
 			throw new IllegalArgumentException("Name already exists.");
 		}
 		
-		modelType.storeModel(path, id, namespace, description, type, jsonRep, svgRep);
+		modelType.storeModel(path, id, namespace, description, type, version, jsonRep, svgRep);
 
 		return new FsModel(getPath(), name, modelType.getFileExtension());
 	}

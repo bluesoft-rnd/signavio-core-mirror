@@ -35,16 +35,20 @@ public interface ModelType {
 	public String getTypeStringFromModelFile(String path);
 	public boolean storeTypeStringToModelFile(String typeString, String path);
 	
+	public boolean storeVersionToModelFile(String version, String path);
+	public String getVersionFromModelFile(String path);
+	
 	public byte[] getRepresentationInfoFromModelFile(RepresentationType type, String path);
 	public void storeRepresentationInfoToModelFile(RepresentationType type, byte[] content, String path);
 
 	public void storeRevisionToModelFile(String jsonRep, String svgRep, String path);
 
-	public File storeModel(String path, String id, String name, String description, String type, String jsonRep, String svgRep);
+	public File storeModel(String path, String id, String name, String description, String type, String version, String jsonRep, String svgRep);
 
 	public boolean acceptUsageForTypeName(String typeName);
 	
 	public boolean renameFile(String parentPath, String oldName, String newName);
 	
 	public void deleteFile(String parentPath, String name);
+
 }

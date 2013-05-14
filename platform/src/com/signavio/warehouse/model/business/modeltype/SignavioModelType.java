@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 
 import com.signavio.platform.util.fsbackend.FileSystemUtil;
-import com.signavio.warehouse.model.business.FsModel;
 import com.signavio.warehouse.model.business.ModelType;
 import com.signavio.warehouse.model.business.ModelTypeFileExtension;
 import com.signavio.warehouse.revision.business.RepresentationType;
@@ -36,6 +35,7 @@ public class SignavioModelType implements ModelType {
 	private static final String XPATH_PREFIX = "/oryxmodel/";
 	
 	private static final String DESCRIPTION_ElEMENT_NAME = "description";
+	private static final String VERSION_ElEMENT_NAME = "version";
 	private static final String TYPE_ElEMENT_NAME = "type";
 	private static final String JSON_ElEMENT_NAME = "json-representation";
 	private static final String SVG_ElEMENT_NAME = "svg-representation";
@@ -55,6 +55,17 @@ public class SignavioModelType implements ModelType {
 	public boolean storeDescriptionToModelFile(String description, String path) {
 		if (!FileSystemUtil.writeXmlNodeChildToFile(DESCRIPTION_ElEMENT_NAME, description, false, path)){
 			throw new IllegalStateException("Could not write new description to file");
+		}
+		return true;
+	}
+	
+	public String getVersionFromModelFile(String path) {
+		return FileSystemUtil.readXmlNodeChildFromFile(XPATH_PREFIX + VERSION_ElEMENT_NAME, path, null);
+	}
+	
+	public boolean storeVersionToModelFile(String version, String path) {
+		if (!FileSystemUtil.writeXmlNodeChildToFile(VERSION_ElEMENT_NAME, version, false, path)){
+			throw new IllegalStateException("Could not write new version to file");
 		}
 		return true;
 	}
@@ -127,9 +138,9 @@ public class SignavioModelType implements ModelType {
 
 	//@Override
 	public File storeModel(String path, String id, String name, String description,
-			String type, String jsonRep, String svgRep) {
+			String type, String version, String jsonRep, String svgRep) {
 		File modelFile;
-		if ((modelFile = FileSystemUtil.createFile(path, this.getInitialModelString(id, name, description, type, jsonRep, svgRep)))
+		if ((modelFile = FileSystemUtil.createFile(path, this.getInitialModelString(id, name, description, type, version, jsonRep, svgRep)))
 				!= null) {
 			return modelFile;
 		} else {
@@ -137,11 +148,12 @@ public class SignavioModelType implements ModelType {
 		}
 	}
 
-	private String getInitialModelString(String id, String name, String description, String type, String jsonRep, String svgRep) {
+	private String getInitialModelString(String id, String name, String description, String type, String version, String jsonRep, String svgRep) {
 		return 	"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + 
 				"<oryxmodel>\n" + 
 					"<description>" + description + "</description>\n" +
 					"<type>" + type + "</type>\n" +
+					"<version>" + version + "</version>\n" +
 					"<json-representation><![CDATA[" + jsonRep + "]]></json-representation>\n" +
 					"<svg-representation><![CDATA[" + svgRep + "]]></svg-representation>\n" +
 				"</oryxmodel>\n";

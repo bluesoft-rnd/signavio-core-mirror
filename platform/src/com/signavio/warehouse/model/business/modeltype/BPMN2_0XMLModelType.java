@@ -1,7 +1,5 @@
 package com.signavio.warehouse.model.business.modeltype;
 
-import java.io.File;
-
 import com.signavio.warehouse.model.business.ModelTypeRequiredNamespaces;
 import com.signavio.warehouse.revision.business.RepresentationType;
 
@@ -28,11 +26,6 @@ public class BPMN2_0XMLModelType extends SignavioModelType {
 		return false;
 	}
 	
-	@Override
-	public File storeModel(String path, String id, String name, String description,
-			String type, String jsonRep, String svgRep) {
-		return super.storeModel(path, id, name, description, type, jsonRep, svgRep);
-	}
 
 	@Override
 	public boolean renameFile(String parentPath, String oldName, String newName) {

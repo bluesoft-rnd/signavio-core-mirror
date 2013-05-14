@@ -1,16 +1,19 @@
 package pl.net.bluesoft.rnd.processtool.editor;
 
-import com.signavio.platform.core.Platform;
-import com.signavio.platform.core.PlatformProperties;
-import com.signavio.platform.exceptions.RequestException;
-import com.sun.msv.datatype.xsd.Comparator;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import de.hpi.bpmn2_0.exceptions.BpmnConverterException;
-import de.hpi.bpmn2_0.factory.AbstractBpmnFactory;
-import de.hpi.bpmn2_0.model.Definitions;
-import de.hpi.bpmn2_0.transformation.Bpmn2XmlConverter;
-import de.hpi.bpmn2_0.transformation.Diagram2BpmnConverter;
-import de.hpi.bpmn2_0.transformation.Diagram2XmlConverter;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -24,22 +27,24 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.oryxeditor.server.diagram.basic.BasicDiagram;
 import org.oryxeditor.server.diagram.basic.BasicDiagramBuilder;
-import org.xml.sax.SAXException;
-import pl.net.bluesoft.rnd.processtool.editor.jpdl.exception.UnsupportedJPDLObjectException;
-import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.*;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import pl.net.bluesoft.rnd.processtool.editor.jpdl.exception.UnsupportedJPDLObjectException;
+import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.JDPLStepEditorNode;
+import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.JPDLComponent;
+import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.JPDLEndEvent;
+import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.JPDLObject;
+import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.JPDLTask;
+import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.JPDLTransition;
+import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.JPDLUserTask;
+
+import com.signavio.platform.core.Platform;
+import com.signavio.platform.core.PlatformProperties;
+import com.signavio.platform.exceptions.RequestException;
+
+import de.hpi.bpmn2_0.factory.AbstractBpmnFactory;
+import de.hpi.bpmn2_0.model.Definitions;
+import de.hpi.bpmn2_0.transformation.Bpmn2XmlConverter;
+import de.hpi.bpmn2_0.transformation.Diagram2BpmnConverter;
 
 public class AperteWorkflowDefinitionGenerator {
 
@@ -57,6 +62,7 @@ public class AperteWorkflowDefinitionGenerator {
     private String processFileName;
     private String bundleDesc;
     private String bundleName;
+    private String processVersion;
     private String processToolDeployment;
     private int offsetY;
     private int offsetX;
@@ -85,6 +91,9 @@ public class AperteWorkflowDefinitionGenerator {
             if (processDefinitionLanguage == null || "".equals(processDefinitionLanguage)) {
                 processDefinitionLanguage = "jpdl";//for old process definitions
             }
+            if(processVersion == null)
+            	processVersion = "1.0.0";
+            
             if (StringUtils.isEmpty(processName)) {
                 throw new RequestException("Process name is empty.");
             }
@@ -183,7 +192,7 @@ public class AperteWorkflowDefinitionGenerator {
     public String generateJpdl() {
         StringBuffer jpdl = new StringBuffer();
         jpdl.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        jpdl.append(String.format("<process name=\"%s\" xmlns=\"http://jbpm.org/4.4/jpdl\">\n", processName));
+        jpdl.append(String.format("<process name=\"%s\" processVersion=\"%s\" xmlns=\"http://jbpm.org/4.4/jpdl\">\n", processName, processVersion));
 
         Set<String> swimlanes = new HashSet<String>();
 
@@ -435,7 +444,7 @@ public class AperteWorkflowDefinitionGenerator {
     public String generateProcessToolConfig() {
         StringBuffer ptc = new StringBuffer();
         ptc.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        ptc.append(String.format("<config.ProcessDefinitionConfig bpmDefinitionKey=\"%s\" description=\"%s\" processName=\"%s\"", processName, processName, processName));
+        ptc.append(String.format("<config.ProcessDefinitionConfig bpmDefinitionKey=\"%s\" description=\"%s\" processName=\"%s\" processVersion=\"%s\"", processName, processName, processName, processVersion));
 
         if (processConfig != null) {
         	
@@ -625,6 +634,12 @@ private String	replaceProcessNameIfExists(String group,String newProcessName){
             throw new RuntimeException(e);
         }
     }
+
+
+	public void setVersion(String version) {
+		this.processVersion = version;
+		
+	}
 
 }
 

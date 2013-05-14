@@ -322,6 +322,7 @@ public class EditorHandler extends BasisHandler {
     		
     		String name = "";
     		String description = "";
+    		String version = "";
     		
     		FsModelRevision rev;
     		
@@ -330,7 +331,7 @@ public class EditorHandler extends BasisHandler {
     			FsModel model = (FsModel) sbo;
     			
     			name = model.getName();
-    			
+    			version = model.getVersion();
     			description = model.getDescription();
     			
     			if(revision != null) {
@@ -382,6 +383,7 @@ public class EditorHandler extends BasisHandler {
 				result.put("model", modelJSON);
 				result.put("name", name);
 				result.put("description", description);
+				result.put("version", version);
 				
 				result.put("modelHandler", getModelHandlerURI(req) );
 				

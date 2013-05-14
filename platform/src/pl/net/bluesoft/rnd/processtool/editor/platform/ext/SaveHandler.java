@@ -39,7 +39,8 @@ public class SaveHandler extends DeployHandler {
             tempJar = File.createTempFile("aw-deploy-", ".tmp");
             AperteWorkflowDefinitionGenerator gen = fillProcessDeploymentBundle(token, tempJar,
                     req.getParameter("name"),
-                    req.getParameter("parent-id"));
+                    req.getParameter("parent-id"),
+                    req.getParameter("version")); 
 
             FileInputStream fis = new FileInputStream(tempJar);
             try {

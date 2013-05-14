@@ -184,12 +184,13 @@ public class DeployHandler extends BasisHandler {
     protected AperteWorkflowDefinitionGenerator fillProcessDeploymentBundle(FsAccessToken token, JSONObject jsonParams, File tempJar) throws JSONException, TranscoderException, IOException {
         String name = jsonParams.getString("name");
         String parentId = jsonParams.getString("parent");
+        String version = jsonParams.getString("version");
         parentId = parentId.replace("/directory/", "");
-        return fillProcessDeploymentBundle(token, tempJar, name, parentId);
+        return fillProcessDeploymentBundle(token, tempJar, name, parentId, version);
     }
 
     protected AperteWorkflowDefinitionGenerator fillProcessDeploymentBundle(FsAccessToken token, File tempJar,
-                                                        String name, String parentId) throws TranscoderException, IOException {
+                                                        String name, String parentId, String version) throws TranscoderException, IOException {
         FsDirectory parent = FsSecurityManager.getInstance().loadObject(FsDirectory.class, parentId, token);
         String signavioXMLExtension = SignavioModelType.class.getAnnotation(ModelTypeFileExtension.class).fileExtension();
         String fileName = name + signavioXMLExtension;
@@ -205,6 +206,7 @@ public class DeployHandler extends BasisHandler {
         int offsetY = Math.round(Float.parseFloat(vs[1]));
         AperteWorkflowDefinitionGenerator gen = new AperteWorkflowDefinitionGenerator(offsetX, offsetY);
         gen.init(jsonRep);
+        gen.setVersion(version);
         
         // MANIFEST
         Manifest mf = getManifest(gen.getBundleName(), gen.getBundleDesc(), gen.getProcessToolDeployment());

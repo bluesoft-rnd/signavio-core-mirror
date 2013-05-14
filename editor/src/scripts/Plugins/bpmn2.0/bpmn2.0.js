@@ -1388,7 +1388,7 @@ new function(){
 				} else {
 					parent.add(shape);
 					shape.bounds.moveTo(pair.value.newPosition);
-				}
+				};
 				
 			}.bind(this));
 			

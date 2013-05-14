@@ -256,6 +256,7 @@ ORYX.I18N.Save.dialogDesciption = "Please enter a name, a description and a comm
 ORYX.I18N.Save.dialogLabelTitle = "Title";
 ORYX.I18N.Save.dialogLabelDesc = "Description";
 ORYX.I18N.Save.dialogLabelType = "Type";
+ORYX.I18N.Save.dialogLabelVersion = "Version";
 ORYX.I18N.Save.dialogLabelComment = "Revision comment";
 
 Ext.MessageBox.buttonText.yes = "Yes";

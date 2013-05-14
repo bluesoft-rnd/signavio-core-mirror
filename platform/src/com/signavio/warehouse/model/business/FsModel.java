@@ -31,11 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.json.JSONException;
-import org.json.JSONObject;
-import org.oryxeditor.server.diagram.Bounds;
-import org.oryxeditor.server.diagram.Point;
 import org.oryxeditor.server.diagram.basic.BasicDiagramBuilder;
-import org.oryxeditor.server.diagram.basic.BasicNode;
 import org.oryxeditor.server.diagram.generic.GenericDiagram;
 
 import com.signavio.platform.security.business.FsSecureBusinessObject;
@@ -124,6 +120,14 @@ public class FsModel extends FsSecureBusinessObject {
 
 	public String getName() {
 		return name;
+	}
+	
+	public String getVersion() {
+		return ModelTypeManager.getInstance().getModelType(this.fileExtension).getVersionFromModelFile(getPath());
+	}
+
+	public void setVersion(String version) {
+		ModelTypeManager.getInstance().getModelType(this.fileExtension).storeVersionToModelFile(version, getPath());
 	}
 	
 	public void setDescription(String description) {
@@ -307,5 +311,6 @@ public class FsModel extends FsSecureBusinessObject {
 		}
 		return parents;
 	}
+
 
 }

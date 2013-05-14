@@ -15,13 +15,20 @@ ORYX.Plugins.AperteUiSave = ORYX.Plugins.Save.extend({
 
 
 		// Get the stencilset
-		var ss = this.facade.getStencilSets().values()[0]
+		var ss = this.facade.getStencilSets().values()[0];
 		
 		var typeTitle = ss.title();
-		
 		// Define Default values
 		var name = (modelMeta["new"] && modelMeta.name === "") ? ORYX.I18N.Save.newProcess : modelInfo.name;
-		var defaultData = {title:Signavio.Utils.escapeHTML(name||""), summary:Signavio.Utils.escapeHTML(modelInfo.description||""), type:typeTitle, url: reqURI, namespace: modelInfo.model.stencilset.namespace, comment: '' }
+		var version = (modelMeta["new"] && modelMeta.version === "") ? "1.0.0" : modelInfo.version;
+		var defaultData = {
+				title:Signavio.Utils.escapeHTML(name||""), 
+				summary:Signavio.Utils.escapeHTML(modelInfo.description||""), 
+				type:typeTitle, 
+				url: reqURI, 
+				namespace: modelInfo.model.stencilset.namespace, 
+				comment: '',
+				version:Signavio.Utils.escapeHTML(modelInfo.version||"")};
 		
 		// Create a Template
 		var dialog = new Ext.XTemplate(		
@@ -34,11 +41,12 @@ ORYX.Plugins.AperteUiSave = ORYX.Plugins.Save.extend({
 							'<p><label for="edit_model_title">' + ORYX.I18N.Save.dialogLabelTitle + '</label><input type="text" class="text" name="title" value="{title}" id="edit_model_title" onfocus="this.className = \'text activated\'" onblur="this.className = \'text\'"/></p>',
 							'<p><label for="edit_model_summary">' + ORYX.I18N.Save.dialogLabelDesc + '</label><textarea rows="5" name="summary" id="edit_model_summary" onfocus="this.className = \'activated\'" onblur="this.className = \'\'">{summary}</textarea></p>',
 							(modelMeta.versioning) ? '<p><label for="edit_model_comment">' + ORYX.I18N.Save.dialogLabelComment + '</label><textarea rows="5" name="comment" id="edit_model_comment" onfocus="this.className = \'activated\'" onblur="this.className = \'\'">{comment}</textarea></p>' : '',
+							'<p><label for="edit_model_version">' + ORYX.I18N.Save.dialogLabelVersion + '</label><input type="text" class="text" name="version" value="{version}" id="edit_model_version" onfocus="this.className = \'text activated\'" onblur="this.className = \'text\'"/></p>',
 							'<p><label for="edit_model_type">' + ORYX.I18N.Save.dialogLabelType + '</label><input type="text" name="type" class="text disabled" value="{type}" disabled="disabled" id="edit_model_type" /></p>',
 							
 						'</fieldset>',
 					
-					'</form>')
+					'</form>');
 		
 		// Create the callback for the template
 		callback = function(form){
@@ -61,10 +69,14 @@ ORYX.Plugins.AperteUiSave = ORYX.Plugins.Save.extend({
 				var comment 	= form .elements["comment"].value.strip();
 				comment			= comment.length == 0 ? defaultData.comment : comment;
 				
+				var version 	= form .elements["version"].value.strip();
+				version			= version.length == 0 ? defaultData.version : version;
+				
 				modelMeta.name = title;
 				modelMeta.description = summary;
 				modelMeta.parent = modelInfo.parent;
 				modelMeta.namespace = namespace;
+				modelMeta.version = version;
 	        		
 				//added changing title of page after first save, but with the changed flag
 				if(!forceNew) window.document.title = this.changeSymbol + title + " | " + ORYX.CONFIG.APPNAME;
@@ -118,9 +130,9 @@ ORYX.Plugins.AperteUiSave = ORYX.Plugins.Save.extend({
 								var node = $(entry.shape.id+""+ref);
 								if (node)
 									node.setAttribute("oryx:glossaryIds", entry.glossary + ";")
-							})
+							});
 						}
-					}.bind(this))
+					}.bind(this));
 					
 
 					// Set the json as string
@@ -154,7 +166,7 @@ ORYX.Plugins.AperteUiSave = ORYX.Plugins.Save.extend({
 				          
 				// Parse dom to string
 		        var svgDOM 	= DataManager.serialize(svgClone);
-				
+		        //ORYX.log.warn("Version: " + version);	
 		        var params = {
 		        		json_xml: json,
 		        		svg_xml: svgDOM,
@@ -163,6 +175,7 @@ ORYX.Plugins.AperteUiSave = ORYX.Plugins.Save.extend({
 		        		parent: modelMeta.parent,
 		        		description: summary,
 		        		comment: comment,
+		        		version: version,
 		        		glossary_xml: glossary,
 		        		namespace: modelMeta.namespace,
 		        		views: Ext.util.JSON.encode(modelMeta.views || [])
@@ -259,6 +272,7 @@ ORYX.Plugins.AperteUiSave = ORYX.Plugins.Save.extend({
 						
 					params.id = modelMeta.modelId;
 					// Send the request out
+					//ORYX.log.warn("Params: " + params);
 					this.sendSaveRequest('PUT', reqURI, params, false, successFn, failure);
 				}
 		}.bind(this);

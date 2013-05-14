@@ -36,7 +36,8 @@ ORYX.Plugins.Deploy = Clazz.extend({
 		
         var params = {
        		name: modelInfo.name,
-			parent: modelInfo.parent
+			parent: modelInfo.parent,
+			version: modelInfo.version
         };
 		  	
 		var successFn = function(transport) {

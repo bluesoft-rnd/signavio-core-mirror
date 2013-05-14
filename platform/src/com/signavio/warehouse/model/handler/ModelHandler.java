@@ -130,9 +130,10 @@ public class ModelHandler extends BasisHandler {
 			throw new RequestException("unsupported.encoding", e);
 		}
 		
-		String name, description, jsonRep, svgRep, comment;
+		String name, description, jsonRep, svgRep, comment, version;
 		try {
 			 name = jParams.getString("name");
+			 version = jParams.getString("version");
 			 description = jParams.getString("description");
 			 jsonRep = jParams.getString("json_xml");
 			 svgRep = jParams.getString("svg_xml");
@@ -140,6 +141,7 @@ public class ModelHandler extends BasisHandler {
 			 
 			 model.setName(name);
 			 model.setDescription(description);
+			 model.setVersion(version);
 			 model.createRevision(jsonRep, svgRep, comment);	
 			 
 			 if(jParams.has("id")) {
@@ -169,7 +171,7 @@ public class ModelHandler extends BasisHandler {
 	public Object postRepresentation(Object params, FsAccessToken token) {
 		JSONObject jsonParams = (JSONObject) params;
 		
-		String id=null, copy=null,parentId, name, description, type, comment, jsonRep, svgRep;
+		String id=null, copy=null,parentId, name, description, type, comment, jsonRep, svgRep, version;
 		FsDirectory parent;
 		try {
 			parentId = jsonParams.getString("parent");
@@ -182,6 +184,7 @@ public class ModelHandler extends BasisHandler {
 				FsModel model = FsSecurityManager.getInstance().loadObject(FsModel.class, mId, token);
 				name = model.getName();
 				description = model.getDescription();
+				version = model.getVersion();
 				type = model.getType();
 				comment = "";
 				jsonRep = new String(model.getHeadRevision().getRepresentation(RepresentationType.JSON).getContent(), "utf-8");
@@ -191,6 +194,7 @@ public class ModelHandler extends BasisHandler {
 				description = jsonParams.getString("description");
 				type = jsonParams.getString("type");
 				comment = jsonParams.getString("comment");
+				version = jsonParams.getString("version");
 				jsonRep = jsonParams.getString("json_xml");
 				svgRep = jsonParams.getString("svg_xml");
 				
@@ -210,9 +214,9 @@ public class ModelHandler extends BasisHandler {
 		
 		try { 
 			if(id == null) {
-				model = parent.createModel(name, description, type, jsonRep, svgRep, comment);
+				model = parent.createModel(name, description, type, jsonRep, svgRep, comment, version);
 			} else {
-				model = parent.createModel(id, name, description, type, jsonRep, svgRep, comment);
+				model = parent.createModel(id, name, description, type, jsonRep, svgRep, comment, version);
 				this.getServletContext().setAttribute(id, model.getId());
 			}
 		} catch (Exception e) {

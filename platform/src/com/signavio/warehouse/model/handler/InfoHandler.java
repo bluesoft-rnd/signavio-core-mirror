@@ -73,6 +73,7 @@ public class InfoHandler extends AbstractInfoHandler {
 			res.put("description", model.getDescription());
 			res.put("created", model.getCreationDate());
 			res.put("type", model.getType());
+			res.put("version", model.getVersion());
 			
 			FsModelRevision head = model.getHeadRevision();
 			if (head != null) {
