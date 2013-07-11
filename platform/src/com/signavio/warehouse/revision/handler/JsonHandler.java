@@ -21,13 +21,6 @@
  */
 package com.signavio.warehouse.revision.handler;
 
-import java.io.UnsupportedEncodingException;
-
-import javax.servlet.ServletContext;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.signavio.platform.annotations.HandlerConfiguration;
 import com.signavio.platform.annotations.HandlerExportConfiguration;
 import com.signavio.platform.annotations.HandlerMethodActivation;
@@ -36,6 +29,11 @@ import com.signavio.platform.security.business.FsSecureBusinessObject;
 import com.signavio.warehouse.revision.business.FsModelRepresentationInfo;
 import com.signavio.warehouse.revision.business.FsModelRevision;
 import com.signavio.warehouse.revision.business.RepresentationType;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javax.servlet.ServletContext;
+import java.io.UnsupportedEncodingException;
 
 @HandlerConfiguration(uri="/json", context=RevisionHandler.class, rel="exp")
 @HandlerExportConfiguration(name="JSON", icon="/explorer/src/img/famfamfam/page_white_code.png", mime="application/json")

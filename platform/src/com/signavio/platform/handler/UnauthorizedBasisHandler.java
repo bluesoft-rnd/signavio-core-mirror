@@ -21,12 +21,9 @@
  */
 package com.signavio.platform.handler;
 
-import javax.servlet.ServletContext;
-
-import com.signavio.platform.core.Platform;
-import com.signavio.platform.exceptions.InconsistentDataException;
 import com.signavio.platform.security.business.FsAccessToken;
-import com.signavio.platform.security.business.FsRootUser;
+
+import javax.servlet.ServletContext;
 
 /**
  * Implementation of Handler which abstracts all Handler for 

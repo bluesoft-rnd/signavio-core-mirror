@@ -21,15 +21,14 @@
  */
 package com.signavio.warehouse.revision.handler;
 
-import javax.servlet.ServletContext;
-
-import org.apache.batik.transcoder.image.PNGTranscoder;
-
 import com.signavio.platform.annotations.HandlerConfiguration;
 import com.signavio.platform.annotations.HandlerExportConfiguration;
 import com.signavio.platform.annotations.HandlerMethodActivation;
 import com.signavio.platform.security.business.FsSecureBusinessObject;
 import com.signavio.warehouse.revision.business.RepresentationType;
+import org.apache.batik.transcoder.image.PNGTranscoder;
+
+import javax.servlet.ServletContext;
 
 @HandlerConfiguration(uri="/png", context=RevisionHandler.class, rel="exp")
 @HandlerExportConfiguration(name="PNG", icon="/explorer/src/img/famfamfam/picture.png", mime="image/png", download=true)

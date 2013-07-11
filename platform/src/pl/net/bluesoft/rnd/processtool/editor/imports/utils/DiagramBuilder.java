@@ -1,19 +1,18 @@
 package pl.net.bluesoft.rnd.processtool.editor.imports.utils;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.oryxeditor.server.diagram.Bounds;
 import org.oryxeditor.server.diagram.Point;
 import org.oryxeditor.server.diagram.basic.BasicDiagram;
 import org.oryxeditor.server.diagram.basic.BasicEdge;
 import org.oryxeditor.server.diagram.basic.BasicNode;
 import org.w3c.dom.Element;
-
 import pl.net.bluesoft.rnd.processtool.editor.imports.exception.ParserException;
 import pl.net.bluesoft.rnd.processtool.editor.imports.exception.UnsupportedTypeOfTaskException;
 import pl.net.bluesoft.rnd.processtool.editor.imports.parsers.Parser;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 //TODO This is very basic import, more work is required.
 public class DiagramBuilder {

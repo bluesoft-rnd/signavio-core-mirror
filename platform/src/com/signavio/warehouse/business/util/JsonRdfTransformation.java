@@ -21,9 +21,7 @@
  */
 package com.signavio.warehouse.business.util;
 
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
+import org.json.JSONObject;
 
 import javax.servlet.ServletContext;
 import javax.xml.transform.Source;
@@ -32,8 +30,9 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-
-import org.json.JSONObject;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 
 public class JsonRdfTransformation {
 

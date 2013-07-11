@@ -21,13 +21,6 @@
  */
 package com.signavio.warehouse.search.handler;
 
-import java.io.IOException;
-import java.util.List;
-
-import javax.servlet.ServletContext;
-
-import org.json.JSONArray;
-
 import com.signavio.platform.annotations.HandlerConfiguration;
 import com.signavio.platform.core.Platform;
 import com.signavio.platform.exceptions.IORequestException;
@@ -39,6 +32,11 @@ import com.signavio.platform.security.business.FsSecureBusinessObject;
 import com.signavio.warehouse.business.FsEntityManager;
 import com.signavio.warehouse.directory.business.FsDirectory;
 import com.signavio.warehouse.model.business.FsModel;
+import org.json.JSONArray;
+
+import javax.servlet.ServletContext;
+import java.io.IOException;
+import java.util.List;
 
 @HandlerConfiguration(uri="/search")
 public class SearchHandler extends BasisHandler {

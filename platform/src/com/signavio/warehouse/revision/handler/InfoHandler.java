@@ -21,17 +21,16 @@
  */
 package com.signavio.warehouse.revision.handler;
 
-import javax.servlet.ServletContext;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.signavio.platform.annotations.HandlerConfiguration;
 import com.signavio.platform.annotations.HandlerMethodActivation;
 import com.signavio.platform.handler.AbstractHandler;
 import com.signavio.platform.security.business.FsAccessToken;
 import com.signavio.platform.security.business.FsSecureBusinessObject;
 import com.signavio.warehouse.revision.business.FsModelRevision;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javax.servlet.ServletContext;
 
 
 /**

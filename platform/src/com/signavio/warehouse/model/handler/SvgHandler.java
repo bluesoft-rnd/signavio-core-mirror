@@ -21,14 +21,14 @@
  */
 package com.signavio.warehouse.model.handler;
 
-import javax.servlet.ServletContext;
-
 import com.signavio.platform.annotations.HandlerConfiguration;
 import com.signavio.platform.annotations.HandlerExportConfiguration;
 import com.signavio.platform.annotations.HandlerMethodActivation;
 import com.signavio.platform.security.business.FsSecureBusinessObject;
 import com.signavio.warehouse.model.business.FsModel;
 import com.signavio.warehouse.revision.handler.AbstractRevisionExportHandler;
+
+import javax.servlet.ServletContext;
 
 @HandlerConfiguration(uri="/svg", context=ModelHandler.class, rel="exp")
 @HandlerExportConfiguration(name="SVG", icon="/explorer/src/img/famfamfam/page_white_vector.png", mime="image/svg+xml")

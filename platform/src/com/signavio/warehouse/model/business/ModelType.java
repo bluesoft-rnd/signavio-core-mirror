@@ -21,9 +21,9 @@
  */
 package com.signavio.warehouse.model.business;
 
-import java.io.File;
-
 import com.signavio.warehouse.revision.business.RepresentationType;
+
+import java.io.File;
 
 public interface ModelType {
 	

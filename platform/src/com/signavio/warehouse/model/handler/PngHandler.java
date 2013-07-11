@@ -21,14 +21,14 @@
  */
 package com.signavio.warehouse.model.handler;
 
-import javax.servlet.ServletContext;
-
 import com.signavio.platform.annotations.HandlerConfiguration;
 import com.signavio.platform.annotations.HandlerExportConfiguration;
 import com.signavio.platform.annotations.HandlerMethodActivation;
 import com.signavio.platform.security.business.FsSecureBusinessObject;
 import com.signavio.warehouse.model.business.FsModel;
 import com.signavio.warehouse.revision.handler.AbstractImageHandler;
+
+import javax.servlet.ServletContext;
 
 @HandlerConfiguration(uri="/png", context=ModelHandler.class, rel="exp")
 @HandlerExportConfiguration(name="PNG", icon="/explorer/src/img/famfamfam/picture.png", mime="image/png", download=true)

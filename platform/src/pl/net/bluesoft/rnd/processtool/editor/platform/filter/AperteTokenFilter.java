@@ -1,19 +1,16 @@
 package pl.net.bluesoft.rnd.processtool.editor.platform.filter;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import com.signavio.platform.core.Platform;
+import com.signavio.platform.core.PlatformProperties;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import org.apache.log4j.Logger;
-
-import com.signavio.platform.core.Platform;
-import com.signavio.platform.core.PlatformProperties;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * Filter to provide authentication between modeler webapp and aperte runtime environment

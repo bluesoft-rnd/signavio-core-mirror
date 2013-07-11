@@ -1,7 +1,6 @@
 package pl.net.bluesoft.rnd.processtool.editor.imports.utils;
 
 import org.apache.commons.codec.binary.Base64;
-
 import pl.net.bluesoft.rnd.processtool.editor.imports.exception.UnsupportedDiagramException;
 
 public class ModelerFileInputDecoder {

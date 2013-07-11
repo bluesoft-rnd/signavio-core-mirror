@@ -21,12 +21,6 @@
  */
 package com.signavio.platform.config.handler;
 
-import javax.servlet.ServletContext;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.signavio.platform.annotations.HandlerConfiguration;
 import com.signavio.platform.annotations.HandlerMethodActivation;
 import com.signavio.platform.core.Platform;
@@ -37,6 +31,11 @@ import com.signavio.platform.security.business.FsAccessToken;
 import com.signavio.platform.security.business.FsSecurityManager;
 import com.signavio.platform.tenant.business.FsTenant;
 import com.signavio.usermanagement.user.business.FsUser;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javax.servlet.ServletContext;
 
 @HandlerConfiguration(uri="/config")
 public class ConfigHandler extends BasisHandler {

@@ -21,15 +21,6 @@
  */
 package com.signavio.warehouse.model.handler;
 
-import java.io.UnsupportedEncodingException;
-import java.util.Set;
-
-import javax.servlet.ServletContext;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.signavio.platform.annotations.HandlerConfiguration;
 import com.signavio.platform.annotations.HandlerMethodActivation;
 import com.signavio.platform.core.Platform;
@@ -43,6 +34,13 @@ import com.signavio.warehouse.exceptions.EncodingException;
 import com.signavio.warehouse.model.business.FsModel;
 import com.signavio.warehouse.revision.business.FsModelRevision;
 import com.signavio.warehouse.revision.business.RepresentationType;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javax.servlet.ServletContext;
+import java.io.UnsupportedEncodingException;
+import java.util.Set;
 
 /**
  * Concrete implementation to get all information from a model

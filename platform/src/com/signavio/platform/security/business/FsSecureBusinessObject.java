@@ -21,12 +21,12 @@
  */
 package com.signavio.platform.security.business;
 
+import com.signavio.platform.tenant.business.FsTenant;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import com.signavio.platform.tenant.business.FsTenant;
 
 public abstract class FsSecureBusinessObject {
 

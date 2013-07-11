@@ -21,12 +21,6 @@
  */
 package com.signavio.warehouse.directory.business;
 
-import com.signavio.platform.core.Platform;
-import com.signavio.platform.core.PlatformProperties;
-import com.signavio.platform.core.impl.FsPlatformPropertiesImpl;
-
-
-
 /**
  * Implementation of the root directory in the file accessing Oryx backend.
  * 

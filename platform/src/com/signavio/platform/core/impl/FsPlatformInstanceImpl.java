@@ -21,10 +21,6 @@
  */
 package com.signavio.platform.core.impl;
 
-import java.io.File;
-
-import javax.servlet.ServletContext;
-
 import com.signavio.platform.account.business.FsAccountManager;
 import com.signavio.platform.core.HandlerDirectory;
 import com.signavio.platform.core.PlatformInstance;
@@ -40,6 +36,9 @@ import com.signavio.warehouse.business.FsEntityManager;
 import com.signavio.warehouse.directory.business.FsDirectory;
 import com.signavio.warehouse.directory.business.FsRootDirectory;
 import com.signavio.warehouse.model.business.ModelTypeManager;
+
+import javax.servlet.ServletContext;
+import java.io.File;
 
 public class FsPlatformInstanceImpl implements PlatformInstance {
 

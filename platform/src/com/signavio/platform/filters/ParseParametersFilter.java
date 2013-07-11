@@ -24,37 +24,19 @@
  */
 package com.signavio.platform.filters;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-
+import com.signavio.platform.exceptions.InputException;
+import com.signavio.platform.exceptions.RequestException;
+import com.signavio.platform.servlets.DispatcherServlet;
 import org.apache.catalina.util.RequestUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.signavio.platform.exceptions.InputException;
-import com.signavio.platform.exceptions.RequestException;
-import com.signavio.platform.servlets.DispatcherServlet;
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import java.io.*;
+import java.net.URLDecoder;
+import java.util.*;
 
 /**
  * @author Bjoern Wagner

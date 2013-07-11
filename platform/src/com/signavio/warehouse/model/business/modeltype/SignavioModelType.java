@@ -21,14 +21,13 @@
  */
 package com.signavio.warehouse.model.business.modeltype;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-
 import com.signavio.platform.util.fsbackend.FileSystemUtil;
-import com.signavio.warehouse.model.business.FsModel;
 import com.signavio.warehouse.model.business.ModelType;
 import com.signavio.warehouse.model.business.ModelTypeFileExtension;
 import com.signavio.warehouse.revision.business.RepresentationType;
+
+import java.io.File;
+import java.io.UnsupportedEncodingException;
 
 @ModelTypeFileExtension(fileExtension=".signavio.xml")
 public class SignavioModelType implements ModelType {

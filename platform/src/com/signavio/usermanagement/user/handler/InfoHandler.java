@@ -21,23 +21,18 @@
  */
 package com.signavio.usermanagement.user.handler;
 
-import java.util.Set;
-
-import javax.servlet.ServletContext;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.signavio.platform.account.business.FsAccount;
 import com.signavio.platform.annotations.HandlerConfiguration;
 import com.signavio.platform.annotations.HandlerMethodActivation;
-import com.signavio.platform.exceptions.JSONRequestException;
-import com.signavio.platform.exceptions.RequestException;
 import com.signavio.platform.handler.AbstractHandler;
 import com.signavio.platform.security.business.FsAccessToken;
 import com.signavio.platform.security.business.FsSecureBusinessObject;
 import com.signavio.usermanagement.user.business.FsUser;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javax.servlet.ServletContext;
 
 
 

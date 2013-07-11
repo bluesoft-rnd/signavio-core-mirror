@@ -1,9 +1,9 @@
 package com.signavio.warehouse.model.business.modeltype;
 
-import java.io.File;
-
 import com.signavio.warehouse.model.business.ModelTypeRequiredNamespaces;
 import com.signavio.warehouse.revision.business.RepresentationType;
+
+import java.io.File;
 
 @ModelTypeRequiredNamespaces(namespaces={"http://b3mn.org/stencilset/bpmn2.0#", "http://b3mn.org/stencilset/bpmn2.0conversation#", "http://b3mn.org/stencilset/bpmn2.0choreography#"})
 public class BPMN2_0XMLModelType extends SignavioModelType {

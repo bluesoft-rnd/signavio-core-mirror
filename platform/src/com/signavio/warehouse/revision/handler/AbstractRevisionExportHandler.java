@@ -21,16 +21,15 @@
  */
 package com.signavio.warehouse.revision.handler;
 
-import java.util.Set;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletResponse;
-
 import com.signavio.platform.annotations.HandlerExportConfiguration;
 import com.signavio.platform.handler.ExportHandler;
 import com.signavio.platform.security.business.FsSecureBusinessObject;
 import com.signavio.warehouse.model.business.FsModel;
 import com.signavio.warehouse.revision.business.FsModelRevision;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Set;
 
 public abstract class AbstractRevisionExportHandler extends ExportHandler {
 

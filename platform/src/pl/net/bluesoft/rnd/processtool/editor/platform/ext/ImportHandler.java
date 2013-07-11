@@ -1,24 +1,13 @@
 package pl.net.bluesoft.rnd.processtool.editor.platform.ext;
 
 import com.signavio.platform.annotations.HandlerConfiguration;
-import com.signavio.platform.annotations.HandlerMethodActivation;
-import com.signavio.platform.exceptions.IORequestException;
-import com.signavio.platform.exceptions.JSONRequestException;
 import com.signavio.platform.exceptions.RequestException;
 import com.signavio.platform.security.business.FsAccessToken;
 import com.signavio.platform.security.business.FsSecureBusinessObject;
-import org.apache.batik.transcoder.TranscoderException;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.oryxeditor.server.diagram.Bounds;
-import org.oryxeditor.server.diagram.Point;
 import org.oryxeditor.server.diagram.basic.BasicDiagram;
-import org.oryxeditor.server.diagram.basic.BasicDiagramBuilder;
-import org.oryxeditor.server.diagram.basic.BasicEdge;
-import org.oryxeditor.server.diagram.basic.BasicNode;
-
-import pl.net.bluesoft.rnd.processtool.editor.AperteWorkflowDefinitionGenerator;
 import pl.net.bluesoft.rnd.processtool.editor.imports.exception.ParserException;
 import pl.net.bluesoft.rnd.processtool.editor.imports.exception.UnsupportedDiagramException;
 import pl.net.bluesoft.rnd.processtool.editor.imports.exception.UnsupportedTypeOfTaskException;
@@ -27,13 +16,11 @@ import pl.net.bluesoft.rnd.processtool.editor.imports.utils.DiagramBuilder;
 import pl.net.bluesoft.rnd.processtool.editor.imports.utils.ModelerFileInputDecoder;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
 import java.util.Map;
 
 

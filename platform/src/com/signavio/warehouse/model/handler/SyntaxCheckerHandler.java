@@ -1,16 +1,5 @@
 package com.signavio.warehouse.model.handler;
 
-import java.io.IOException;
-import java.util.List;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.oryxeditor.server.diagram.basic.BasicDiagramBuilder;
-
 import com.signavio.platform.annotations.HandlerConfiguration;
 import com.signavio.platform.exceptions.IORequestException;
 import com.signavio.platform.exceptions.JSONRequestException;
@@ -19,9 +8,17 @@ import com.signavio.platform.handler.BasisHandler;
 import com.signavio.platform.security.business.FsAccessToken;
 import com.signavio.platform.security.business.FsSecureBusinessObject;
 import com.signavio.warehouse.model.syntaxchecker.SyntaxCheckerPerformer;
-
 import de.hpi.bpmn2_0.exceptions.BpmnConverterException;
 import de.hpi.bpmn2_0.factory.AbstractBpmnFactory;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.oryxeditor.server.diagram.basic.BasicDiagramBuilder;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
 
 @HandlerConfiguration(uri="/syntaxchecker", rel="syntaxchecker")
 public class SyntaxCheckerHandler extends BasisHandler {

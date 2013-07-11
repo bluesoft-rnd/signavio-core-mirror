@@ -21,21 +21,6 @@
  */
 package com.signavio.warehouse.model.business.modeltype;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
-
 import com.signavio.platform.util.fsbackend.FileSystemUtil;
 import com.signavio.warehouse.business.util.jpdl4.InvalidModelException;
 import com.signavio.warehouse.business.util.jpdl4.JpdlToJson;
@@ -44,6 +29,19 @@ import com.signavio.warehouse.model.business.ModelType;
 import com.signavio.warehouse.model.business.ModelTypeFileExtension;
 import com.signavio.warehouse.model.business.ModelTypeRequiredNamespaces;
 import com.signavio.warehouse.revision.business.RepresentationType;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 @ModelTypeFileExtension(fileExtension=".jpdl.xml")
 @ModelTypeRequiredNamespaces(namespaces={"http://b3mn.org/stencilset/jbpm4#"})

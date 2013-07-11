@@ -21,19 +21,17 @@
  */
 package com.signavio.platform.handler;
 
-import java.util.Collection;
-
-import javax.servlet.ServletContext;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.signavio.platform.core.HandlerDirectory;
 import com.signavio.platform.core.HandlerEntry;
 import com.signavio.platform.core.Platform;
 import com.signavio.platform.security.business.FsAccessToken;
 import com.signavio.platform.security.business.FsSecureBusinessObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javax.servlet.ServletContext;
+import java.util.Collection;
 
 /**
  * Implementation of Handler which abstracts all Handler for 

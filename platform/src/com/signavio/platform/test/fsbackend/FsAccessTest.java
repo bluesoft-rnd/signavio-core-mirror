@@ -21,17 +21,9 @@
  */
 package com.signavio.platform.test.fsbackend;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
-
 import com.signavio.platform.account.business.FsAccount;
 import com.signavio.platform.account.business.FsAccountManager;
-import com.signavio.platform.exceptions.AccountInActiveException;
-import com.signavio.platform.exceptions.IncorrectPasswordException;
-import com.signavio.platform.exceptions.PrincipalException;
-import com.signavio.platform.exceptions.TenantException;
-import com.signavio.platform.exceptions.TenantInActiveException;
+import com.signavio.platform.exceptions.*;
 import com.signavio.platform.security.business.FsAccessToken;
 import com.signavio.platform.security.business.FsRootObject;
 import com.signavio.platform.security.business.FsSecurityManager;
@@ -42,6 +34,8 @@ import com.signavio.usermanagement.user.business.FsUser;
 import com.signavio.warehouse.business.FsEntityManager;
 import com.signavio.warehouse.directory.business.FsDirectory;
 import com.signavio.warehouse.model.business.FsModel;
+import junit.framework.Assert;
+import org.junit.Test;
 
 
 public class FsAccessTest {

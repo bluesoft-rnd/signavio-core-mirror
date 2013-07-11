@@ -21,11 +21,11 @@
  */
 package com.signavio.platform.account.business;
 
-import java.util.Set;
-
 import com.signavio.platform.security.business.FsBusinessObjectManager;
 import com.signavio.platform.security.business.FsSecureBusinessObject;
 import com.signavio.platform.tenant.business.FsTenant;
+
+import java.util.Set;
 
 /**
  * Implementation of an Account Manager for file system accessing Oryx.

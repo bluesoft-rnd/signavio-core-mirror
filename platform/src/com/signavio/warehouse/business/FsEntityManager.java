@@ -21,17 +21,17 @@
  */
 package com.signavio.warehouse.business;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import com.signavio.platform.security.business.FsBusinessObjectManager;
 import com.signavio.platform.security.business.FsSecureBusinessObject;
 import com.signavio.platform.tenant.business.FsTenant;
 import com.signavio.usermanagement.user.business.FsUser;
 import com.signavio.warehouse.directory.business.FsDirectory;
 import com.signavio.warehouse.directory.business.FsRootDirectory;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Implementation of an Entity Manager for file system accessing Oryx.

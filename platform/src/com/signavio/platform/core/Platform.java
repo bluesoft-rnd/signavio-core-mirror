@@ -21,9 +21,9 @@
  */
 package com.signavio.platform.core;
 
-import java.lang.reflect.Constructor;
-
 import com.signavio.platform.exceptions.InitializationException;
+
+import java.lang.reflect.Constructor;
 
 /**
  * The Platform class stores the active {@link PlatformInstance} and provides an interface for 

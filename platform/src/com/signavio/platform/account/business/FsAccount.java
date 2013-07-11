@@ -21,14 +21,14 @@
  */
 package com.signavio.platform.account.business;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.signavio.platform.security.business.FsAccessToken;
 import com.signavio.platform.security.business.FsSecureBusinessObject;
 import com.signavio.platform.security.business.FsSecureBusinessSubject;
 import com.signavio.platform.tenant.business.FsTenant;
 import com.signavio.usermanagement.user.business.FsUser;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**

@@ -21,11 +21,6 @@
  */
 package com.signavio.warehouse.directory.handler;
 
-import javax.servlet.ServletContext;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.signavio.platform.annotations.HandlerConfiguration;
 import com.signavio.platform.annotations.HandlerMethodActivation;
 import com.signavio.platform.exceptions.JSONRequestException;
@@ -34,6 +29,10 @@ import com.signavio.platform.security.business.FsAccessToken;
 import com.signavio.platform.security.business.FsSecureBusinessObject;
 import com.signavio.warehouse.directory.business.FsDirectory;
 import com.signavio.warehouse.directory.business.FsRootDirectory;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javax.servlet.ServletContext;
 
 
 /**

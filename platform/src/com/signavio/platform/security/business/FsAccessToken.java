@@ -21,11 +21,11 @@
  */
 package com.signavio.platform.security.business;
 
-import java.io.Serializable;
-
 import com.signavio.platform.account.business.FsAccount;
 import com.signavio.platform.tenant.business.FsTenant;
 import com.signavio.usermanagement.user.business.FsUser;
+
+import java.io.Serializable;
 
 /**
  * Implementation of an Access Token for file system accessing Oryx.

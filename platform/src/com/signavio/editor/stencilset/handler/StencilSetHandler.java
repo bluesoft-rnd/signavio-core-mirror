@@ -21,19 +21,6 @@
  */
 package com.signavio.editor.stencilset.handler;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import com.signavio.platform.annotations.HandlerConfiguration;
 import com.signavio.platform.core.Platform;
 import com.signavio.platform.exceptions.RequestException;
@@ -42,6 +29,13 @@ import com.signavio.platform.security.business.FsAccessToken;
 import com.signavio.platform.security.business.FsSecureBusinessObject;
 import com.signavio.platform.util.FileUtil;
 import com.signavio.usermanagement.user.business.FsUser;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 
 
 @HandlerConfiguration(uri = "/editor_stencilset", rel = "stencilset")

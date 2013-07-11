@@ -21,23 +21,6 @@
  */
 package com.signavio.warehouse.model.business;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.oryxeditor.server.diagram.Bounds;
-import org.oryxeditor.server.diagram.Point;
-import org.oryxeditor.server.diagram.basic.BasicDiagramBuilder;
-import org.oryxeditor.server.diagram.basic.BasicNode;
-import org.oryxeditor.server.diagram.generic.GenericDiagram;
-
 import com.signavio.platform.security.business.FsSecureBusinessObject;
 import com.signavio.platform.util.fsbackend.FileSystemUtil;
 import com.signavio.warehouse.business.FsEntityManager;
@@ -46,6 +29,14 @@ import com.signavio.warehouse.directory.business.FsRootDirectory;
 import com.signavio.warehouse.revision.business.FsModelRepresentationInfo;
 import com.signavio.warehouse.revision.business.FsModelRevision;
 import com.signavio.warehouse.revision.business.RepresentationType;
+import org.json.JSONException;
+import org.oryxeditor.server.diagram.basic.BasicDiagramBuilder;
+import org.oryxeditor.server.diagram.generic.GenericDiagram;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.*;
 
 /**
  * Implementation of a model in the file accessing Oryx backend.

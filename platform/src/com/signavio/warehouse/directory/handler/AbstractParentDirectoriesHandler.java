@@ -1,17 +1,14 @@
 package com.signavio.warehouse.directory.handler;
 
-import java.util.List;
-
-import javax.servlet.ServletContext;
-
-import org.json.JSONArray;
-
-import com.signavio.platform.core.Directory;
 import com.signavio.platform.handler.AbstractHandler;
 import com.signavio.platform.security.business.FsAccessToken;
 import com.signavio.platform.security.business.FsSecureBusinessObject;
 import com.signavio.warehouse.directory.business.FsDirectory;
 import com.signavio.warehouse.model.business.FsModel;
+import org.json.JSONArray;
+
+import javax.servlet.ServletContext;
+import java.util.List;
 
 public abstract class AbstractParentDirectoriesHandler extends AbstractHandler {
 

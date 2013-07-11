@@ -21,13 +21,13 @@
  */
 package com.signavio.warehouse.revision.handler;
 
-import javax.servlet.ServletContext;
-
 import com.signavio.platform.annotations.HandlerConfiguration;
 import com.signavio.platform.annotations.HandlerMethodActivation;
 import com.signavio.platform.handler.BasisHandler;
 import com.signavio.platform.security.business.FsAccessToken;
 import com.signavio.platform.security.business.FsSecureBusinessObject;
+
+import javax.servlet.ServletContext;
 
 
 

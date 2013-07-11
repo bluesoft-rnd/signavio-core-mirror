@@ -1,11 +1,10 @@
 package test.pl.net.bluesoft.rnd.processtool.editor.imports;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
-
 import pl.net.bluesoft.rnd.processtool.editor.imports.exception.UnsupportedDiagramException;
 import pl.net.bluesoft.rnd.processtool.editor.imports.utils.ModelerFileInputDecoder;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * The class <code>ModelerFileInputDecoderTest</code> contains tests for the

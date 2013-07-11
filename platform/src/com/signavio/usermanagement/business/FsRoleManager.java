@@ -21,14 +21,14 @@
  */
 package com.signavio.usermanagement.business;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.signavio.platform.account.business.FsAccount;
 import com.signavio.platform.exceptions.PrincipalException;
 import com.signavio.platform.security.business.FsBusinessObjectManager;
 import com.signavio.platform.security.business.FsSecureBusinessObject;
 import com.signavio.usermanagement.user.business.FsUser;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Implementation of a role manager in the file accessing Oryx backend.

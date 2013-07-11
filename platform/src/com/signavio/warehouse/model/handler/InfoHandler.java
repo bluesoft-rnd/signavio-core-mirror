@@ -21,13 +21,6 @@
  */
 package com.signavio.warehouse.model.handler;
 
-import java.io.UnsupportedEncodingException;
-
-import javax.servlet.ServletContext;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.signavio.platform.annotations.HandlerConfiguration;
 import com.signavio.platform.annotations.HandlerMethodActivation;
 import com.signavio.platform.exceptions.JSONRequestException;
@@ -38,6 +31,11 @@ import com.signavio.platform.security.business.FsSecureBusinessObject;
 import com.signavio.warehouse.directory.business.FsDirectory;
 import com.signavio.warehouse.model.business.FsModel;
 import com.signavio.warehouse.revision.business.FsModelRevision;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javax.servlet.ServletContext;
+import java.io.UnsupportedEncodingException;
 
 
 /**

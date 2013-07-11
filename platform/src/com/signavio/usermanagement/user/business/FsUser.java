@@ -21,13 +21,13 @@
  */
 package com.signavio.usermanagement.user.business;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.signavio.platform.account.business.FsAccount;
 import com.signavio.platform.security.business.FsSecureBusinessObject;
 import com.signavio.platform.security.business.FsSecureBusinessSubject;
 import com.signavio.usermanagement.business.FsRoleManager;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Dummy implementation of a user in the file accessing Oryx backend.

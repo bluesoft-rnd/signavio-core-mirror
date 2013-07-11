@@ -21,12 +21,12 @@
  */
 package com.signavio.platform.tenant.business;
 
-import java.util.Set;
-
 import com.signavio.platform.account.business.FsAccount;
 import com.signavio.platform.exceptions.TenantException;
 import com.signavio.platform.security.business.FsBusinessObjectManager;
 import com.signavio.platform.security.business.FsSecureBusinessObject;
+
+import java.util.Set;
 
 /**
  * Implementation of a tenant manager in the file accessing Oryx backend.

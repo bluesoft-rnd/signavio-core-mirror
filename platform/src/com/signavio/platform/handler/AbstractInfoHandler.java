@@ -21,14 +21,13 @@
  */
 package com.signavio.platform.handler;
 
-import javax.servlet.ServletContext;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.signavio.platform.exceptions.JSONRequestException;
 import com.signavio.platform.security.business.FsAccessToken;
 import com.signavio.platform.security.business.FsSecureBusinessObject;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javax.servlet.ServletContext;
 
 
 /**

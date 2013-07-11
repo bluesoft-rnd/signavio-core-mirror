@@ -21,14 +21,13 @@
  */
 package com.signavio.platform.listeners;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
-import org.apache.log4j.Logger;
-
 import com.signavio.platform.core.Platform;
 import com.signavio.platform.core.PlatformInstance;
 import com.signavio.platform.core.impl.FsPlatformInstanceImpl;
+import org.apache.log4j.Logger;
+
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
 /**
  * This is the entry point for the application. 

@@ -21,15 +21,15 @@
  */
 package com.signavio.warehouse.revision.business;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-
 import com.signavio.platform.security.business.FsAccessToken;
 import com.signavio.platform.security.business.FsSecureBusinessObject;
 import com.signavio.platform.security.business.FsSecurityManager;
 import com.signavio.usermanagement.user.business.FsUser;
 import com.signavio.warehouse.model.business.FsModel;
+
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Implementation of an Comment for file system accessing Oryx.

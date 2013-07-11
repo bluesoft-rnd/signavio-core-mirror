@@ -1,14 +1,13 @@
 package pl.net.bluesoft.rnd.processtool.editor.imports.parsers;
 
-import java.util.List;
-
 import org.oryxeditor.server.diagram.Bounds;
 import org.oryxeditor.server.diagram.Point;
 import org.w3c.dom.Element;
-
 import pl.net.bluesoft.rnd.processtool.editor.imports.exception.ParserException;
 import pl.net.bluesoft.rnd.processtool.editor.imports.exception.UnsupportedTypeOfTaskException;
 import pl.net.bluesoft.rnd.processtool.editor.imports.utils.NodeTypeEnum;
+
+import java.util.List;
 
 public interface Parser {
 /**

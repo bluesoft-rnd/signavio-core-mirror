@@ -21,25 +21,16 @@
  */
 package com.signavio.warehouse.model.business;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import com.signavio.platform.core.HandlerDirectory;
-import com.signavio.platform.handler.AbstractHandler;
 import com.signavio.warehouse.model.business.modeltype.BPMN2_0XMLModelType;
 import com.signavio.warehouse.model.business.modeltype.JpdlModelType;
 import com.signavio.warehouse.model.business.modeltype.SignavioModelType;
+
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class ModelTypeManager {
 	

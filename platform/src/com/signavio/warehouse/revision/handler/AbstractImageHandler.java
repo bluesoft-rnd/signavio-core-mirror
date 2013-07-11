@@ -21,24 +21,18 @@
  */
 package com.signavio.warehouse.revision.handler;
 
+import com.signavio.platform.security.business.FsSecureBusinessObject;
+import com.signavio.warehouse.revision.business.FsModelRepresentationInfo;
+import com.signavio.warehouse.revision.business.FsModelRevision;
+import com.signavio.warehouse.revision.business.RepresentationType;
+import org.apache.batik.transcoder.*;
+
+import javax.servlet.ServletContext;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-
-import javax.servlet.ServletContext;
-
-import org.apache.batik.transcoder.AbstractTranscoder;
-import org.apache.batik.transcoder.TranscoderException;
-import org.apache.batik.transcoder.TranscoderInput;
-import org.apache.batik.transcoder.TranscoderOutput;
-import org.apache.batik.transcoder.TranscodingHints;
-
-import com.signavio.platform.security.business.FsSecureBusinessObject;
-import com.signavio.warehouse.revision.business.FsModelRepresentationInfo;
-import com.signavio.warehouse.revision.business.FsModelRevision;
-import com.signavio.warehouse.revision.business.RepresentationType;
 
 public class AbstractImageHandler extends AbstractRevisionExportHandler {
 

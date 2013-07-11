@@ -1,13 +1,12 @@
 package com.signavio.warehouse.model.handler;
 
-import javax.servlet.ServletContext;
-
-import org.json.JSONObject;
-
 import com.signavio.platform.annotations.HandlerConfiguration;
 import com.signavio.platform.handler.AbstractHandler;
 import com.signavio.platform.security.business.FsAccessToken;
 import com.signavio.platform.security.business.FsSecureBusinessObject;
+import org.json.JSONObject;
+
+import javax.servlet.ServletContext;
 
 @HandlerConfiguration(context=ModelHandler.class, uri="/notify", rel="notify")
 public class NotificationHandler extends AbstractHandler {

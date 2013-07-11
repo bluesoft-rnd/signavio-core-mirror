@@ -21,12 +21,6 @@
  */
 package com.signavio.warehouse.directory.handler;
 
-import javax.servlet.ServletContext;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.signavio.platform.annotations.HandlerConfiguration;
 import com.signavio.platform.annotations.HandlerMethodActivation;
 import com.signavio.platform.core.Platform;
@@ -39,6 +33,11 @@ import com.signavio.platform.security.business.FsSecurityManager;
 import com.signavio.warehouse.business.FsEntityManager;
 import com.signavio.warehouse.directory.business.FsDirectory;
 import com.signavio.warehouse.model.business.FsModel;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javax.servlet.ServletContext;
 
 
 

@@ -24,25 +24,15 @@
  */
 package com.signavio.platform.filters;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.signavio.platform.core.HandlerEntry;
 import com.signavio.platform.core.Platform;
 import com.signavio.platform.exceptions.RequestException;
-import com.signavio.platform.security.business.FsAccessToken;
 import com.signavio.platform.servlets.DispatcherServlet;
-import com.signavio.platform.tenant.LicenseException;
+
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * This filter checks, if the requested handler exists.
