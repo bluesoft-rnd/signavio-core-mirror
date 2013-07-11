@@ -43,6 +43,7 @@ import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 
+import de.hpi.bpmn2_0.model.misc.Property;
 import org.w3c.dom.Element;
 
 import de.hpi.bpmn2_0.model.activity.resource.ActivityResource;
@@ -97,7 +98,7 @@ import de.hpi.diagram.SignavioUUID;
 // MessageFlow.class,
 // TInputOutputBinding.class,
 // TResourceParameter.class,
-// TProperty.class,
+Property.class,
  DataInput.class,
  ResourceRole.class,
 // TComplexBehaviorDefinition.class,

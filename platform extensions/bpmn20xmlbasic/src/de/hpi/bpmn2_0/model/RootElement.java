@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 
 import de.hpi.bpmn2_0.model.data_object.Message;
+import de.hpi.bpmn2_0.model.misc.ItemDefinition;
 import de.hpi.bpmn2_0.model.misc.Signal;
 
 
@@ -32,7 +33,7 @@ import de.hpi.bpmn2_0.model.misc.Signal;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tRootElement")
 @XmlSeeAlso(value = {
-//    TItemDefinition.class,
+ItemDefinition.class,
 //    Category.class,
 //    Collaboration.class,
 //    TEndPoint.class,

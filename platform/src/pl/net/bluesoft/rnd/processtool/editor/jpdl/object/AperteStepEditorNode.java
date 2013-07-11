@@ -1,24 +1,23 @@
 package pl.net.bluesoft.rnd.processtool.editor.jpdl.object;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import com.signavio.platform.exceptions.RequestException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.aperteworkflow.editor.domain.Permission;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.signavio.platform.exceptions.RequestException;
-
 import pl.net.bluesoft.rnd.processtool.editor.AperteWorkflowDefinitionGenerator;
 import pl.net.bluesoft.rnd.processtool.editor.Widget;
 import pl.net.bluesoft.rnd.processtool.editor.XmlUtil;
+import pl.net.bluesoft.rnd.processtool.editor.jpdl.components.StencilNames;
 
-public abstract class JDPLStepEditorNode extends JPDLTask {
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+public  class AperteStepEditorNode extends AperteTask {
 
 	protected Widget widget;
 	protected String commentary;
@@ -29,7 +28,7 @@ public abstract class JDPLStepEditorNode extends JPDLTask {
 	protected String candidateGroups;
 	protected List<Permission> permissions;
 
-	protected JDPLStepEditorNode(AperteWorkflowDefinitionGenerator generator) {
+	protected AperteStepEditorNode(AperteWorkflowDefinitionGenerator generator) {
 		super(generator);
 	}
 
@@ -153,14 +152,14 @@ public abstract class JDPLStepEditorNode extends JPDLTask {
 				throw new RuntimeException("User task: " + name
 						+ " has more than one outgoing transition.");
 			}
-			JPDLTransition next = outgoing.values().iterator().next();
-			JPDLComponent component = generator.findComponent(next.getTarget());
-			if (component instanceof JPDLDecision) {
-				for (JPDLTransition trans : component.getOutgoing().values()) {
+			AperteTransition next = outgoing.values().iterator().next();
+			AperteComponent component = generator.findComponent(next.getTarget());
+			if (StencilNames.EXCLUSIVE_DATABASED_GATEWAY.equalsStencilName(component.getStencilId())) {
+				for (AperteTransition trans : component.getOutgoing().values()) {
 					sb.append(trans.generateStateActionXML());
 				}
 			} else {// normal button,
-				for (JPDLTransition trans : outgoing.values()) {
+				for (AperteTransition trans : outgoing.values()) {
 					sb.append(trans.generateStateActionXML());
 				}
 			}
@@ -221,28 +220,28 @@ public abstract class JDPLStepEditorNode extends JPDLTask {
 
 	private String generateChildrenXML(List<Widget> list,
 			boolean withChildrenTag) {
-		if (list.isEmpty()) {
-			return "";
-		}
+        if (list.isEmpty()) {
+            return "";
+        }
 
-		StringBuilder sb = new StringBuilder();
-		if (withChildrenTag) {
-			sb.append("<children>\n");
-		}
-		for (Widget w : list) {
-			sb.append(String
-					.format("<config.ProcessStateWidget className=\"%s\" priority=\"%d\">\n",
-							w.getWidgetId(), w.getPriority()));
-			sb.append(generateWidgetPermissionsXML(w.getPermissions()));
-			sb.append(generateAttributesXML(w.getAttributesMap()));
-			sb.append(generateChildrenXML(w.getChildrenList(), true));
-			sb.append("</config.ProcessStateWidget>\n");
-		}
-		if (withChildrenTag) {
-			sb.append("</children>\n");
-		}
-		return sb.toString();
-	}
+        StringBuilder sb = new StringBuilder();
+        if (withChildrenTag) {
+            sb.append("<children>\n");
+        }
+        for (Widget w : list) {
+            sb.append(String
+                    .format("<config.ProcessStateWidget className=\"%s\" priority=\"%d\">\n",
+                            w.getWidgetId(), w.getPriority()));
+            sb.append(generateWidgetPermissionsXML(w.getPermissions()));
+            sb.append(generateAttributesXML(w.getAttributesMap()));
+            sb.append(generateChildrenXML(w.getChildrenList(), true));
+            sb.append("</config.ProcessStateWidget>\n");
+        }
+        if (withChildrenTag) {
+            sb.append("</children>\n");
+        }
+        return sb.toString();
+    }
 
 	public String getSwimlane() {
 		return swimlane;

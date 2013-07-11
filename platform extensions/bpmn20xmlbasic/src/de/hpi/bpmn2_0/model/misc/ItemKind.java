@@ -48,7 +48,10 @@ public enum ItemKind {
     @XmlEnumValue("Information")
     INFORMATION("Information"),
     @XmlEnumValue("Physical")
-    PHYSICAL("Physical");
+    PHYSICAL("Physical"),
+    @XmlEnumValue("_STRING")
+    _STRING("_STRING");
+
     private final String value;
 
     ItemKind(String v) {

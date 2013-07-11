@@ -3,14 +3,18 @@ package pl.net.bluesoft.rnd.processtool.editor;
 import com.signavio.platform.core.Platform;
 import com.signavio.platform.core.PlatformProperties;
 import com.signavio.platform.exceptions.RequestException;
-import com.sun.msv.datatype.xsd.Comparator;
-
 import de.hpi.bpmn2_0.exceptions.BpmnConverterException;
 import de.hpi.bpmn2_0.factory.AbstractBpmnFactory;
+import de.hpi.bpmn2_0.model.BaseElement;
 import de.hpi.bpmn2_0.model.Definitions;
+import de.hpi.bpmn2_0.model.Process;
+import de.hpi.bpmn2_0.model.activity.type.ScriptTask;
+import de.hpi.bpmn2_0.model.extension.ExtensionElements;
+import de.hpi.bpmn2_0.model.extension.jbpm5.ImportClass;
+import de.hpi.bpmn2_0.model.misc.ItemKind;
+import de.hpi.bpmn2_0.model.misc.Property;
 import de.hpi.bpmn2_0.transformation.Bpmn2XmlConverter;
 import de.hpi.bpmn2_0.transformation.Diagram2BpmnConverter;
-import de.hpi.bpmn2_0.transformation.Diagram2XmlConverter;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -26,7 +30,10 @@ import org.oryxeditor.server.diagram.basic.BasicDiagram;
 import org.oryxeditor.server.diagram.basic.BasicDiagramBuilder;
 import org.xml.sax.SAXException;
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.exception.UnsupportedJPDLObjectException;
-import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.*;
+import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.AperteComponent;
+import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.AperteObject;
+import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.AperteStepEditorNode;
+import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.AperteTransition;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -34,7 +41,6 @@ import javax.xml.transform.TransformerException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
@@ -43,17 +49,17 @@ import java.util.regex.Pattern;
 
 public class AperteWorkflowDefinitionGenerator {
 
-    //key = resourceId
-    private Map<String, JPDLComponent> componentMap = new HashMap<String, JPDLComponent>();
-    private Map<String, JPDLTransition> transitionMap = new HashMap<String, JPDLTransition>();
-
-    private String json;
-
-    private ProcessConfig processConfig;
-
+    public static final String ACTION = "ACTION";
+    public static final String RESULT = "RESULT";
     private final Logger logger = Logger.getLogger(AperteWorkflowDefinitionGenerator.class);
-
+    private String AUTO_STEP_ACTION_CLASS = Platform.getInstance().getPlatformProperties().getAperteStepActionClass();
+    private String AUTO_STEP_ACTION_CLASS_PATH = Platform.getInstance().getPlatformProperties().getAperteStepActionClassPackage() + "." + AUTO_STEP_ACTION_CLASS;
+    private Map<String, AperteComponent> componentMap = new HashMap<String, AperteComponent>();
+    private Map<String, AperteTransition> transitionMap = new HashMap<String, AperteTransition>();
+    private String json;
+    private ProcessConfig processConfig;
     private String processName;
+    private String processId;
     private String processFileName;
     private String bundleDesc;
     private String bundleName;
@@ -62,31 +68,38 @@ public class AperteWorkflowDefinitionGenerator {
     private int offsetX;
     private String processDefinitionLanguage;
 
+
     public AperteWorkflowDefinitionGenerator(int offsetX, int offsetY) {
         this.offsetX = offsetX;
         this.offsetY = offsetY;
     }
 
-
     public void init(String json) {
         try {
             this.json = json;
             JSONObject jsonObj = enrichModelerDataForBpmn20();
-//            JSONObject jsonObj = new JSONObject(json);
-            processName = jsonObj.getJSONObject("properties").getString("name");
-            processFileName = jsonObj.getJSONObject("properties").optString("aperte-process-filename");
-            bundleDesc = jsonObj.getJSONObject("properties").optString("mf-bundle-description");
-            bundleName = jsonObj.getJSONObject("properties").optString("mf-bundle-name");
-            processToolDeployment = jsonObj.getJSONObject("properties").optString("mf-processtool-deployment");
+            processName = jsonObj.getJSONObject(JsonConstants.PROPERTIES.getName()).getString("name");
+            processId = jsonObj.getJSONObject(JsonConstants.PROPERTIES.getName()).getString("process-id");
+            processFileName = jsonObj.getJSONObject(JsonConstants.PROPERTIES.getName()).optString("aperte-process-filename");
+            bundleDesc = jsonObj.getJSONObject(JsonConstants.PROPERTIES.getName()).optString("mf-bundle-description");
+            bundleName = jsonObj.getJSONObject(JsonConstants.PROPERTIES.getName()).optString("mf-bundle-name");
+            processToolDeployment = jsonObj.getJSONObject(JsonConstants.PROPERTIES.getName()).optString("mf-processtool-deployment");
             PlatformProperties props = Platform.getInstance().getPlatformProperties();
             String aperteData = getAperteData(props.getServerName() + props.getJbpmGuiUrl() + props.getAperteConfigurationUrl());
             processDefinitionLanguage = new JSONObject(aperteData).optString("definitionLanguage");
-            //processDefinitionLanguage = jsonObj.getJSONObject("properties").optString("aperte-language");
+            //processDefinitionLanguage = jsonObj.getJSONObject(JsonConstants.PROPERTIES.getName()).optString("aperte-language");
             if (processDefinitionLanguage == null || "".equals(processDefinitionLanguage)) {
-                processDefinitionLanguage = "jpdl";//for old process definitions
+                processDefinitionLanguage = "bpmn20";//for old process definitions
             }
             if (StringUtils.isEmpty(processName)) {
                 throw new RequestException("Process name is empty.");
+            }
+            if (StringUtils.isEmpty(processId)) {
+                if (!StringUtils.isEmpty(processName)) {
+                    processId = processName;
+                } else {
+                    throw new RequestException("Process name is empty.");
+                }
             }
             if (StringUtils.isEmpty(processFileName)) {
                 throw new RequestException("Aperte process filename is empty.");
@@ -100,12 +113,12 @@ public class AperteWorkflowDefinitionGenerator {
             if (StringUtils.isEmpty(processToolDeployment)) {
                 throw new RequestException("Manifest: ProcessTool-Process-Deployment is empty.");
             }
-            if (StringUtils.contains(processToolDeployment,' ')) {
+            if (StringUtils.contains(processToolDeployment, ' ')) {
                 throw new RequestException("Manifest: ProcessTool-Process-Deployment cannot have spaces in name.");
             }
 
 
-            String processConfJson = jsonObj.getJSONObject("properties").optString("process-conf");
+            String processConfJson = jsonObj.getJSONObject(JsonConstants.PROPERTIES.getName()).optString("process-conf");
             if (processConfJson != null && !processConfJson.trim().isEmpty()) {
                 processConfig = ProcessConfigJSONHandler.getInstance().toObject(processConfJson);
             }
@@ -113,21 +126,22 @@ public class AperteWorkflowDefinitionGenerator {
             JSONArray childShapes = jsonObj.getJSONArray("childShapes");
             for (int i = 0; i < childShapes.length(); i++) {
                 JSONObject obj = childShapes.getJSONObject(i);
-                JPDLObject jpdlObject = JPDLObject.getJPDLObject(obj, this);
-                jpdlObject.fillBasicProperties(obj);
-                checkIfTheNamesAreRepeated(componentMap, jpdlObject);
-                
-                
-                if (jpdlObject instanceof JPDLComponent) {
-                        //not needed anymore
-//                    ((JPDLComponent) jpdlObject).applyOffset(offsetX, offsetY);
-                    componentMap.put(jpdlObject.getResourceId(), (JPDLComponent) jpdlObject);
-                } else if (jpdlObject instanceof JPDLTransition) {
-                	JPDLTransition transition =(JPDLTransition) jpdlObject;
-                    transitionMap.put(jpdlObject.getResourceId(), transition);
+
+                //BPMN preparation
+                AperteObject aperteObject = AperteObject.getJPDLObject(obj, this);
+
+                aperteObject.fillBasicProperties(obj);
+                // checkIfTheNamesAreRepeated(componentMap, aperteObject);
+
+
+                if (aperteObject instanceof AperteComponent) {
+                    componentMap.put(aperteObject.getResourceId(), (AperteComponent) aperteObject);
+                } else if (aperteObject instanceof AperteTransition) {
+                    AperteTransition transition = (AperteTransition) aperteObject;
+                    transitionMap.put(aperteObject.getResourceId(), transition);
                 }
             }
-            
+
         } catch (JSONException e) {
             logger.error("Error while generating JPDL file.", e);
             throw new RequestException("Error while generating JPDL file.", e);
@@ -138,77 +152,39 @@ public class AperteWorkflowDefinitionGenerator {
 
         //second pass, complete the transition map
         for (String key : componentMap.keySet()) {
-            JPDLComponent cmp = componentMap.get(key);
+            AperteComponent cmp = componentMap.get(key);
             for (String resourceId : cmp.getOutgoing().keySet()) {
-                JPDLTransition transition = transitionMap.get(resourceId);
+                AperteTransition transition = transitionMap.get(resourceId);
                 transition.setTargetName(componentMap.get(transition.getTarget()).getName());
-                
-                JPDLComponent jpdlComponent = componentMap.get(transition.getTarget());
-                 
+
+                AperteComponent jpdlComponent = componentMap.get(transition.getTarget());
+
                 cmp.putTransition(resourceId, transition);
-                jpdlComponent.putIncomingTransition(resourceId, transition); 
+                jpdlComponent.putIncomingTransition(resourceId, transition);
             }
-            
+
         }
-
     }
-       
-	private void checkIfTheNamesAreRepeated(Map componentMap, final JPDLObject obj) {
-		JPDLTask jtask;
-		if (obj instanceof JPDLTask && !(obj instanceof JPDLEndEvent)){
-		Collection values = componentMap.values();
-		for (Object object : values) {
-			if (object instanceof JPDLTask && !(object instanceof JPDLEndEvent)) {
-				jtask = (JPDLTask) object;
-				if (jtask.getName().equals(obj.getName())) {
-					throw new RequestException("Name: '" + obj.getName()
-							+ "' is duplicated. Change name it.");
+       //TODO remove after tests
+    /*private void checkIfTheNamesAreRepeated(Map componentMap, final AperteObject obj) {
+        AperteTask jtask;
+        if (obj instanceof AperteTask && !(obj instanceof AperteEndEvent)) {
+            Collection values = componentMap.values();
+            for (Object object : values) {
+                if (object instanceof AperteTask && !(object instanceof AperteEndEvent)) {
+                    jtask = (AperteTask) object;
+                    if (jtask.getName().equals(obj.getName())) {
+                        throw new RequestException("Name: '" + obj.getName()
+                                + "' is duplicated. Change name it.");
 
-				} 
-			}
-		}
-		}
-    } 
-
-    public String generateDefinition() {
-        if ("jpdl".equals(processDefinitionLanguage)) {
-            return generateJpdl();
-        } else {
-            return generateBpmn20();
-        }
-
-    }
-
-
-    public String generateJpdl() {
-        StringBuffer jpdl = new StringBuffer();
-        jpdl.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        jpdl.append(String.format("<process name=\"%s\" xmlns=\"http://jbpm.org/4.4/jpdl\">\n", processName));
-
-        Set<String> swimlanes = new HashSet<String>();
-
-        for (String key : componentMap.keySet()) {
-            JPDLComponent comp = componentMap.get(key);
-            if (comp instanceof JPDLUserTask) {
-                JPDLUserTask userTask = (JPDLUserTask) comp;
-                if (userTask.getSwimlane() != null && userTask.getSwimlane().trim().length() > 0) {
-                    swimlanes.add(userTask.getSwimlane());
+                    }
                 }
             }
         }
+    }*/
 
-        for (String sl : swimlanes) {
-            jpdl.append(String.format("<swimlane candidate-groups=\"%s\" name=\"%s\"/>\n", sl, sl));
-        }
-
-
-        for (String key : componentMap.keySet()) {
-            jpdl.append(componentMap.get(key).toXML());
-        }
-
-        jpdl.append("</process>");
-
-        return jpdl.toString();
+    public String generateDefinition() {
+        return generateBpmn20();
     }
 
     public String generateBpmn20() {
@@ -216,27 +192,50 @@ public class AperteWorkflowDefinitionGenerator {
         try {
             JSONObject jsonObj = enrichModelerDataForBpmn20();
             String jsonForBpmn20 = jsonObj.toString();
-            BasicDiagram diagram = BasicDiagramBuilder.parseJson(jsonForBpmn20);
-
-            Diagram2BpmnConverter converter;
-
-            converter = new Diagram2BpmnConverter(diagram, AbstractBpmnFactory.getFactoryClasses());
-            Definitions bpmnDefinitions = converter.getDefinitionsFromDiagram();
-            ((de.hpi.bpmn2_0.model.Process)bpmnDefinitions.getRootElement().get(0)).setExecutable(true);
-            bpmnDefinitions.getRootElement().get(0).setId(processName);
-            Bpmn2XmlConverter xmlConverter = new Bpmn2XmlConverter(bpmnDefinitions,
-                    Platform.getInstance().getFile("/WEB-INF/xsd/BPMN20.xsd").getAbsolutePath());
-            return xmlConverter.getXml().toString();
+            Definitions bpmnDefinitions = prepareDefinitions(jsonForBpmn20);
+            List<Property> propertyList = preparePropertyList(jsonForBpmn20);
+            enrichtDefinitions(propertyList, bpmnDefinitions);
+            return convertDiagramToXml(bpmnDefinitions);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
+    private Definitions prepareDefinitions(String jsonForBpmn20) throws JSONException, BpmnConverterException {
+        BasicDiagram diagram = BasicDiagramBuilder.parseJson(jsonForBpmn20);
+        Diagram2BpmnConverter converter;
+        Platform.getInstance().getPlatformProperties();
+
+
+        converter = new Diagram2BpmnConverter(diagram, AbstractBpmnFactory.getFactoryClasses());
+        return converter.getDefinitionsFromDiagram();
+    }
+
+    public List<String> getSubProcessNamesFromJson(String json) throws JSONException {
+        List<String> subprocessNames = new ArrayList<String>();
+        JSONObject jsonObj = new JSONObject(json);
+        JSONArray childShapes = jsonObj.getJSONArray("childShapes");
+        for (int i = 0; i < childShapes.length(); i++) {
+            JSONObject obj = childShapes.getJSONObject(i);
+            String stencilId = obj.getJSONObject("stencil").getString("id");
+            if (TaskType.COLAPSED_SUBPROCESS.getName().equals(stencilId)) {
+                String taskName = getTaskName(obj);
+                subprocessNames.add(taskName);
+            }
+        }
+        return subprocessNames;
+    }
+
+    private String getTaskName(JSONObject obj) throws JSONException {
+        JSONObject propertiesObj = obj.getJSONObject(JsonConstants.PROPERTIES.getName());
+        return propertiesObj.optString("name");
+    }
+
     private JSONObject enrichModelerDataForBpmn20() throws JSONException {
         JSONObject jsonObj = new JSONObject(json);
         JSONArray childShapes = jsonObj.getJSONArray("childShapes");
-        Map<String,JSONObject> outgoingMap = new HashMap<String, JSONObject>();
-        Map<String,JSONObject> resourceIdMap = new HashMap<String, JSONObject>();
+        Map<String, JSONObject> outgoingMap = new HashMap<String, JSONObject>();
+        Map<String, JSONObject> resourceIdMap = new HashMap<String, JSONObject>();
         for (int i = 0; i < childShapes.length(); i++) {
             JSONObject obj = childShapes.getJSONObject(i);
             fixBounds(obj);
@@ -244,7 +243,7 @@ public class AperteWorkflowDefinitionGenerator {
             resourceIdMap.put(obj.getString("resourceId"), obj);
             if (obj.has("outgoing")) {
                 JSONArray outgoing = obj.getJSONArray("outgoing");
-                for (int j=0; j <  outgoing.length(); j++) {
+                for (int j = 0; j < outgoing.length(); j++) {
                     JSONObject outobj = outgoing.getJSONObject(j);
                     outgoingMap.put(outobj.getString("resourceId"), obj);
                 }
@@ -253,18 +252,15 @@ public class AperteWorkflowDefinitionGenerator {
         for (int i = 0; i < childShapes.length(); i++) {
             JSONObject obj = childShapes.getJSONObject(i);
             String stencilId = obj.getJSONObject("stencil").getString("id");
-
             if ("Task".equals(stencilId)) {
-                String taskType = obj.getJSONObject("properties").getString("tasktype");
-                if ("User".equals(taskType)) {
+                String taskType = obj.getJSONObject(JsonConstants.PROPERTIES.getName()).getString("tasktype");
+                if (TaskType.USER.getName().equals(taskType)) {
                     enrichBpmn20AssignmentConfig(obj, resourceIdMap);
                 } else {
                     enrichBpmn20JavaTask(obj, resourceIdMap);
                 }
-            } else if ("SequenceFlow".equals(stencilId)) {
-                enrichBpmn20SequenceFlow(obj, outgoingMap, resourceIdMap);
-            } else if ("Exclusive_Databased_Gateway".equals(stencilId)) {
-
+            } else if (TaskType.COLAPSED_SUBPROCESS.getName().equals(stencilId)) {
+                makeSubProcesCompatibleWithJbpm5(obj);
             }
         }
         return jsonObj;
@@ -273,7 +269,7 @@ public class AperteWorkflowDefinitionGenerator {
     private void fixDockers(JSONObject obj) throws JSONException {
         JSONArray dockers = obj.optJSONArray("dockers");
         if (dockers == null) return;
-        for (int i=0; i < dockers.length(); i++) {
+        for (int i = 0; i < dockers.length(); i++) {
             fixOffset(dockers.getJSONObject(i));
         }
     }
@@ -294,30 +290,31 @@ public class AperteWorkflowDefinitionGenerator {
         point.put("y", y + offsetY);
     }
 
-    private void enrichBpmn20SequenceFlow(JSONObject obj,
-                                          Map<String,JSONObject> outgoingMap,
-                                          Map<String,JSONObject> resourceIdMap) throws JSONException {
-//        String targetId = obj.getJSONObject("target").getString("resourceId");
-//        JSONObject source = outgoingMap.get(obj.getString("resourceId"));
-
-
-//        JSONArray incoming = obj.getJSONArray("incoming");
-//        JSONArray outgoing = obj.getJSONArray("outgoing");
-//        JSONObject incomingNode = incoming.getJSONObject(0);
-//        JSONObject outgoingNode = outgoing.getJSONObject(0);
-
+    private void makeSubProcesCompatibleWithJbpm5(JSONObject obj) throws JSONException {
+        JSONObject propertiesObj = obj.getJSONObject(JsonConstants.PROPERTIES.getName());
+        boolean isCallActivity = Boolean.parseBoolean(propertiesObj.optString(JsonConstants.CALL_ACTIVITY.getName()));
+        if (!isCallActivity) {
+            propertiesObj.put(JsonConstants.CALL_ACTIVITY.getName(), "true");
+        }
     }
 
-    private void enrichBpmn20JavaTask(JSONObject obj, Map<String,JSONObject> resourceIdMap) throws JSONException {
-        JSONObject propertiesObj = obj.getJSONObject("properties");
+    private void enrichBpmn20JavaTask(JSONObject obj, Map<String, JSONObject> resourceIdMap) throws JSONException {
+
+
+        JSONObject propertiesObj = obj.getJSONObject(JsonConstants.PROPERTIES.getName());
         JSONObject aperteCfg = new JSONObject(propertiesObj.getString("aperte-conf"));
 
         String stepName = propertiesObj.getString("tasktype");
         if ("bpmn20".equals(processDefinitionLanguage))
-            propertiesObj.put("tasktype", "Service");
-        propertiesObj.put("activiti_class", "org.aperteworkflow.ext.activiti.ActivitiStepAction");
+            propertiesObj.put("tasktype", "Script");
+        String attributeMap = generateAttributeMap(aperteCfg);
+        String script = generateScript(stepName, attributeMap);
+        propertiesObj.put("script", script);
 
-        JSONArray fields = new JSONArray();
+
+        //propertiesObj.put("activiti_class", "org.aperteworkflow.ext.activiti.ActivitiStepAction");
+
+   /*     JSONArray fields = new JSONArray();
         JSONObject nameField = new JSONObject();
         nameField.put("name", "stepName");
         nameField.put("string_value", stepName);
@@ -325,7 +322,7 @@ public class AperteWorkflowDefinitionGenerator {
         JSONObject paramsField = new JSONObject();
         paramsField.put("name", "params");
 
-        
+
         StringBuilder sb = new StringBuilder();
         sb.append("<map>\n");
         Iterator iterator = aperteCfg.keys();
@@ -351,8 +348,127 @@ public class AperteWorkflowDefinitionGenerator {
         fields.put(paramsField);
 
         propertiesObj.put("activiti_fields", fields);
+       */
+        processOutgoingConditions(obj, resourceIdMap, propertiesObj, RESULT);
+    }
 
-        processOutgoingConditions(obj, resourceIdMap, propertiesObj, "RESULT");
+    private String generateAttributeMap(JSONObject aperteCfg) throws JSONException {
+        StringBuilder scriptAttributeMap = new StringBuilder();
+        Iterator keys = aperteCfg.keys();
+        if (keys.hasNext()) {
+            String comma = "";
+            scriptAttributeMap.append("[");
+            while (keys.hasNext()) {
+                String key = (String) keys.next();
+                String value = decodeValues(aperteCfg.getString(key));
+                scriptAttributeMap.append(comma + "'" + key + "' : " + "'" + value + "'");
+                comma = ",";
+            }
+            scriptAttributeMap.append("]");
+        }
+
+
+        return scriptAttributeMap.toString();
+    }
+
+    private String generateScript(String taskName, String attributeMap) {
+        StringBuilder script = new StringBuilder();
+        script.append("jbpmStepAction = new " + AUTO_STEP_ACTION_CLASS + "()");
+        script.append(System.getProperty("line.separator"));
+        script.append("jbpmStepAction.invoke('" + taskName + "'," + attributeMap + ");");
+
+        return script.toString();
+    }
+
+    private String decodeValues(String codedString) {
+        if (codedString != null && !codedString.trim().isEmpty()) {
+            try {
+                byte[] bytes = Base64.decodeBase64(codedString.getBytes());
+                codedString = new String(bytes);
+            } catch (Exception e) {
+                //TODO nothing, as some properties are base64, and some are not
+            }
+        }
+        return codedString;
+
+    }
+
+    private List<Property> preparePropertyList(String jsonForBpmn20) {
+        List<Property> propertyList = new ArrayList<Property>();
+        Set<String> lisOfVariables = findAllVariables(jsonForBpmn20);
+        lisOfVariables.add(ACTION);
+        lisOfVariables.add(RESULT);
+        for (String variable : lisOfVariables) {
+            Property property = new Property();
+            property.setId(variable);
+            property.setItemSubjectRef(ItemKind._STRING);
+            propertyList.add(property);
+        }
+
+
+        return propertyList;
+    }
+
+    private Set<String> findAllVariables(String jsonForBpmn20) {
+        Set<String> variables = new HashSet<String>();
+        String regex = "#\\{[a-zA-Z0-9]*\\}";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(jsonForBpmn20);
+        while (matcher.find()) {
+            String group = matcher.group();
+            group = removeSufixAndPrefix(group);
+            variables.add(group);
+        }
+        return variables;
+    }
+
+    private String removeSufixAndPrefix(String group) {
+        return group.substring(2, group.length() - 1);
+    }
+
+    private void enrichtDefinitions(List<Property> propertyList, Definitions bpmnDefinitions) {
+        Process process = getProcess(bpmnDefinitions);
+        addAutoStepClassImport(process);
+        process.setExecutable(true);
+        process.setId(processId);
+        process.getProperty().addAll(propertyList);
+    }
+
+    private String convertDiagramToXml(Definitions bpmnDefinitions) throws JAXBException, SAXException, ParserConfigurationException, TransformerException {
+        Bpmn2XmlConverter xmlConverter = new Bpmn2XmlConverter(bpmnDefinitions,
+                Platform.getInstance().getFile("/WEB-INF/xsd/BPMN20.xsd").getAbsolutePath());
+
+        return xmlConverter.getXml().toString();
+    }
+
+    private Process getProcess(Definitions bpmnDefinitions) {
+        List<BaseElement> rootElements = bpmnDefinitions.getRootElement();
+        for (BaseElement rootElement : rootElements) {
+            boolean b = rootElement instanceof Process;
+            if (b) {
+                return (Process) rootElement;
+            }
+        }
+        return null;
+
+    }
+
+    private void addAutoStepClassImport(Process process) {
+        if (containsScriptTask(process)) {
+            ExtensionElements extensionElements = new ExtensionElements();
+            extensionElements.add(new ImportClass(AUTO_STEP_ACTION_CLASS_PATH));
+            process.setExtensionElements(extensionElements);
+        }
+    }
+
+    private boolean containsScriptTask(Process process) {
+        List<BaseElement> childs = process.getChilds();
+        for (BaseElement child : childs) {
+            if (child instanceof ScriptTask) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void processOutgoingConditions(JSONObject obj, Map<String, JSONObject> resourceIdMap, JSONObject propertiesObj, String varName) throws JSONException {
@@ -362,22 +478,22 @@ public class AperteWorkflowDefinitionGenerator {
         if (outgoing.length() > 1) {
             throw new RuntimeException("Java task: " + propertiesObj.optString("name") + " has more than one outgoing transition.");
         }
-        for (int i=0; i < outgoing.length(); i++) {
+        for (int i = 0; i < outgoing.length(); i++) {
             JSONObject transition = resourceIdMap.get(outgoing.getJSONObject(i).getString("resourceId"));
-            JSONObject properties = transition.getJSONObject("properties");
+            JSONObject properties = transition.getJSONObject(JsonConstants.PROPERTIES.getName());
             if (properties.has("conditionexpression")) {
                 properties.remove("conditionexpression");
             }
             properties.put("conditiontype", "Default");
-            
+
             String targetId = transition.getJSONObject("target").getString("resourceId");
             JSONObject nextNode = resourceIdMap.get(targetId);
             String stencilId = nextNode.getJSONObject("stencil").getString("id");
             if ("Exclusive_Databased_Gateway".equals(stencilId)) {
                 JSONArray xorOutgoing = nextNode.getJSONArray("outgoing");
-                for (int j=0; j < xorOutgoing.length(); j++) {
+                for (int j = 0; j < xorOutgoing.length(); j++) {
                     JSONObject xorTransition = resourceIdMap.get(xorOutgoing.getJSONObject(j).getString("resourceId"));
-                    JSONObject subProperties = xorTransition.getJSONObject("properties");
+                    JSONObject subProperties = xorTransition.getJSONObject(JsonConstants.PROPERTIES.getName());
                     if (xorOutgoing.length() == 1) { //only one outgoing, remove condition and set condition type to default
                         if (subProperties.has("conditionexpression")) {
                             subProperties.remove("conditionexpression");
@@ -387,21 +503,23 @@ public class AperteWorkflowDefinitionGenerator {
                         String condition = subProperties.optString("conditionexpression");
                         String conditionType = subProperties.optString("conditiontype");
                         if (!"Default".equals(conditionType) && (condition == null || condition.trim().isEmpty())) {
-                            subProperties.put("conditionexpression", String.format("${%s=='%s'}", varName, subProperties.optString("name")));
+                            subProperties.put("conditionexpression", String.format("%s=='%s'", varName, subProperties.optString("name")));
                             subProperties.put("conditiontype", "Expression");
                         }
                     }
                 }
             }
-            
+
         }
     }
 
-
-    private void enrichBpmn20AssignmentConfig(JSONObject obj, Map<String,JSONObject> resourceIdMap) throws JSONException {
-        JSONObject propertiesObj = obj.getJSONObject("properties");
+    private void enrichBpmn20AssignmentConfig(JSONObject obj, Map<String, JSONObject> resourceIdMap) throws JSONException {
+        JSONObject propertiesObj = obj.getJSONObject(JsonConstants.PROPERTIES.getName());
         JSONObject aperteCfg = new JSONObject(propertiesObj.getString("aperte-conf"));
         String assignee = aperteCfg.optString("assignee");
+        String taskName = propertiesObj.optString("name");
+        ArrayList<String> singleAddress = new ArrayList<String>();
+        String priority = aperteCfg.optString("priority");
         //It looks like swimlanes are unsupported in Activiti :(
 //        String swimlane = obj.optString("swimlane");
         String candidateGroups = aperteCfg.optString("candidate_groups");
@@ -410,16 +528,22 @@ public class AperteWorkflowDefinitionGenerator {
         JSONArray items = new JSONArray();
         if (assignee != null && !assignee.trim().isEmpty()) {
             JSONObject o = new JSONObject();
-            o.put("resource_type", "humanperformer");
+            o.put("resource_type", "potentialOwner");
             o.put("resourceassignmentexpr", assignee);
             items.put(o);
         }
         if (candidateGroups != null && !candidateGroups.trim().isEmpty()) {
             JSONObject o = new JSONObject();
-            o.put("resource_type", "potentialowner");
+            o.put("resource_type", "potentialOwner");
             o.put("resourceassignmentexpr", candidateGroups);
             items.put(o);
         }
+        // if (taskName != null && !taskName.trim().isEmpty()) {
+        JSONObject ioSpecification = new JSONObject();
+        ioSpecification.put("resource_type", "ioSpecification");
+        ioSpecification.put("resource_type", "dataInput");
+        items.put(ioSpecification);
+        //  }
         resources.put("items", items);
         resources.put("totalCount", items.length());
         if (items.length() != 0) {
@@ -427,19 +551,21 @@ public class AperteWorkflowDefinitionGenerator {
                 propertiesObj.remove("resources");
             propertiesObj.put("resources", resources);//overwrite
         }
+
+
         propertiesObj.put("implementation", "unspecified");
         processOutgoingConditions(obj, resourceIdMap, propertiesObj, "ACTION");
-        
+
     }
 
     public String generateProcessToolConfig() {
         StringBuffer ptc = new StringBuffer();
         ptc.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        ptc.append(String.format("<config.ProcessDefinitionConfig bpmDefinitionKey=\"%s\" description=\"%s\" processName=\"%s\"", processName, processName, processName));
+        ptc.append(String.format("<config.ProcessDefinitionConfig bpmDefinitionKey=\"%s\" description=\"%s\" processName=\"%s\"", processId, processName, processName));
 
         if (processConfig != null) {
-        	
-        	ptc.append(String.format(" taskItemClass=\"%s\">\n",processConfig.getTaskItemClass()));
+
+            ptc.append(String.format(" taskItemClass=\"%s\">\n", processConfig.getTaskItemClass()));
 
             if (processConfig.getComment() != null && !processConfig.getComment().isEmpty()) {
                 ptc.append(String.format("<comment>%s</comment>", XmlUtil.wrapCDATA(processConfig.getComment())));
@@ -455,17 +581,17 @@ public class AperteWorkflowDefinitionGenerator {
                 ptc.append("</permissions>\n");
             }
 
-        }else{
-        	ptc.append(String.format(">\n"));
+        } else {
+            ptc.append(String.format(">\n"));
         }
 
         ptc.append("<states>\n");
 
         //processtool-config.xml generation
         for (String key : componentMap.keySet()) {
-            JPDLComponent cmp = componentMap.get(key);
-            if (cmp instanceof JDPLStepEditorNode) {
-            	JDPLStepEditorNode task = (JDPLStepEditorNode) cmp;
+            AperteComponent cmp = componentMap.get(key);
+            if (cmp instanceof AperteStepEditorNode) {
+                AperteStepEditorNode task = (AperteStepEditorNode) cmp;
                 if (task.getWidget() != null) {
                     ptc.append(task.generateWidgetXML());
                 }
@@ -477,7 +603,7 @@ public class AperteWorkflowDefinitionGenerator {
         return ptc.toString();
     }
 
-    public JPDLComponent findComponent(String key) {
+    public AperteComponent findComponent(String key) {
         return componentMap.get(key);
     }
 
@@ -552,53 +678,52 @@ public class AperteWorkflowDefinitionGenerator {
         }
         return processConfig.getMessages();
     }
-    
+
     public String getDictionary() {
         if (processConfig == null) {
             return null;
         }
-        return insertProcessName(processConfig.getDictionary());
+        return insertProcessId(processConfig.getDictionary());
     }
 
-	private String insertProcessName(String dict) {
-		if (dict != null) {
-			Pattern pattern = Pattern.compile("<process-dictionaries([^>]*)>");
-			Matcher m = pattern.matcher(dict);
+    private String insertProcessId(String dict) {
+        if (dict != null) {
+            Pattern pattern = Pattern.compile("<process-dictionaries([^>]*)>");
+            Matcher m = pattern.matcher(dict);
 
-			if (m.find()) {
+            if (m.find()) {
 
-				String group = m.group(1);
-				String toInsert = " processBpmDefinitionKey=\"" + processName
-						+ "\"";
-				if (group.contains("processBpmDefinitionKey=")) {
+                String group = m.group(1);
+                String toInsert = " processBpmDefinitionKey=\"" + processId
+                        + "\"";
+                if (group.contains("processBpmDefinitionKey=")) {
 
-					toInsert = replaceProcessNameIfExists(group, toInsert);
-				} else {
-					toInsert += group;
+                    toInsert = replaceProcessIdIfExists(group, toInsert);
+                } else {
+                    toInsert += group;
 
-				}
+                }
 
-				return dict.substring(0, m.start(1)) + toInsert
-						+ dict.substring(m.end(1));
-			}
-			return dict;
-		}
-		return null;
-	}
-	
-private String	replaceProcessNameIfExists(String group,String newProcessName){
-	Pattern pattern = Pattern.compile("processBpmDefinitionKey=\"[A-Za-z]*\"");
-	Matcher mSmall = pattern.matcher(group);
-	if(mSmall.find()){
-	return	mSmall.replaceAll(newProcessName);
-	}
-	return newProcessName;
-	}
-	
+                return dict.substring(0, m.start(1)) + toInsert
+                        + dict.substring(m.end(1));
+            }
+            return dict;
+        }
+        return null;
+    }
 
-	public String getDefaultLanguage() {
-		return processConfig.getDefaultLanguage();
-	}
+    private String replaceProcessIdIfExists(String group, String newProcessId) {
+        Pattern pattern = Pattern.compile("processBpmDefinitionKey=\"[A-Za-z]*\"");
+        Matcher mSmall = pattern.matcher(group);
+        if (mSmall.find()) {
+            return mSmall.replaceAll(newProcessId);
+        }
+        return newProcessId;
+    }
+
+    public String getDefaultLanguage() {
+        return processConfig.getDefaultLanguage();
+    }
 
     public byte[] getProcessIcon() {
         if (processConfig == null) {
@@ -607,8 +732,7 @@ private String	replaceProcessNameIfExists(String group,String newProcessName){
         return processConfig.getProcessIcon();
     }
 
-
-    private String getAperteData(String aperteUrl)  {
+    private String getAperteData(String aperteUrl) {
         try {
             URL url = new URL(aperteUrl);
             URLConnection conn = url.openConnection();
@@ -624,6 +748,15 @@ private String	replaceProcessNameIfExists(String group,String newProcessName){
             logger.error("Error reading data from " + aperteUrl, e);
             throw new RuntimeException(e);
         }
+    }
+
+    public List<String> getSubprocessName() throws JSONException, BpmnConverterException {
+        JSONObject jsonObj = enrichModelerDataForBpmn20();
+        String jsonForBpmn20 = jsonObj.toString();
+        Definitions bpmnDefinitions = prepareDefinitions(jsonForBpmn20);
+        getProcess(bpmnDefinitions);
+
+        return null;
     }
 
 }

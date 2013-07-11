@@ -34,6 +34,7 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import de.hpi.bpmn2_0.model.misc.ItemDefinition;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -1869,6 +1870,11 @@ public class Diagram2BpmnConverter {
 	 */
 	public Definitions getDefinitionsFromDiagram()
 			throws BpmnConverterException {
+        ItemDefinition itemDefinition = new ItemDefinition();
+        itemDefinition.setStructureRef("String");
+        itemDefinition.setId("_STRING");
+
+        definitions.getRootElement().add(itemDefinition);
 
 		/* Build-up the definitions as root element of the document */
 		this.setDefinitionsAttributes();
@@ -1930,7 +1936,10 @@ public class Diagram2BpmnConverter {
 
 		this.checkUniquenessOfProcessIDs();
 
-		return definitions;
+
+
+
+        return definitions;
 	}
 
 	/**

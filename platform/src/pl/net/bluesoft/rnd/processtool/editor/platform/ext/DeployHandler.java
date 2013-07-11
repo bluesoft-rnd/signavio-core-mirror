@@ -29,7 +29,10 @@ import javax.servlet.ServletContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
@@ -205,9 +208,11 @@ public class DeployHandler extends BasisHandler {
         int offsetY = Math.round(Float.parseFloat(vs[1]));
         AperteWorkflowDefinitionGenerator gen = new AperteWorkflowDefinitionGenerator(offsetX, offsetY);
         gen.init(jsonRep);
-        
+        String processName = gen.getProcessName();
+
         // MANIFEST
         Manifest mf = getManifest(gen.getBundleName(), gen.getBundleDesc(), gen.getProcessToolDeployment());
+        setManifestImporExportPackages(prepareImportPackages(jsonRep, gen), processName, mf);
 
         // convert SVG to PNG format
         byte[] png = svg2png(svgData);
@@ -223,7 +228,7 @@ public class DeployHandler extends BasisHandler {
         String language = gen.getProcessDefinitionLanguage();
         // adding PNG and XML files
         addEntry(processDir + "processdefinition.png", target, new ByteArrayInputStream(png));
-        addEntry(processDir + "processdefinition." + language + ".xml", target, new ByteArrayInputStream(gen.generateDefinition().getBytes("UTF-8")));
+        addEntry(processDir + "processdefinition." + language, target, new ByteArrayInputStream(gen.generateDefinition().getBytes("UTF-8")));
         addEntry(processDir + "processtool-config.xml", target, new ByteArrayInputStream(gen.generateProcessToolConfig().getBytes("UTF-8")));
         addEntry(processDir + "queues-config.xml", target, new ByteArrayInputStream(gen.generateQueuesConfig().getBytes("UTF-8")));
 
@@ -269,7 +274,30 @@ public class DeployHandler extends BasisHandler {
         return gen;
     }
 
-	private boolean hasLocalizedMessages(AperteWorkflowDefinitionGenerator gen) {
+    private void setManifestImporExportPackages(String importPackage, String processName, Manifest mf) {
+        mf.getMainAttributes().put(new Attributes.Name("Import-Package"),importPackage);
+        mf.getMainAttributes().put(new Attributes.Name("Export-Package"), "pl.net.bluesoft.process.name." + processName);
+    }
+
+    private String prepareImportPackages(String jsonRep, AperteWorkflowDefinitionGenerator gen) {
+        List<String> subProcessNamesFromJson;
+        StringBuilder subprocessPackages = new StringBuilder();
+        subprocessPackages.append("org.osgi.framework");
+        try {
+            subProcessNamesFromJson = gen.getSubProcessNamesFromJson(jsonRep);
+            for (String s : subProcessNamesFromJson) {
+                subprocessPackages.append(",");
+                subprocessPackages.append("pl.net.bluesoft.process.name."+s);
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            throw new RequestException("JSONException", e);
+        }
+        return subprocessPackages.toString();
+    }
+
+    private boolean hasLocalizedMessages(AperteWorkflowDefinitionGenerator gen) {
 		return gen.getMessages() != null && !gen.getMessages().isEmpty();
 	}
 

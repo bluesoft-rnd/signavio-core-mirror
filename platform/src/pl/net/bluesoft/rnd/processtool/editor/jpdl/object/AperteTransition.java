@@ -5,7 +5,6 @@ import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import pl.net.bluesoft.rnd.processtool.editor.AperteWorkflowDefinitionGenerator;
 import pl.net.bluesoft.rnd.processtool.editor.XmlUtil;
 
@@ -14,9 +13,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class JPDLTransition extends JPDLObject {
+public class AperteTransition extends AperteObject {
 
-    public JPDLTransition(AperteWorkflowDefinitionGenerator generator) {
+    public AperteTransition(AperteWorkflowDefinitionGenerator generator) {
         super(generator);
     }
 
@@ -183,11 +182,7 @@ public class JPDLTransition extends JPDLObject {
 		return true;
 		
 	}
-	
-	@Override
-	public String getObjectName() {
-		return "Transition";
-	}
+
 	
 	public String getDockers(int offsetX, int offsetY) {
 		StringBuffer dockerString = new StringBuffer();

@@ -40,7 +40,11 @@ public interface PlatformProperties {
 	public abstract Set<String> getAdmins();
 
 	public String getRootDirectoryPath();
-	
+
+    public String getAperteStepActionClass();
+
+    public String getAperteStepActionClassPackage();
+
 	public String getAperteStepEditorUrl();
 	
 	public String getAperteActionEditorUrl();

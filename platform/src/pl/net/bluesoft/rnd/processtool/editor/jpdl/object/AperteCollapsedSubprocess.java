@@ -1,57 +1,24 @@
 package pl.net.bluesoft.rnd.processtool.editor.jpdl.object;
 
+import com.signavio.platform.exceptions.RequestException;
+import org.json.JSONException;
+import org.json.JSONObject;
+import pl.net.bluesoft.rnd.processtool.editor.AperteWorkflowDefinitionGenerator;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.signavio.platform.exceptions.RequestException;
-
-import pl.net.bluesoft.rnd.processtool.editor.AperteWorkflowDefinitionGenerator;
-
-public class JPDLCollapsedSubprocess extends JPDLComponent {
+public class AperteCollapsedSubprocess extends AperteComponent {
 
 	private String subprocess;
 	private Map<String, String> output;
 	private Map<String, String> input;
 
-	public JPDLCollapsedSubprocess(AperteWorkflowDefinitionGenerator generator) {
+	public AperteCollapsedSubprocess(AperteWorkflowDefinitionGenerator generator) {
 		super(generator);
 	}
 
-	@Override
-	public String toXML() {
-		StringBuffer sb = new StringBuffer();
-
-		sb.append(String
-				.format("<sub-process sub-process-key=\"%s\" name=\"%s\" g=\"%d,%d,%d,%d\">\n",
-						subprocess, name, boundsX, boundsY, width, height));
-		for (Entry<String, String> entry : input.entrySet()) {
-			sb.append(String.format(
-					"<parameter-in subvar=\"%s\" var=\"%s\"/>\n",
-					entry.getKey(), entry.getValue()));
-		}
-		for (Entry<String, String> entry : output.entrySet()) {
-			sb.append(String.format(
-					"<parameter-out var=\"%s\" subvar=\"%s\"/>\n",
-					entry.getKey(), entry.getValue()));
-		}
-
-		sb.append(getTransitionsXML());
-		sb.append("</sub-process>\n");
-
-		return sb.toString();
-	}
-
-	@Override
-	public String getObjectName() {
-		return "Subprocess";
-	}
 
 	@Override
 	public void fillBasicProperties(JSONObject json) throws JSONException {

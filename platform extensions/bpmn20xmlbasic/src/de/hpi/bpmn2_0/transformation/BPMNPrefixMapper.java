@@ -67,6 +67,9 @@ public class BPMNPrefixMapper extends NamespacePrefixMapper {
 		else if(namespace.equals("http://activiti.org/bpmn"))
 			return "activiti";
 
+        else if(namespace.equals("http://www.jboss.org/drools"))
+            return "drools";
+
 		/* Check custom extension */
 		else if(getCustomExtensions().get(namespace) != null) {
 			return getCustomExtensions().get(namespace);

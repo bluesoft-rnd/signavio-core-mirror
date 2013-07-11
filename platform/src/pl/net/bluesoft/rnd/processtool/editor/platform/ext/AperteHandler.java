@@ -93,6 +93,7 @@ public class AperteHandler extends BasisHandler {
         o_prop.put(getAperteLanguage());
         o_prop.put(getProcessConf());
         o_prop.put(getProcessFileName());
+        o_prop.put(getProcessId());
         o_prop.put(getBundleName());
         o_prop.put(getBundleDescription());
         o_prop.put(getProcessToolDeployment());
@@ -132,13 +133,24 @@ public class AperteHandler extends BasisHandler {
     }
 
     private JSONObject getProcessFileName() throws JSONException {
-    	JSONObject o = new JSONObject();
+        JSONObject o = new JSONObject();
         o.put("id","aperte-process-filename");
-		o.put("type","String");
-		o.put("title","Aperte process filename");
-		o.put("description","Aperte process filename");
-		o.put("readonly",false);
-		o.put("optional",true);
+        o.put("type","String");
+        o.put("title","Aperte process filename");
+        o.put("description","Aperte process filename");
+        o.put("readonly",false);
+        o.put("optional",true);
+        return o;
+    }
+
+    private JSONObject getProcessId() throws JSONException {
+        JSONObject o = new JSONObject();
+        o.put("id","process-id");
+        o.put("type","String");
+        o.put("title","Aperte process Id");
+        o.put("description","Aperte process Id");
+        o.put("readonly",false);
+        o.put("optional",true);
         return o;
     }
     
@@ -343,6 +355,9 @@ public class AperteHandler extends BasisHandler {
         removestencils.put("InclusiveGateway");
         removestencils.put("ComplexGateway");
         removestencils.put("CollapsedPool");
+        removestencils.put("Pool");
+        removestencils.put("Lanes");
+        removestencils.put("MessageFlow");
         removestencils.put("processparticipant");
         removestencils.put("Group");
         removestencils.put("TextAnnotation");
@@ -353,20 +368,20 @@ public class AperteHandler extends BasisHandler {
         removestencils.put("IntermediateEvent");
         removestencils.put("IntermediateMessageEventCatching");
         removestencils.put("IntermediateMessageEventThrowing");
-        removestencils.put("IntermediateTimerEvent");
-        removestencils.put("IntermediateErrorEvent");
+        //removestencils.put("IntermediateTimerEvent");
+        //removestencils.put("IntermediateErrorEvent");
         removestencils.put("IntermediateCancelEvent");
         removestencils.put("IntermediateCompensationEventCatching");
         removestencils.put("IntermediateCompensationEventThrowing");
         removestencils.put("IntermediateConditionalEvent");
-        removestencils.put("IntermediateSignalEventCatching");
+       // removestencils.put("IntermediateSignalEventCatching");
         removestencils.put("IntermediateSignalEventThrowing");
         removestencils.put("IntermediateMultipleEventCatching");
         removestencils.put("IntermediateMultipleEventThrowing");
         removestencils.put("IntermediateLinkEventCatching");
         removestencils.put("IntermediateLinkEventThrowing");
         removestencils.put("EndMessageEvent");
-        removestencils.put("EndErrorEvent");
+        //removestencils.put("EndErrorEvent");
         removestencils.put("EndCancelEvent");
         removestencils.put("EndCompensationEvent");
         removestencils.put("EndSignalEvent");
@@ -376,8 +391,8 @@ public class AperteHandler extends BasisHandler {
         removestencils.put("Association_Unidirectional");
         removestencils.put("Association_Bidirectional");
         //removestencils.put("CollapsedSubprocess");
-        removestencils.put("StartTimerEvent");
-        removestencils.put("MessageFlow");
+        //removestencils.put("StartTimerEvent");
+      //  removestencils.put("MessageFlow");
         removestencils.put("StartMessageEvent");
         root.put("removeproperties",new JSONArray() );
     }

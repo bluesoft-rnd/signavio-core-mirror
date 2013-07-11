@@ -73,6 +73,7 @@ import de.hpi.bpmn2_0.model.gateway.ExclusiveGateway;
 import de.hpi.bpmn2_0.model.gateway.InclusiveGateway;
 import de.hpi.bpmn2_0.model.gateway.ParallelGateway;
 import de.hpi.bpmn2_0.model.misc.ProcessType;
+import de.hpi.bpmn2_0.model.misc.Property;
 import de.hpi.bpmn2_0.model.participant.Lane;
 import de.hpi.bpmn2_0.model.participant.LaneSet;
 
@@ -110,7 +111,7 @@ import de.hpi.bpmn2_0.model.participant.LaneSet;
 @XmlType(name = "tProcess", propOrder = {
 //    "auditing",
 //    "monitoring",
-//    "property",
+    "property",
     "laneSet",
     "flowElement",
     "artifact",
@@ -124,7 +125,7 @@ public class Process
 
 //    protected TAuditing auditing;
 //    protected TMonitoring monitoring;
-//    protected List<TProperty> property;
+    protected List<Property> property;
 //	@XmlElementRefs({
 //		/* Events */
 //		@XmlElementRef(type = StartEvent.class),
@@ -399,16 +400,16 @@ public class Process
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link TProperty }
+     * {@link Property }
      * 
      * 
      */
-//    public List<TProperty> getProperty() {
-//        if (property == null) {
-//            property = new ArrayList<TProperty>();
-//        }
-//        return this.property;
-//    }
+    public List<Property> getProperty() {
+        if (property == null) {
+            property = new ArrayList<Property>();
+        }
+        return this.property;
+    }
 
     /**
      * Gets the value of the laneSet property.

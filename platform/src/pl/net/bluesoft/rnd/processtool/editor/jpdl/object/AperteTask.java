@@ -4,11 +4,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import pl.net.bluesoft.rnd.processtool.editor.AperteWorkflowDefinitionGenerator;
 
-public abstract class JPDLTask extends JPDLComponent {
+public abstract class AperteTask extends AperteComponent {
   
 	protected String taskType;
 
-    protected JPDLTask(AperteWorkflowDefinitionGenerator generator) {
+    protected AperteTask(AperteWorkflowDefinitionGenerator generator) {
         super(generator);
     }
 

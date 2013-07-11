@@ -62,6 +62,7 @@ import de.hpi.bpmn2_0.model.event.EventDefinition;
 import de.hpi.bpmn2_0.model.event.LinkEventDefinition;
 import de.hpi.bpmn2_0.model.event.SignalEventDefinition;
 import de.hpi.bpmn2_0.model.extension.Extension;
+import de.hpi.bpmn2_0.model.misc.ItemDefinition;
 import de.hpi.bpmn2_0.model.misc.Signal;
 import de.hpi.diagram.SignavioUUID;
 
@@ -111,7 +112,8 @@ public class Definitions {
 	// protected List<TImport> _import;
 	 protected List<Extension> extension;
 	
-	@XmlElementRefs( { @XmlElementRef(type = Process.class),
+	@XmlElementRefs( { @XmlElementRef(type = ItemDefinition.class),
+            @XmlElementRef(type = Process.class),
 			@XmlElementRef(type = Choreography.class),
 			@XmlElementRef(type = Collaboration.class),
 			@XmlElementRef(type = Conversation.class),

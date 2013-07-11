@@ -143,14 +143,14 @@ public abstract class FlowNode extends FlowElement {
 		/* Incoming sequence flows */
 		for (Edge edge : this.getIncoming()) {
 			if (edge instanceof SequenceFlow) {
-				get_incomingSequenceFlows().add((SequenceFlow) edge);
+			//	get_incomingSequenceFlows().add((SequenceFlow) edge);
 			}
 		}
 
 		/* Outgoing sequence flows */
 		for (Edge edge : this.getOutgoing()) {
 			if (edge instanceof SequenceFlow) {
-				get_outgoingSequenceFlows().add((SequenceFlow) edge);
+		//		get_outgoingSequenceFlows().add((SequenceFlow) edge);
 			}
 		}
 	}

@@ -66,8 +66,8 @@ import de.hpi.bpmn2_0.transformation.Visitor;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "tDataAssociation", propOrder = { "transformation",
-		"assignment", "sourceRefList", "targetRefList" })
+@XmlType(name = "tDataAssociation", propOrder = { "transformation", "sourceRefList", "targetRefList",
+		"assignment"  })
 @XmlSeeAlso({ DataInputAssociation.class, DataOutputAssociation.class })
 public class DataAssociation extends Edge {
 	@XmlIDREF

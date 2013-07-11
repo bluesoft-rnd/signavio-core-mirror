@@ -68,12 +68,15 @@ public class Property
     
     @XmlAttribute
     protected String name;
-    
+
+    @XmlAttribute
+    protected ItemKind itemSubjectRef;
+
     @XmlAttribute
     protected  ItemKind itemKind;
     
     @XmlAttribute
-    protected boolean isCollection;
+    protected Boolean isCollection;
     
     @XmlElement
     protected String structure;
@@ -175,5 +178,14 @@ public class Property
 	public void setStructure(String structure) {
 		this.structure = structure;
 	}
+
+
+    public ItemKind getItemSubjectRef() {
+        return itemSubjectRef;
+    }
+
+    public void setItemSubjectRef(ItemKind itemSubjectRef) {
+        this.itemSubjectRef = itemSubjectRef;
+    }
 
 }

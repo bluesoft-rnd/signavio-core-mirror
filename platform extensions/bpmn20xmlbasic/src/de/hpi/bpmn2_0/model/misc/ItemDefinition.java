@@ -24,11 +24,7 @@
 
 package de.hpi.bpmn2_0.model.misc;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 
 import de.hpi.bpmn2_0.model.RootElement;
 
@@ -52,6 +48,7 @@ import de.hpi.bpmn2_0.model.RootElement;
  * 
  * 
  */
+@XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tItemDefinition")
 public class ItemDefinition
@@ -62,6 +59,8 @@ public class ItemDefinition
     protected String structure;
     @XmlAttribute
     protected Boolean isCollection;
+    @XmlAttribute
+    protected String structureRef;
     @XmlAttribute
     protected ItemKind itemKind;
 
@@ -143,6 +142,15 @@ public class ItemDefinition
      */
     public void setItemKind(ItemKind value) {
         this.itemKind = value;
+    }
+
+
+    public String getStructureRef() {
+        return structureRef;
+    }
+
+    public void setStructureRef(String structureRef) {
+        this.structureRef = structureRef;
     }
 
 }
