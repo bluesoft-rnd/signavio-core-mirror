@@ -59,7 +59,7 @@ public class AperteWorkflowDefinitionGenerator {
     private String json;
     private ProcessConfig processConfig;
     private String processName;
-    private String processId;
+    //private String processId;
     private String processFileName;
     private String bundleDesc;
     private String bundleName;
@@ -79,7 +79,6 @@ public class AperteWorkflowDefinitionGenerator {
             this.json = json;
             JSONObject jsonObj = enrichModelerDataForBpmn20();
             processName = jsonObj.getJSONObject(JsonConstants.PROPERTIES.getName()).getString("name");
-            processId = jsonObj.getJSONObject(JsonConstants.PROPERTIES.getName()).getString("process-id");
             processFileName = jsonObj.getJSONObject(JsonConstants.PROPERTIES.getName()).optString("aperte-process-filename");
             bundleDesc = jsonObj.getJSONObject(JsonConstants.PROPERTIES.getName()).optString("mf-bundle-description");
             bundleName = jsonObj.getJSONObject(JsonConstants.PROPERTIES.getName()).optString("mf-bundle-name");
@@ -94,13 +93,7 @@ public class AperteWorkflowDefinitionGenerator {
             if (StringUtils.isEmpty(processName)) {
                 throw new RequestException("Process name is empty.");
             }
-            if (StringUtils.isEmpty(processId)) {
-                if (!StringUtils.isEmpty(processName)) {
-                    processId = processName;
-                } else {
-                    throw new RequestException("Process name is empty.");
-                }
-            }
+
             if (StringUtils.isEmpty(processFileName)) {
                 throw new RequestException("Aperte process filename is empty.");
             }
@@ -430,7 +423,7 @@ public class AperteWorkflowDefinitionGenerator {
         Process process = getProcess(bpmnDefinitions);
         addAutoStepClassImport(process);
         process.setExecutable(true);
-        process.setId(processId);
+        process.setId(processName);
         process.getProperty().addAll(propertyList);
     }
 
@@ -454,11 +447,11 @@ public class AperteWorkflowDefinitionGenerator {
     }
 
     private void addAutoStepClassImport(Process process) {
-        if (containsScriptTask(process)) {
+      //  if (containsScriptTask(process)) {
             ExtensionElements extensionElements = new ExtensionElements();
             extensionElements.add(new ImportClass(AUTO_STEP_ACTION_CLASS_PATH));
             process.setExtensionElements(extensionElements);
-        }
+      //  }
     }
 
     private boolean containsScriptTask(Process process) {
@@ -561,7 +554,7 @@ public class AperteWorkflowDefinitionGenerator {
     public String generateProcessToolConfig() {
         StringBuffer ptc = new StringBuffer();
         ptc.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        ptc.append(String.format("<config.ProcessDefinitionConfig bpmDefinitionKey=\"%s\" description=\"%s\" processName=\"%s\"", processId, processName, processName));
+        ptc.append(String.format("<config.ProcessDefinitionConfig bpmDefinitionKey=\"%s\" description=\"%s\" processName=\"%s\"", processName, processName, processName));
 
         if (processConfig != null) {
 
@@ -694,7 +687,7 @@ public class AperteWorkflowDefinitionGenerator {
             if (m.find()) {
 
                 String group = m.group(1);
-                String toInsert = " processBpmDefinitionKey=\"" + processId
+                String toInsert = " processBpmDefinitionKey=\"" + processName
                         + "\"";
                 if (group.contains("processBpmDefinitionKey=")) {
 

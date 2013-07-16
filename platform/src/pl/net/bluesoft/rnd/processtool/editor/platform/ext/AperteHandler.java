@@ -369,7 +369,7 @@ public class AperteHandler extends BasisHandler {
         removestencils.put("IntermediateMessageEventCatching");
         removestencils.put("IntermediateMessageEventThrowing");
         //removestencils.put("IntermediateTimerEvent");
-        //removestencils.put("IntermediateErrorEvent");
+        removestencils.put("IntermediateErrorEvent");
         removestencils.put("IntermediateCancelEvent");
         removestencils.put("IntermediateCompensationEventCatching");
         removestencils.put("IntermediateCompensationEventThrowing");
@@ -381,7 +381,7 @@ public class AperteHandler extends BasisHandler {
         removestencils.put("IntermediateLinkEventCatching");
         removestencils.put("IntermediateLinkEventThrowing");
         removestencils.put("EndMessageEvent");
-        //removestencils.put("EndErrorEvent");
+        removestencils.put("EndErrorEvent");
         removestencils.put("EndCancelEvent");
         removestencils.put("EndCompensationEvent");
         removestencils.put("EndSignalEvent");
