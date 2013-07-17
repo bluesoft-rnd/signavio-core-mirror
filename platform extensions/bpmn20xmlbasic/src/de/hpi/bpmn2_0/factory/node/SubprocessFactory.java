@@ -28,6 +28,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.hpi.bpmn2_0.factory.jbpm5.utils.IoSpecificationHelper;
+import de.hpi.bpmn2_0.model.connector.DataInputAssociation;
+import de.hpi.bpmn2_0.model.connector.DataOutputAssociation;
+import de.hpi.bpmn2_0.model.data_object.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.oryxeditor.server.diagram.generic.GenericShape;
@@ -54,7 +58,6 @@ import de.hpi.bpmn2_0.model.activity.Transaction;
 import de.hpi.bpmn2_0.model.activity.TransactionMethod;
 import de.hpi.bpmn2_0.model.artifacts.Artifact;
 import de.hpi.bpmn2_0.model.bpmndi.BPMNShape;
-import de.hpi.bpmn2_0.model.extension.activiti.ActivitiField;
 import de.hpi.bpmn2_0.model.extension.activiti.ActivitiIn;
 import de.hpi.bpmn2_0.model.extension.activiti.ActivitiOut;
 import de.hpi.bpmn2_0.model.extension.signavio.SignavioMetaData;
@@ -145,14 +148,25 @@ public class SubprocessFactory extends AbstractActivityFactory {
 	protected void independentCallActivitySupport(GenericShape shape,
 			CallActivity callAct) throws BpmnConverterException{
 		callAct.setCalledElement(shape.getProperty("entry"));
-
+        InputOutputSpecification ioSpecification = IoSpecificationHelper.extractIoSpecification(callAct);
+        InputSet inputSet = new InputSet();
+        OutputSet outputSet = new OutputSet();
 		String inputMapsString;
+
+
 		try {
 			inputMapsString = shape.getProperty("inputmaps");
 			Map<String, String> inputMaps = jsonStringToMap(inputMapsString);
 			for(Entry<String, String> entry : inputMaps.entrySet()){
-				ActivitiIn ai = new ActivitiIn(entry.getValue(), entry.getKey());
-				callAct.getOrCreateExtensionElements().add(ai);
+                String targetVariable = entry.getValue();
+                String dataId = IoSpecificationHelper.constructInputId(callAct, targetVariable);
+                DataInput dataInput = IoSpecificationHelper.prepareDataInput(dataId, targetVariable);
+                DataInput inputSetData = IoSpecificationHelper.prepareInputSet(dataId);
+                DataInputAssociation dataInputAssociation = IoSpecificationHelper.prepareInputDataAssociation(dataId,entry.getKey());
+
+                inputSet.getDataInputRefs().add(inputSetData);
+                ioSpecification.getDataInput().add(dataInput);
+                callAct.getDataInputAssociation().add(dataInputAssociation);
 			}
 		} catch (JSONException e) {
 			throw new BpmnConverterException(e);
@@ -162,12 +176,24 @@ public class SubprocessFactory extends AbstractActivityFactory {
 			String outputMapsString = shape.getProperty("outputmaps");
 			Map<String, String> outputMaps = jsonStringToMap(outputMapsString);
 			for(Entry<String, String> entry : outputMaps.entrySet()){
-				ActivitiOut ao = new ActivitiOut(entry.getValue(), entry.getKey());
-				callAct.getOrCreateExtensionElements().add(ao);
+
+                String targetVariable = entry.getValue();
+                String dataId = IoSpecificationHelper.constructOutputId(callAct, targetVariable);
+                DataOutput dataOutput = IoSpecificationHelper.prepareDataOutput(dataId, targetVariable);
+                DataOutput outputSetData = IoSpecificationHelper.prepareOutputSet(dataId);
+                DataOutputAssociation dataOutputAssociation = IoSpecificationHelper.prepareOutputDataAssociation(dataId,entry.getKey());
+
+                outputSet.getDataOutputRefs().add(outputSetData);
+                ioSpecification.getDataOutput().add(dataOutput);
+                callAct.getDataOutputAssociation().add(dataOutputAssociation);
 			}
 		} catch (JSONException e) {
 			throw new BpmnConverterException(e);
 		}
+
+        ioSpecification.getInputSet().add(inputSet);
+        ioSpecification.getOutputSet().add(outputSet);
+        callAct.setIoSpecification(ioSpecification);
 	}
 
 	protected Map<String, String> jsonStringToMap(String inputMapsString) throws JSONException {

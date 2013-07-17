@@ -27,6 +27,7 @@ import de.hpi.bpmn2_0.annotations.Property;
 import de.hpi.bpmn2_0.annotations.StencilId;
 import de.hpi.bpmn2_0.exceptions.BpmnConverterException;
 import de.hpi.bpmn2_0.factory.AbstractActivityFactory;
+import de.hpi.bpmn2_0.factory.jbpm5.utils.IoSpecificationHelper;
 import de.hpi.bpmn2_0.factory.jbpm5.utils.IoSpecyficationNames;
 import de.hpi.bpmn2_0.model.FormalExpression;
 import de.hpi.bpmn2_0.model.activity.Activity;
@@ -43,7 +44,6 @@ import de.hpi.bpmn2_0.model.connector.DataInputAssociation;
 import de.hpi.bpmn2_0.model.data_object.*;
 import de.hpi.bpmn2_0.model.extension.ExtensionElements;
 import de.hpi.bpmn2_0.model.extension.activiti.ActivitiField;
-import de.hpi.bpmn2_0.model.misc.Assignment;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -63,12 +63,14 @@ import java.util.Map;
 @StencilId("Task")
 public class TaskFactory extends AbstractActivityFactory {
 
+    private final IoSpecificationHelper IoSpecificationHelper = new IoSpecificationHelper();
+
     /*
-     * (non-Javadoc)
-     *
-     * @seede.hpi.bpmn2_0.factory.AbstractBpmnFactory#createProcessElement(org.
-     * oryxeditor.server.diagram.Shape)
-     */
+         * (non-Javadoc)
+         *
+         * @seede.hpi.bpmn2_0.factory.AbstractBpmnFactory#createProcessElement(org.
+         * oryxeditor.server.diagram.Shape)
+         */
     // @Override
     protected Activity createProcessElement(GenericShape shape)
             throws BpmnConverterException {
@@ -136,7 +138,7 @@ public class TaskFactory extends AbstractActivityFactory {
     }
 
     private void fillTaskWithIoSpecification(UserTask task, Map<IoSpecyficationNames, String> dataIOSpecyfication) {
-        InputOutputSpecification ioSpecification = task.getIoSpecification();
+        InputOutputSpecification ioSpecification = IoSpecificationHelper.extractIoSpecification(task);
         InputSet inputSet = new InputSet();
         OutputSet outputSet = new OutputSet();
 
@@ -147,10 +149,10 @@ public class TaskFactory extends AbstractActivityFactory {
 
         for (IoSpecyficationNames data : dataIOSpecyfication.keySet()) {
             String dataName = data.getName();
-            String dataId = constructId(task, dataName);
-            DataInput dataInput = prepareDataInput(dataId, dataName);
-            DataInput inputSetData = prepareInputSet(dataId);
-            DataInputAssociation dataInputAssociation = prepareDataAssociation(dataId, dataIOSpecyfication.get(data));
+            String dataId = IoSpecificationHelper.constructInputId(task, dataName);
+            DataInput dataInput = IoSpecificationHelper.prepareDataInput(dataId, dataName);
+            DataInput inputSetData = IoSpecificationHelper.prepareInputSet(dataId);
+            DataInputAssociation dataInputAssociation = IoSpecificationHelper.prepareInputDataAssociation(dataId, dataIOSpecyfication.get(data));
 
 
             inputSet.getDataInputRefs().add(inputSetData);
@@ -163,37 +165,6 @@ public class TaskFactory extends AbstractActivityFactory {
         task.setIoSpecification(ioSpecification);
 
 
-    }
-
-    private DataInput prepareDataInput(String dataId, String data) {
-        DataInput dataInputTemp = new DataInput();
-        dataInputTemp.setName(data);
-        dataInputTemp.setId(dataId);
-        return dataInputTemp;
-    }
-
-    private DataInput prepareInputSet(String dataId) {
-        DataInput input = new DataInput();
-        input.setId(dataId);
-        return input;
-    }
-
-    private DataInputAssociation prepareDataAssociation(String dataId, String value) {
-        DataInputAssociation dia = new DataInputAssociation();
-        DataInput input = new DataInput();
-        Assignment assignment = new Assignment();
-        assignment.setFrom(value);
-        assignment.setTo(dataId);
-        input.setId(dataId);
-        dia.setTargetRef(input);
-        dia.getAssignment().add(assignment);
-
-
-        return dia;
-    }
-
-    private String constructId(UserTask task, String data) {
-        return task.getId() + "_" + data + "Input";
     }
 
     @Property(name = "tasktype", value = "Receive")

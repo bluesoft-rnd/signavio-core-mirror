@@ -212,16 +212,16 @@ public class AperteWorkflowDefinitionGenerator {
             JSONObject obj = childShapes.getJSONObject(i);
             String stencilId = obj.getJSONObject("stencil").getString("id");
             if (TaskType.COLAPSED_SUBPROCESS.getName().equals(stencilId)) {
-                String taskName = getTaskName(obj);
+                String taskName = getProcessName(obj);
                 subprocessNames.add(taskName);
             }
         }
         return subprocessNames;
     }
 
-    private String getTaskName(JSONObject obj) throws JSONException {
+    private String getProcessName(JSONObject obj) throws JSONException {
         JSONObject propertiesObj = obj.getJSONObject(JsonConstants.PROPERTIES.getName());
-        return propertiesObj.optString("name");
+        return propertiesObj.optString("entry");
     }
 
     private JSONObject enrichModelerDataForBpmn20() throws JSONException {
@@ -368,7 +368,7 @@ public class AperteWorkflowDefinitionGenerator {
         StringBuilder script = new StringBuilder();
         script.append("jbpmStepAction = new " + AUTO_STEP_ACTION_CLASS + "()");
         script.append(System.getProperty("line.separator"));
-        script.append("jbpmStepAction.invoke('" + taskName + "'," + attributeMap + ");");
+        script.append("jbpmStepAction.invoke(kcontext.getProcessInstance().getId(),'" + taskName + "'," + attributeMap + ");");
 
         return script.toString();
     }
@@ -670,13 +670,6 @@ public class AperteWorkflowDefinitionGenerator {
             return null;
         }
         return processConfig.getMessages();
-    }
-
-    public String getDictionary() {
-        if (processConfig == null) {
-            return null;
-        }
-        return insertProcessId(processConfig.getDictionary());
     }
 
     private String insertProcessId(String dict) {

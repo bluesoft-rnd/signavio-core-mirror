@@ -8,7 +8,7 @@ package pl.net.bluesoft.rnd.processtool.editor;
  * To change this template use File | Settings | File Templates.
  */
 public enum JsonConstants {
-    PROPERTIES("properties"),APERTE_CONF("aperte-conf"),CALL_ACTIVITY("callactivity");
+    PROPERTIES("properties"),APERTE_CONF("aperte-conf"),CALL_ACTIVITY("callacitivity");
 
     private String name;
 
