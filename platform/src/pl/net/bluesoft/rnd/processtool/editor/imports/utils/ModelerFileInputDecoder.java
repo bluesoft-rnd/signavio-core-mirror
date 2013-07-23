@@ -12,7 +12,7 @@ public class ModelerFileInputDecoder {
 		String[] splitedInput = base64String.split(",");
 		if (testIfBase64AndNotNull(splitedInput)) {
 
-			byte[] decodedBase64 = Base64.decodeBase64(splitedInput[1]);
+			byte[] decodedBase64 = Base64.decodeBase64(splitedInput[1].getBytes());
 			decodedString = new String(decodedBase64);
 		}
 		else{

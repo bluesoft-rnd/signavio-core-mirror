@@ -366,10 +366,11 @@ public class AperteWorkflowDefinitionGenerator {
 
     private String generateScript(String taskName, String attributeMap) {
         StringBuilder script = new StringBuilder();
-        script.append("jbpmStepAction = new " + AUTO_STEP_ACTION_CLASS + "()");
+        script.append("jbpmStepAction = new " + AUTO_STEP_ACTION_CLASS + "();");
         script.append(System.getProperty("line.separator"));
-        script.append("jbpmStepAction.invoke(kcontext.getProcessInstance().getId(),'" + taskName + "'," + attributeMap + ");");
-
+        script.append(" processId =kcontext.getProcessInstance().getId();");
+        script.append(" processIdString =String.valueOf(processId)");
+        script.append("jbpmStepAction.invoke(processIdString,'" + taskName + "'," + attributeMap + ");");
         return script.toString();
     }
 
