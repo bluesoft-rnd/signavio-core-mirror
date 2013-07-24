@@ -53,7 +53,6 @@ import de.hpi.bpmn2_0.model.activity.resource.Rendering;
  * 
  * 
  */
-@XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tGlobalUserTask", propOrder = {
     "rendering"

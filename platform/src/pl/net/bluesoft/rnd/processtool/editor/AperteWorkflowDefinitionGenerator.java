@@ -303,45 +303,6 @@ public class AperteWorkflowDefinitionGenerator {
         String attributeMap = generateAttributeMap(aperteCfg);
         String script = generateScript(stepName, attributeMap);
         propertiesObj.put("script", script);
-
-
-        //propertiesObj.put("activiti_class", "org.aperteworkflow.ext.activiti.ActivitiStepAction");
-
-   /*     JSONArray fields = new JSONArray();
-        JSONObject nameField = new JSONObject();
-        nameField.put("name", "stepName");
-        nameField.put("string_value", stepName);
-        fields.put(nameField);
-        JSONObject paramsField = new JSONObject();
-        paramsField.put("name", "params");
-
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("<map>\n");
-        Iterator iterator = aperteCfg.keys();
-        while (iterator.hasNext()) {
-            String key = (String) iterator.next();
-            String value = aperteCfg.getString(key);
-            if (value != null && !value.trim().isEmpty()) {
-                try {
-                    byte[] bytes = Base64.decodeBase64(value.getBytes());
-                    value = new String(bytes);
-                } catch (Exception e) {
-                    //TODO nothing, as some properties are base64, and some are not
-                }
-                sb.append(String.format("<%s>%s</%s>",
-                        key,
-                        XmlUtil.encodeXmlEcscapeCharacters(value), //todo use XStream
-                        key));
-            }
-        }
-        sb.append("</map>\n");
-
-        paramsField.put("expression", sb.toString());
-        fields.put(paramsField);
-
-        propertiesObj.put("activiti_fields", fields);
-       */
         processOutgoingConditions(obj, resourceIdMap, propertiesObj, RESULT);
     }
 
@@ -514,10 +475,7 @@ public class AperteWorkflowDefinitionGenerator {
         String taskName = propertiesObj.optString("name");
         ArrayList<String> singleAddress = new ArrayList<String>();
         String priority = aperteCfg.optString("priority");
-        //It looks like swimlanes are unsupported in Activiti :(
-//        String swimlane = obj.optString("swimlane");
         String candidateGroups = aperteCfg.optString("candidate_groups");
-        //resources/items[0]/resource_type
         JSONObject resources = new JSONObject();
         JSONArray items = new JSONArray();
         if (assignee != null && !assignee.trim().isEmpty()) {
