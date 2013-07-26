@@ -320,9 +320,11 @@ public class AperteWorkflowDefinitionGenerator {
             }
             scriptAttributeMap.append("]");
         }
-
-
-        return scriptAttributeMap.toString();
+        String script = scriptAttributeMap.toString();
+        if(script==null || script.isEmpty()){
+            script="null";
+        }
+        return script;
     }
 
     private String generateScript(String taskName, String attributeMap) {
