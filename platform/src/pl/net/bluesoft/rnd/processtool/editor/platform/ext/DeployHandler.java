@@ -29,10 +29,7 @@ import javax.servlet.ServletContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
@@ -272,7 +269,7 @@ public class DeployHandler extends BasisHandler {
     }
 
     private String prepareImportPackages(String jsonRep, AperteWorkflowDefinitionGenerator gen) {
-        List<String> subProcessNamesFromJson;
+        Set<String> subProcessNamesFromJson;
         StringBuilder subprocessPackages = new StringBuilder();
         subprocessPackages.append("org.osgi.framework");
         try {

@@ -29,6 +29,7 @@ import org.json.JSONObject;
 import org.oryxeditor.server.diagram.basic.BasicDiagram;
 import org.oryxeditor.server.diagram.basic.BasicDiagramBuilder;
 import org.xml.sax.SAXException;
+import pl.net.bluesoft.rnd.processtool.editor.jpdl.components.ConditionProperties;
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.exception.UnsupportedJPDLObjectException;
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.AperteComponent;
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.object.AperteObject;
@@ -49,8 +50,7 @@ import java.util.regex.Pattern;
 
 public class AperteWorkflowDefinitionGenerator {
 
-    public static final String ACTION = "ACTION";
-    public static final String RESULT = "RESULT";
+
     private final Logger logger = Logger.getLogger(AperteWorkflowDefinitionGenerator.class);
     private String AUTO_STEP_ACTION_CLASS = Platform.getInstance().getPlatformProperties().getAperteStepActionClass();
     private String AUTO_STEP_ACTION_CLASS_PATH = Platform.getInstance().getPlatformProperties().getAperteStepActionClassPackage() + "." + AUTO_STEP_ACTION_CLASS;
@@ -204,8 +204,8 @@ public class AperteWorkflowDefinitionGenerator {
         return converter.getDefinitionsFromDiagram();
     }
 
-    public List<String> getSubProcessNamesFromJson(String json) throws JSONException {
-        List<String> subprocessNames = new ArrayList<String>();
+    public Set<String> getSubProcessNamesFromJson(String json) throws JSONException {
+        Set<String> subprocessNames = new HashSet<String>();
         JSONObject jsonObj = new JSONObject(json);
         JSONArray childShapes = jsonObj.getJSONArray("childShapes");
         for (int i = 0; i < childShapes.length(); i++) {
@@ -303,7 +303,7 @@ public class AperteWorkflowDefinitionGenerator {
         String attributeMap = generateAttributeMap(aperteCfg);
         String script = generateScript(stepName, attributeMap);
         propertiesObj.put("script", script);
-        processOutgoingConditions(obj, resourceIdMap, propertiesObj, RESULT);
+        processOutgoingConditions(obj, resourceIdMap, propertiesObj, ConditionProperties.RESULT);
     }
 
     private String generateAttributeMap(JSONObject aperteCfg) throws JSONException {
@@ -355,8 +355,9 @@ public class AperteWorkflowDefinitionGenerator {
     private List<Property> preparePropertyList(String jsonForBpmn20) {
         List<Property> propertyList = new ArrayList<Property>();
         Set<String> lisOfVariables = findAllVariables(jsonForBpmn20);
-        lisOfVariables.add(ACTION);
-        lisOfVariables.add(RESULT);
+        lisOfVariables.add(ConditionProperties.ACTION);
+        lisOfVariables.add(ConditionProperties.RESULT);
+        lisOfVariables.add(ConditionProperties.CONDITION);
         for (String variable : lisOfVariables) {
             Property property = new Property();
             property.setId(variable);
