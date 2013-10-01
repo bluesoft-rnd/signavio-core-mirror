@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import pl.net.bluesoft.rnd.processtool.editor.AperteWorkflowDefinitionGenerator;
+import pl.net.bluesoft.rnd.processtool.editor.IndentedStringBuilder;
 import pl.net.bluesoft.rnd.processtool.editor.XmlUtil;
 
 import java.util.*;
@@ -94,17 +95,20 @@ public class AperteTransition extends AperteObject {
 		return sb.toString();
 	}
 	
-	public String generateStateActionXML() {
-		StringBuffer sb = new StringBuffer();
+	public void generateStateActionXML(IndentedStringBuilder sb) {
 		sb.append(String.format("<config.ProcessStateAction bpmName=\"%s\" buttonName=\"%s\" ", name, buttonName));
 		for (String name : actionAutowiredProperties.keySet()) {
-			sb.append(String.format("%s=\"%s\" ", name, actionAutowiredProperties.get(name)));
+			Object value = actionAutowiredProperties.get(name);
+			if (value != null) {
+				sb.append(String.format("%s=\"%s\" ", name, value));
+			}
 		}
-	    sb.append(" >\n");
+	    sb.append(">\n");
+		sb.begin();
 	    sb.append(generateActionPermissionsXML());
 	    sb.append(generateActionAttributesXML());
+		sb.end();
 	    sb.append("</config.ProcessStateAction>\n");
-	    return sb.toString();
 	}
   
 	public void fillBasicProperties(JSONObject json) throws JSONException {
@@ -175,12 +179,11 @@ public class AperteTransition extends AperteObject {
 
 	private boolean isPriorityisFilledCorrect(String actionProperties){
 		if (actionProperties!=null && !actionProperties.isEmpty()) {
-		Pattern patern = Pattern.compile("\"priority\":\"\\d*\"");
-		Matcher matcher = patern.matcher(actionProperties);
-		return matcher.find();
+			Pattern patern = Pattern.compile("\"priority\":\"\\d*\"");
+			Matcher matcher = patern.matcher(actionProperties);
+			return matcher.find();
 		}
 		return true;
-		
 	}
 
 	

@@ -48,14 +48,16 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static pl.net.bluesoft.rnd.processtool.editor.XmlUtil.hasText;
+
 public class AperteWorkflowDefinitionGenerator {
 
 
     private final Logger logger = Logger.getLogger(AperteWorkflowDefinitionGenerator.class);
     private String AUTO_STEP_ACTION_CLASS = Platform.getInstance().getPlatformProperties().getAperteStepActionClass();
     private String AUTO_STEP_ACTION_CLASS_PATH = Platform.getInstance().getPlatformProperties().getAperteStepActionClassPackage() + "." + AUTO_STEP_ACTION_CLASS;
-    private Map<String, AperteComponent> componentMap = new HashMap<String, AperteComponent>();
-    private Map<String, AperteTransition> transitionMap = new HashMap<String, AperteTransition>();
+    private Map<String, AperteComponent> componentMap = new TreeMap<String, AperteComponent>();
+    private Map<String, AperteTransition> transitionMap = new TreeMap<String, AperteTransition>();
     private String json;
     private ProcessConfig processConfig;
     private String processName;
@@ -87,7 +89,7 @@ public class AperteWorkflowDefinitionGenerator {
             String aperteData = getAperteData(props.getServerName() + props.getJbpmGuiUrl() + props.getAperteConfigurationUrl());
             processDefinitionLanguage = new JSONObject(aperteData).optString("definitionLanguage");
             //processDefinitionLanguage = jsonObj.getJSONObject(JsonConstants.PROPERTIES.getName()).optString("aperte-language");
-            if (processDefinitionLanguage == null || "".equals(processDefinitionLanguage)) {
+            if (processDefinitionLanguage == null || processDefinitionLanguage.isEmpty()) {
                 processDefinitionLanguage = "bpmn20";//for old process definitions
             }
             if (StringUtils.isEmpty(processName)) {
@@ -205,7 +207,7 @@ public class AperteWorkflowDefinitionGenerator {
     }
 
     public Set<String> getSubProcessNamesFromJson(String json) throws JSONException {
-        Set<String> subprocessNames = new HashSet<String>();
+        Set<String> subprocessNames = new TreeSet<String>();
         JSONObject jsonObj = new JSONObject(json);
         JSONArray childShapes = jsonObj.getJSONArray("childShapes");
         for (int i = 0; i < childShapes.length(); i++) {
@@ -292,8 +294,6 @@ public class AperteWorkflowDefinitionGenerator {
     }
 
     private void enrichBpmn20JavaTask(JSONObject obj, Map<String, JSONObject> resourceIdMap) throws JSONException {
-
-
         JSONObject propertiesObj = obj.getJSONObject(JsonConstants.PROPERTIES.getName());
         JSONObject aperteCfg = new JSONObject(propertiesObj.getString("aperte-conf"));
 
@@ -315,7 +315,7 @@ public class AperteWorkflowDefinitionGenerator {
             while (keys.hasNext()) {
                 String key = (String) keys.next();
                 String value = decodeValues(aperteCfg.getString(key));
-                scriptAttributeMap.append(comma + "'" + key + "' : " + "'" + value + "'");
+                scriptAttributeMap.append(comma).append("'").append(key).append("' : ").append("'").append(value).append("'");
                 comma = ",";
             }
             scriptAttributeMap.append("]");
@@ -329,13 +329,13 @@ public class AperteWorkflowDefinitionGenerator {
 
     private String generateScript(String taskName, String attributeMap) {
         StringBuilder script = new StringBuilder();
-        script.append("jbpmStepAction = new " + AUTO_STEP_ACTION_CLASS + "();");
-        script.append("\n");
+        script.append("jbpmStepAction = new ").append(AUTO_STEP_ACTION_CLASS).append("();");
+        script.append('\n');
         script.append(" processId =kcontext.getProcessInstance().getId();");
-        script.append("\n");
+        script.append('\n');
         script.append(" processIdString =String.valueOf(processId);");
-        script.append("\n");
-        script.append("jbpmStepAction.invoke(processIdString,'" + taskName + "'," + attributeMap + ");");
+        script.append('\n');
+        script.append("jbpmStepAction.invoke(processIdString,'").append(taskName).append("',").append(attributeMap).append(");");
         return script.toString();
     }
 
@@ -364,13 +364,11 @@ public class AperteWorkflowDefinitionGenerator {
             property.setItemSubjectRef(ItemKind._STRING);
             propertyList.add(property);
         }
-
-
         return propertyList;
     }
 
     private Set<String> findAllVariables(String jsonForBpmn20) {
-        Set<String> variables = new HashSet<String>();
+        Set<String> variables = new TreeSet<String>();
         String regex = "#\\{[a-zA-Z0-9]*\\}";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(jsonForBpmn20);
@@ -410,7 +408,6 @@ public class AperteWorkflowDefinitionGenerator {
             }
         }
         return null;
-
     }
 
     private void addAutoStepClassImport(Process process) {
@@ -469,7 +466,6 @@ public class AperteWorkflowDefinitionGenerator {
                     }
                 }
             }
-
         }
     }
 
@@ -508,104 +504,185 @@ public class AperteWorkflowDefinitionGenerator {
                 propertiesObj.remove("resources");
             propertiesObj.put("resources", resources);//overwrite
         }
-
-
         propertiesObj.put("implementation", "unspecified");
         processOutgoingConditions(obj, resourceIdMap, propertiesObj, "ACTION");
-
     }
 
+	//processtool-config.xml generation
+
     public String generateProcessToolConfig() {
-        StringBuffer ptc = new StringBuffer();
+        IndentedStringBuilder ptc = new IndentedStringBuilder(8*1024);
+
         ptc.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        ptc.append(String.format("<config.ProcessDefinitionConfig bpmDefinitionKey=\"%s\" description=\"%s\" processName=\"%s\"", processName, processName, processName));
+        ptc.append(String.format(
+				"<config.ProcessDefinitionConfig bpmDefinitionKey=\"%s\" description=\"%s\" processName=\"%s\"",
+				processName, processName, processName));
 
         if (processConfig != null) {
+			if (hasText(processConfig.getDefaultStepInfo())) {
+            	ptc.append(" defaultStepInfoPattern=\"");
+				ptc.append(processConfig.getDefaultStepInfo());
+				ptc.append('"');
+			}
 
-            ptc.append(String.format(" taskItemClass=\"%s\">\n", processConfig.getTaskItemClass()));
+			String usedLanguagesStr = getUsedLanguagesStr(processConfig.getUsedLanguages());
 
-            if (processConfig.getComment() != null && !processConfig.getComment().isEmpty()) {
-                ptc.append(String.format("<comment>%s</comment>", XmlUtil.wrapCDATA(processConfig.getComment())));
-            }
+			if (hasText(usedLanguagesStr)) {
+				ptc.append(" supportedLocales=\"");
+				ptc.append(usedLanguagesStr);
+				ptc.append('"');
+			}
 
-            if (processConfig.getProcessPermissions() != null && !processConfig.getProcessPermissions().isEmpty()) {
-                ptc.append("<permissions>\n");
+			ptc.append(">\n");
 
-                for (Permission permission : processConfig.getProcessPermissions()) {
-                    ptc.append(String.format("<config.ProcessDefinitionPermission privilegeName=\"%s\" roleName=\"%s\"/>", permission.getPrivilegeName(), permission.getRoleName()));
-                }
-
-                ptc.append("</permissions>\n");
-            }
-
-        } else {
-            ptc.append(String.format(">\n"));
+			ptc.begin();
+			generateComment(ptc);
+			generatePermissions(ptc);
+			ptc.end();
+        }
+		else {
+            ptc.append(">\n");
         }
 
-        ptc.append("<states>\n");
+		ptc.begin();
+		generateStates(ptc);
+		ptc.end();
 
-        //processtool-config.xml generation
-        for (String key : componentMap.keySet()) {
-            AperteComponent cmp = componentMap.get(key);
-            if (cmp instanceof AperteStepEditorNode) {
-                AperteStepEditorNode task = (AperteStepEditorNode) cmp;
-                if (task.getWidget() != null) {
-                    ptc.append(task.generateWidgetXML());
-                }
-            }
-        }
-
-        ptc.append("</states>\n");
         ptc.append("</config.ProcessDefinitionConfig>\n");
         return ptc.toString();
     }
 
-    public AperteComponent findComponent(String key) {
+	private void generateComment(IndentedStringBuilder ptc) {
+		if (hasText(processConfig.getComment())) {
+			ptc.append("<comment>");
+			ptc.append(XmlUtil.wrapCDATA(processConfig.getComment()));
+			ptc.append("</comment>\n");
+		}
+	}
+
+	private void generatePermissions(IndentedStringBuilder ptc) {
+		if (processConfig.getProcessPermissions() != null && !processConfig.getProcessPermissions().isEmpty()) {
+			ptc.append("<permissions>\n");
+			ptc.begin();
+
+			for (Permission permission : processConfig.getProcessPermissions()) {
+				generatePermission(ptc, permission);
+			}
+
+			ptc.end();
+			ptc.append("</permissions>\n");
+		}
+	}
+
+	private void generatePermission(IndentedStringBuilder ptc, Permission permission) {
+		ptc.append("<config.ProcessDefinitionPermission privilegeName=\"");
+		ptc.append(permission.getPrivilegeName());
+		ptc.append("\" roleName=\"");
+		ptc.append(permission.getRoleName());
+		ptc.append("\"/>\n");
+	}
+
+	private void generateStates(IndentedStringBuilder ptc) {
+		ptc.append("<states>\n");
+		ptc.begin();
+
+		for (Map.Entry<String, AperteComponent> stringAperteComponentEntry : componentMap.entrySet()) {
+			AperteComponent cmp = stringAperteComponentEntry.getValue();
+			if (cmp instanceof AperteStepEditorNode) {
+				AperteStepEditorNode task = (AperteStepEditorNode) cmp;
+				if (task.getWidget() != null) {
+					task.generateWidgetXML(ptc);
+				}
+			}
+		}
+		ptc.end();
+		ptc.append("</states>\n");
+	}
+
+	private String getUsedLanguagesStr(Collection<String> languages) {
+		if (languages.isEmpty()) {
+			return null;
+		}
+
+		StringBuilder sb = new StringBuilder();
+		boolean first = true;
+
+		for (String language : languages) {
+			if (first) {
+				first = false;
+			}
+			else {
+				sb.append(',');
+			}
+			sb.append(language);
+		}
+		return sb.toString();
+	}
+
+	public AperteComponent findComponent(String key) {
         return componentMap.get(key);
     }
 
     public String generateQueuesConfig() {
+        IndentedStringBuilder q = new IndentedStringBuilder(1024);
 
-        StringBuffer q = new StringBuffer();
         q.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         q.append("<list>\n");
 
         if (processConfig != null) {
             if (processConfig.getQueues() != null && !processConfig.getQueues().isEmpty()) {
+				q.begin();
                 for (Queue queue : processConfig.getQueues()) {
-                    String description = queue.getDescription();
-                    if (description == null) {
-                        description = queue.getName();
-                    }
-
-                    q.append(String.format(
-                            "<config.ProcessQueueConfig name=\"%s\" description=\"%s\">\n",
-                            queue.getName(),
-                            description
-                    ));
-                    q.append("<rights>\n");
-
-                    if (queue.getRolePermissions() != null && !queue.getRolePermissions().isEmpty()) {
-                        for (QueueRolePermission rolePermission : queue.getRolePermissions()) {
-                            q.append(String.format(
-                                    "<config.ProcessQueueRight roleName=\"%s\" browseAllowed=\"%b\"/>\n",
-                                    rolePermission.getRoleName(),
-                                    rolePermission.isBrowsingAllowed()
-                            ));
-                        }
-                    }
-
-                    q.append("</rights>\n");
-                    q.append("</config.ProcessQueueConfig>\n");
+					generateQueueConfig(q, queue);
                 }
+				q.end();
             }
         }
-
         q.append("</list>\n");
         return q.toString();
     }
 
-    public String getProcessDefinitionLanguage() {
+	private void generateQueueConfig(IndentedStringBuilder q, Queue queue) {
+		String description = queue.getDescription();
+		if (description == null) {
+			description = queue.getName();
+		}
+
+		q.append(String.format(
+				"<config.ProcessQueueConfig name=\"%s\" description=\"%s\">\n",
+				queue.getName(),
+				description
+		));
+
+		q.begin();
+		generateRights(q, queue);
+		q.end();
+
+		q.append("</config.ProcessQueueConfig>\n");
+	}
+
+	private void generateRights(IndentedStringBuilder q, Queue queue) {
+		q.append("<rights>\n");
+
+		if (queue.getRolePermissions() != null && !queue.getRolePermissions().isEmpty()) {
+			q.begin();
+			for (QueueRolePermission rolePermission : queue.getRolePermissions()) {
+				generateQueuePermission(q, rolePermission);
+			}
+			q.end();
+		}
+		q.append("</rights>\n");
+	}
+
+	private void generateQueuePermission(IndentedStringBuilder q, QueueRolePermission rolePermission) {
+		q.append(String.format(
+				"<config.ProcessQueueRight roleName=\"%s\" browseAllowed=\"%b\"/>\n",
+				rolePermission.getRoleName(),
+				rolePermission.isBrowsingAllowed()
+		));
+	}
+
+	public String getProcessDefinitionLanguage() {
         return processDefinitionLanguage;
     }
 
@@ -687,7 +764,7 @@ public class AperteWorkflowDefinitionGenerator {
             URL url = new URL(aperteUrl);
             URLConnection conn = url.openConnection();
             BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             String line;
             while ((line = rd.readLine()) != null) {
                 sb.append(line);
@@ -708,6 +785,5 @@ public class AperteWorkflowDefinitionGenerator {
 
         return null;
     }
-
 }
 
