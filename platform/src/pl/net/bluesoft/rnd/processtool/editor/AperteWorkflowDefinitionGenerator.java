@@ -51,17 +51,14 @@ import java.util.regex.Pattern;
 import static pl.net.bluesoft.rnd.processtool.editor.XmlUtil.hasText;
 
 public class AperteWorkflowDefinitionGenerator {
-
-
-    private final Logger logger = Logger.getLogger(AperteWorkflowDefinitionGenerator.class);
-    private String AUTO_STEP_ACTION_CLASS = Platform.getInstance().getPlatformProperties().getAperteStepActionClass();
-    private String AUTO_STEP_ACTION_CLASS_PATH = Platform.getInstance().getPlatformProperties().getAperteStepActionClassPackage() + "." + AUTO_STEP_ACTION_CLASS;
+    private static final Logger logger = Logger.getLogger(AperteWorkflowDefinitionGenerator.class);
+    private static final String AUTO_STEP_ACTION_CLASS = Platform.getInstance().getPlatformProperties().getAperteStepActionClass();
+    private static final String AUTO_STEP_ACTION_CLASS_PATH = Platform.getInstance().getPlatformProperties().getAperteStepActionClassPackage() + "." + AUTO_STEP_ACTION_CLASS;
     private Map<String, AperteComponent> componentMap = new TreeMap<String, AperteComponent>();
     private Map<String, AperteTransition> transitionMap = new TreeMap<String, AperteTransition>();
     private String json;
     private ProcessConfig processConfig;
     private String processName;
-    //private String processId;
     private String processFileName;
     private String bundleDesc;
     private String bundleName;
@@ -519,6 +516,12 @@ public class AperteWorkflowDefinitionGenerator {
 				processName, processName, processName));
 
         if (processConfig != null) {
+			if (hasText(processConfig.getExternalKeyPattern())) {
+				ptc.append(" externalKeyPattern=\"");
+				ptc.append(processConfig.getExternalKeyPattern());
+				ptc.append('"');
+			}
+
 			if (hasText(processConfig.getDefaultStepInfo())) {
             	ptc.append(" defaultStepInfoPattern=\"");
 				ptc.append(processConfig.getDefaultStepInfo());
