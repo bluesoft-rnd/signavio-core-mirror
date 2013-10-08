@@ -29,8 +29,8 @@ public class AperteTransition extends AperteObject {
     //action properties
     private String buttonName;
     private List<String> actionPermissions = new ArrayList<String>();
-    private Map<String,Object> actionAttributes = new HashMap<String,Object>();
-    private Map<String,Object> actionAutowiredProperties = new HashMap<String,Object>();
+    private Map<String,Object> actionAttributes = new TreeMap<String,Object>();
+    private Map<String,Object> actionAutowiredProperties = new TreeMap<String,Object>();
     
     //for 'decision'
     private String condition;
@@ -67,32 +67,28 @@ public class AperteTransition extends AperteObject {
 		this.buttonName = buttonName;
 	}
 
-	private String generateActionPermissionsXML() {
-		StringBuffer sb = new StringBuffer();
+	private void generateActionPermissionsXML(IndentedStringBuilder sb) {
 		if (!actionPermissions.isEmpty()) {
-		  sb.append("<permissions>\n");
+			sb.append("<permissions>\n");
+			sb.begin();
+			for (String perm : actionPermissions) {
+				sb.append(String.format("<config.ProcessStateActionPermission roleName=\"%s\" />\n", perm));
+			}
+			sb.end();
+			sb.append("</permissions>\n");
 		}
-		for (String perm : actionPermissions) {
-			sb.append(String.format("<config.ProcessStateActionPermission roleName=\"%s\" />\n", perm));
-		}
-		if (!actionPermissions.isEmpty()) {
-		  sb.append("</permissions>\n");
-		}
-		return sb.toString();
 	}
 	
-	private String generateActionAttributesXML() {
-		StringBuffer sb = new StringBuffer();
+	private void generateActionAttributesXML(IndentedStringBuilder sb) {
 		if (!actionAttributes.isEmpty()) {
 			sb.append("<attributes>\n");
-
+			sb.begin();
 			for (String name : actionAttributes.keySet()) {
 				sb.append(String.format("<config.ProcessStateActionAttribute name=\"%s\" value=\"%s\" />\n", name, actionAttributes.get(name)));
 			}
-
+			sb.end();
 			sb.append("</attributes>\n");
 		}
-		return sb.toString();
 	}
 	
 	public void generateStateActionXML(IndentedStringBuilder sb) {
@@ -105,8 +101,8 @@ public class AperteTransition extends AperteObject {
 		}
 	    sb.append(">\n");
 		sb.begin();
-	    sb.append(generateActionPermissionsXML());
-	    sb.append(generateActionAttributesXML());
+	    generateActionPermissionsXML(sb);
+	    generateActionAttributesXML(sb);
 		sb.end();
 	    sb.append("</config.ProcessStateAction>\n");
 	}

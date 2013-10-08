@@ -154,7 +154,6 @@ public class AperteWorkflowDefinitionGenerator {
                 cmp.putTransition(resourceId, transition);
                 jpdlComponent.putIncomingTransition(resourceId, transition);
             }
-
         }
     }
        //TODO remove after tests
@@ -482,12 +481,7 @@ public class AperteWorkflowDefinitionGenerator {
             o.put("resourceassignmentexpr", assignee);
             items.put(o);
         }
-        if (candidateGroups != null && !candidateGroups.trim().isEmpty()) {
-            JSONObject o = new JSONObject();
-            o.put("resource_type", "potentialOwner");
-            o.put("resourceassignmentexpr", candidateGroups);
-            items.put(o);
-        }
+		// candidate groups are used in TaskFactory
         // if (taskName != null && !taskName.trim().isEmpty()) {
         JSONObject ioSpecification = new JSONObject();
         ioSpecification.put("resource_type", "ioSpecification");
@@ -518,13 +512,13 @@ public class AperteWorkflowDefinitionGenerator {
         if (processConfig != null) {
 			if (hasText(processConfig.getExternalKeyPattern())) {
 				ptc.append(" externalKeyPattern=\"");
-				ptc.append(processConfig.getExternalKeyPattern());
+				ptc.append(XmlUtil.encodeXmlEcscapeCharacters(processConfig.getExternalKeyPattern()));
 				ptc.append('"');
 			}
 
 			if (hasText(processConfig.getDefaultStepInfo())) {
             	ptc.append(" defaultStepInfoPattern=\"");
-				ptc.append(processConfig.getDefaultStepInfo());
+				ptc.append(XmlUtil.encodeXmlEcscapeCharacters(processConfig.getDefaultStepInfo()));
 				ptc.append('"');
 			}
 
@@ -589,17 +583,32 @@ public class AperteWorkflowDefinitionGenerator {
 		ptc.append("<states>\n");
 		ptc.begin();
 
-		for (Map.Entry<String, AperteComponent> stringAperteComponentEntry : componentMap.entrySet()) {
-			AperteComponent cmp = stringAperteComponentEntry.getValue();
-			if (cmp instanceof AperteStepEditorNode) {
-				AperteStepEditorNode task = (AperteStepEditorNode) cmp;
-				if (task.getWidget() != null) {
-					task.generateWidgetXML(ptc);
-				}
+		for (AperteStepEditorNode task : getStatesOrderdByName()) {
+			if (task.getWidget() != null) {
+				task.generateWidgetXML(ptc);
 			}
 		}
 		ptc.end();
 		ptc.append("</states>\n");
+	}
+
+	private List<AperteStepEditorNode> getStatesOrderdByName() {
+		List<AperteStepEditorNode> result = new ArrayList<AperteStepEditorNode>();
+
+		for (Map.Entry<String, AperteComponent> entry : componentMap.entrySet()) {
+			AperteComponent cmp = entry.getValue();
+			if (cmp instanceof AperteStepEditorNode) {
+				AperteStepEditorNode task = (AperteStepEditorNode) cmp;
+				result.add(task);
+			}
+		}
+		Collections.sort(result, new Comparator<AperteStepEditorNode>() {
+			@Override
+			public int compare(AperteStepEditorNode n1, AperteStepEditorNode n2) {
+				return n1.getName().compareTo(n2.getName());
+			}
+		});
+		return result;
 	}
 
 	private String getUsedLanguagesStr(Collection<String> languages) {

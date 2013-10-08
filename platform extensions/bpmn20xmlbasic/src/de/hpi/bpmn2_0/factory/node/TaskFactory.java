@@ -117,9 +117,10 @@ public class TaskFactory extends AbstractActivityFactory {
         Map<IoSpecyficationNames, String> propertyMap = new HashMap<IoSpecyficationNames, String>();
         propertyMap.put(IoSpecyficationNames.TASK_NAME, shape.getProperty("name"));
         propertyMap.put(IoSpecyficationNames.PRIORITY, aperteCfg.optString("priority"));
+		if (aperteCfg.optString("candidate_groups") != null && !aperteCfg.optString("candidate_groups").isEmpty()) {
+			propertyMap.put(IoSpecyficationNames.GROUP_ID, aperteCfg.optString("candidate_groups"));
+		}
         fillTaskWithIoSpecification(task, propertyMap);
-
-
 
 		/* Set implementation property */
         String implementation = shape.getProperty("implementation");

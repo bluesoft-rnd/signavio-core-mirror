@@ -13,10 +13,7 @@ import pl.net.bluesoft.rnd.processtool.editor.Widget;
 import pl.net.bluesoft.rnd.processtool.editor.XmlUtil;
 import pl.net.bluesoft.rnd.processtool.editor.jpdl.components.StencilNames;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static pl.net.bluesoft.rnd.processtool.editor.XmlUtil.hasText;
 
@@ -136,12 +133,15 @@ public  class AperteStepEditorNode extends AperteTask {
 	}
 
 	public void generateWidgetXML(IndentedStringBuilder sb) {
-		sb.append(String.format("<config.ProcessStateConfiguration description=\"%s\" name=\"%s\"",
-				description, name));
+		sb.append("<config.ProcessStateConfiguration name=\"").append(name).append('"');
+
+		if (hasText(description)) {
+			sb.append(" description=\"").append(description).append('"');
+		}
 
 		if (hasText(stepInfoPattern)) {
 			sb.append(" stepInfoPattern=\"");
-			sb.append(stepInfoPattern);
+			sb.append(XmlUtil.encodeXmlEcscapeCharacters(stepInfoPattern));
 			sb.append('"');
 		}
 
@@ -170,13 +170,9 @@ public  class AperteStepEditorNode extends AperteTask {
 			AperteTransition next = outgoing.values().iterator().next();
 			AperteComponent component = generator.findComponent(next.getTarget());
 			if (StencilNames.EXCLUSIVE_DATABASED_GATEWAY.equalsStencilName(component.getStencilId())) {
-				for (AperteTransition trans : component.getOutgoing().values()) {
-					trans.generateStateActionXML(sb);
-				}
+				generateActions(sb, component.getOutgoing().values());
 			} else {// normal button,
-				for (AperteTransition trans : outgoing.values()) {
-					trans.generateStateActionXML(sb);
-				}
+				generateActions(sb, outgoing.values());
 			}
 			sb.end();
 			sb.append("</actions>\n");
@@ -184,6 +180,23 @@ public  class AperteStepEditorNode extends AperteTask {
 		generateStatePermissionsXML(sb, permissions);
 		sb.end();
 		sb.append("</config.ProcessStateConfiguration>\n");
+	}
+
+	private void generateActions(IndentedStringBuilder sb, Collection<AperteTransition> transitions) {
+		for (AperteTransition trans : getTransitionsOrderedByName(transitions)) {
+			trans.generateStateActionXML(sb);
+		}
+	}
+
+	private List<AperteTransition> getTransitionsOrderedByName(Collection<AperteTransition> transitions) {
+		List<AperteTransition> result = new ArrayList<AperteTransition>(transitions);
+		Collections.sort(result, new Comparator<AperteTransition>() {
+			@Override
+			public int compare(AperteTransition t1, AperteTransition t2) {
+				return t1.getName().compareTo(t2.getName());
+			}
+		});
+		return result;
 	}
 
 	private void generateWidgetPermissionsXML(IndentedStringBuilder sb, List<Permission> permissions) {

@@ -11,7 +11,7 @@ public class XmlUtil {
         new StringPair(">", "&gt;"),
         new StringPair("\"", "&quot;"),
         new StringPair("&", "&amp;"),
-        new StringPair("\'", "&#039;") // TODO why ' is escaped with \?
+        new StringPair("\'", "&apos;")
     };
 
     /**
