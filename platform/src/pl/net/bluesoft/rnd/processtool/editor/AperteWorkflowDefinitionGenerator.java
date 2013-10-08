@@ -516,6 +516,12 @@ public class AperteWorkflowDefinitionGenerator {
 				ptc.append('"');
 			}
 
+			if (hasText(processConfig.getProcessGroup())) {
+				ptc.append(" processGroup=\"");
+				ptc.append(XmlUtil.encodeXmlEcscapeCharacters(processConfig.getProcessGroup()));
+				ptc.append('"');
+			}
+
 			if (hasText(processConfig.getDefaultStepInfo())) {
             	ptc.append(" defaultStepInfoPattern=\"");
 				ptc.append(XmlUtil.encodeXmlEcscapeCharacters(processConfig.getDefaultStepInfo()));
