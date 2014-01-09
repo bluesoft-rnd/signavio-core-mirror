@@ -54,6 +54,12 @@ public class AperteWorkflowDefinitionGenerator {
     private static final Logger logger = Logger.getLogger(AperteWorkflowDefinitionGenerator.class);
     private static final String AUTO_STEP_ACTION_CLASS = Platform.getInstance().getPlatformProperties().getAperteStepActionClass();
     private static final String AUTO_STEP_ACTION_CLASS_PATH = Platform.getInstance().getPlatformProperties().getAperteStepActionClassPackage() + "." + AUTO_STEP_ACTION_CLASS;
+
+    private static final String[] EXCLUDED_WORDS = {
+            "AND", "OR", "NOT"
+    };
+
+
     private Map<String, AperteComponent> componentMap = new TreeMap<String, AperteComponent>();
     private Map<String, AperteTransition> transitionMap = new TreeMap<String, AperteTransition>();
     private String json;
@@ -373,7 +379,42 @@ public class AperteWorkflowDefinitionGenerator {
             group = removeSufixAndPrefix(group);
             variables.add(group);
         }
+
+        /* Look for variables in conditional expressions */
+        variables.addAll(findAllVariabledInConditionalExpressions(jsonForBpmn20));
         return variables;
+    }
+
+    private Set<String> findAllVariabledInConditionalExpressions(String jsonForBpm20)
+    {
+        Set<String> variables = new TreeSet<String>();
+        String regex = "(?<=\"return\\s)(.*?)(?=\")";
+        String innerRegex = "(?<![\\S'])[A-Za-z]+";
+        Pattern pattern = Pattern.compile(regex);
+        Pattern innerPattern = Pattern.compile(innerRegex);
+        Matcher matcher = pattern.matcher(jsonForBpm20);
+        while (matcher.find())
+        {
+            String group = matcher.group();
+            Matcher innerMatcher = innerPattern.matcher(group);
+            while (innerMatcher.find())
+            {
+                String innerGroup = innerMatcher.group();
+                if(isValid(innerGroup))
+                    variables.add(innerGroup);
+            }
+        }
+
+        return variables;
+    }
+
+    private boolean isValid(String word)
+    {
+        String upperCasedWord = word.toUpperCase();
+        for(String filteredWord: EXCLUDED_WORDS)
+            if(filteredWord.equals(upperCasedWord))
+                return false;
+        return true;
     }
 
     private String removeSufixAndPrefix(String group) {
