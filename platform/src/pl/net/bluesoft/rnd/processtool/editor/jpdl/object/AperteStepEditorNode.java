@@ -38,8 +38,12 @@ public  class AperteStepEditorNode extends AperteTask {
 		super.fillBasicProperties(json);
 
 		// Properties from Step Editor attributes
-		String widgetJson = json.getJSONObject("properties").getString(
-				"aperte-conf");
+		String widgetJson = json.getJSONObject("properties").getString("aperte-conf");
+
+		fillWidget(widgetJson, true);
+	}
+
+	private void fillWidget(String widgetJson, boolean validate) throws JSONException {
 		if (widgetJson != null && !widgetJson.trim().isEmpty()) {
 			widget = new Widget();
 			widgetJson = XmlUtil.decodeXmlEscapeCharacters(widgetJson);
@@ -61,7 +65,9 @@ public  class AperteStepEditorNode extends AperteTask {
 			permissions = generatePermissionsFromJSON(widgetJsonObj
 					.optJSONArray("step-permissions"));
 
-			checkAssignee();
+			if (validate) {
+				checkAssignee();
+			}
 			JSONArray children = widgetJsonObj.optJSONArray("children");
 			JSONObject properties = widgetJsonObj.optJSONObject("properties");
 			JSONArray permissions = widgetJsonObj.optJSONArray("permissions");
@@ -180,11 +186,38 @@ public  class AperteStepEditorNode extends AperteTask {
 		generateStatePermissionsXML(sb, permissions);
 		sb.end();
 		sb.append("</config.ProcessStateConfiguration>\n");
+
+		if (!outgoing.isEmpty()) {
+			AperteTransition next = outgoing.values().iterator().next();
+			AperteComponent component = generator.findComponent(next.getTarget());
+			if (StencilNames.EXCLUSIVE_DATABASED_GATEWAY.equalsStencilName(component.getStencilId())) {
+				generateActionPseudoStates(sb, component.getOutgoing().values());
+			}
+		}
 	}
 
 	private void generateActions(IndentedStringBuilder sb, Collection<AperteTransition> transitions) {
 		for (AperteTransition trans : getTransitionsOrderedByName(transitions)) {
 			trans.generateStateActionXML(sb);
+		}
+	}
+
+	private void generateActionPseudoStates(IndentedStringBuilder sb, Collection<AperteTransition> transitions) {
+		for (AperteTransition trans : getTransitionsOrderedByName(transitions)) {
+			if (trans.getWidgetsJson() == null || trans.getWidgetsJson().trim().isEmpty()) {
+				continue;
+			}
+
+			AperteStepEditorNode pseudoState = new AperteStepEditorNode(generator);
+
+			try {
+				pseudoState.fillWidget(trans.getWidgetsJson(), false);
+				pseudoState.name = this.name + "__" + trans.name;
+				pseudoState.generateWidgetXML(sb);
+			}
+			catch (JSONException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 

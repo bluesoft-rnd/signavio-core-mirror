@@ -1,6 +1,7 @@
 package pl.net.bluesoft.rnd.processtool.editor.jpdl.object;
 
 import com.signavio.platform.exceptions.RequestException;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -9,14 +10,16 @@ import pl.net.bluesoft.rnd.processtool.editor.AperteWorkflowDefinitionGenerator;
 import pl.net.bluesoft.rnd.processtool.editor.IndentedStringBuilder;
 import pl.net.bluesoft.rnd.processtool.editor.XmlUtil;
 
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
 public class AperteTransition extends AperteObject {
+	public static final String ACTION_PSEUDO_STATE_WIDGETS = "actionPseudoStateWidgets";
 
-    public AperteTransition(AperteWorkflowDefinitionGenerator generator) {
+	public AperteTransition(AperteWorkflowDefinitionGenerator generator) {
         super(generator);
     }
 
@@ -31,6 +34,7 @@ public class AperteTransition extends AperteObject {
     private List<String> actionPermissions = new ArrayList<String>();
     private Map<String,Object> actionAttributes = new TreeMap<String,Object>();
     private Map<String,Object> actionAutowiredProperties = new TreeMap<String,Object>();
+	private String widgetsJson;
     
     //for 'decision'
     private String condition;
@@ -116,10 +120,8 @@ public class AperteTransition extends AperteObject {
 		
 		if(!isPriorityisFilledCorrect(ap)){
 			throw new JSONException("Priority field in:  '" + name + "' transition must be filled with number!");
-			
 		}
-		
-		
+
 		JSONArray dockerArray = json.getJSONArray("dockers");
 		
 		dockers = new ArrayList<Docker>();
@@ -131,8 +133,6 @@ public class AperteTransition extends AperteObject {
 			int y = round(docker.getString("y"));
 			dockers.add(new Docker(x, y));
 		}
-		
-		
 		
 		if (json.optJSONObject("target") != null) {
 		  target = json.getJSONObject("target").optString("resourceId");
@@ -158,11 +158,25 @@ public class AperteTransition extends AperteObject {
 		}
 
 		loadAttributeMap(properties, "action-properties", actionAutowiredProperties);
+
 		loadAttributeMap(properties, "action-attributes", actionAttributes);
+
+		if (actionAttributes.containsKey(ACTION_PSEUDO_STATE_WIDGETS)) {
+			widgetsJson = (String)actionAttributes.get(ACTION_PSEUDO_STATE_WIDGETS);
+			actionAttributes.remove(ACTION_PSEUDO_STATE_WIDGETS);
+
+			if (widgetsJson != null && !widgetsJson.isEmpty()) {
+				widgetsJson = new String(Base64.decodeBase64(widgetsJson), Charset.forName("UTF-8"));
+			}
+		}
 	}
 
 	private void loadAttributeMap(JSONObject properties, String propertyName, Map<String, Object> targetMap) throws JSONException {
 		String autowiredProps = properties.optString(propertyName);
+		loadAttributeMap(autowiredProps, targetMap);
+	}
+
+	private void loadAttributeMap(String autowiredProps, Map<String, Object> targetMap) throws JSONException {
 		if (!StringUtils.isEmpty(autowiredProps)) {
 			JSONObject jsonObj = new JSONObject(XmlUtil.decodeXmlEscapeCharacters(autowiredProps));
 			Iterator i = jsonObj.keys();
@@ -182,7 +196,10 @@ public class AperteTransition extends AperteObject {
 		return true;
 	}
 
-	
+	public String getWidgetsJson() {
+		return widgetsJson;
+	}
+
 	public String getDockers(int offsetX, int offsetY) {
 		StringBuffer dockerString = new StringBuffer();
 		for(Docker d : dockers) {
