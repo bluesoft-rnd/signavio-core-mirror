@@ -5,12 +5,14 @@ import com.signavio.platform.core.PlatformProperties;
 import com.signavio.platform.exceptions.RequestException;
 import de.hpi.bpmn2_0.exceptions.BpmnConverterException;
 import de.hpi.bpmn2_0.factory.AbstractBpmnFactory;
-import de.hpi.bpmn2_0.model.BaseElement;
-import de.hpi.bpmn2_0.model.Definitions;
+import de.hpi.bpmn2_0.model.*;
 import de.hpi.bpmn2_0.model.Process;
+import de.hpi.bpmn2_0.model.activity.CallActivity;
 import de.hpi.bpmn2_0.model.activity.type.ScriptTask;
+import de.hpi.bpmn2_0.model.connector.DataInputAssociation;
 import de.hpi.bpmn2_0.model.extension.ExtensionElements;
 import de.hpi.bpmn2_0.model.extension.jbpm5.ImportClass;
+import de.hpi.bpmn2_0.model.misc.Assignment;
 import de.hpi.bpmn2_0.model.misc.ItemKind;
 import de.hpi.bpmn2_0.model.misc.Property;
 import de.hpi.bpmn2_0.transformation.Bpmn2XmlConverter;
@@ -427,6 +429,25 @@ public class AperteWorkflowDefinitionGenerator {
         process.setExecutable(true);
         process.setId(processName);
         process.getProperty().addAll(propertyList);
+
+        /* Add Transaformer to enable input and ouput mapping for subprocess */
+        for(FlowElement flowElement: process.getFlowElement())
+        {
+            if(flowElement instanceof CallActivity)
+            {
+                CallActivity callActivity = (CallActivity)flowElement;
+                for(DataInputAssociation dataInputAssociation: callActivity.getDataInputAssociation())
+                {
+                    String expresssion = "";
+                    Assignment assignment = dataInputAssociation.getAssignment().get(0);
+                    if(assignment != null)
+                        expresssion = assignment.getFrom();
+
+                    FormalExpression formalExpression = new FormalExpression(expresssion);
+                    dataInputAssociation.setTransformation(formalExpression);
+                }
+            }
+        }
     }
 
     private String convertDiagramToXml(Definitions bpmnDefinitions) throws JAXBException, SAXException, ParserConfigurationException, TransformerException {
